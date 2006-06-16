@@ -24,6 +24,9 @@
 #		Globally SORT all this stuff. How? Suggestions are welcome.
 #
 ###############################################################################
+# Version 8 2006.06.16: Improved explanation for Apple Backup 3 excludes.
+#			File is now	under SubVersion Control.  
+#
 # Version 7 2006.03.26	Cleaned up and added some more explanations
 #			Additions: 	.TemporaryItems/
 #
@@ -143,7 +146,7 @@
 - .icbu
 
 
-# Apple Backup 3.0 incompleted Backup Set (due to error during Backup)
+# Apple Backup 3.0 incompleted Backup Set (due to error during Backup or because the Backup is currently running)
 # Does it make sense to keep a FAILED backup of another Backup application?
 - .backXX
 # other filetypes used by Apple Backup 3.0 are
