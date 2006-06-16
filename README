@@ -1,0 +1,35 @@
+MacLemon Backup - README v46
+Please send feedback and suggestions to pepi@maclemon.at
+
+
+Disclaimer:
+	This software is provided as-is. It is in early alpha status and should be treated as such. Please do not solely rely on the backups made with MacLemon Backup.
+
+
+Installation:
+	See INSTALL on how to install all the necessary files to use MacLemon backup.
+
+
+Usage:
+	Create a config file for your backup.
+	Copy the included sampleconfig and edit the values accordingly.
+	The sample config you can find in /etc/maclemon/backup/demo.mlbackupconf.sample is (hopefully) well enough documented.
+
+
+Additions:
+	None of these are mandatory, but they provide some comfort.
+
+	If you have growl installed, mlbackup will make use of it.
+	For more info on growl see http://grwol.info/
+
+
+	If you have osxutils installed via fink, mlbackup will make use of it.
+	For more info on osxutils see http://sourceforge.net/projects/osxutils/
+	You can run `fink install osxutils` to install them if you have fink.
+	See http://fink.sf.net/ for info on fink.
+
+
+
+Known Bugs:
+	no manpage for mlbackup yet
+	If you backup to an external drive and that drive is not available when mlbackup runs there is no exception handling yet (in the works)

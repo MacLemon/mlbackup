@@ -1,0 +1,76 @@
+Version History for MacLemon Backup
+-------------------------------------------------------------------------------
+List of Error Codes returned by MacLemon Backup:
+
+255 Error invoking backlemon. Cannot continue without a config.
+254 Config file doesn't exist
+253 Config file not readable by user
+-------------------------------------------------------------------------------
+build 46: 2006.05.01.
+NEW in 46:
+	install script included.
+	
+	Will install these files:
+
+	/usr/local/mlbackup-v46.sh
+	symlink mlbackup to mlbackup-v46.sh
+
+	/etc/maclemon/backup/globalexclusions
+	/etc/maclemon/backup/democonfig.mlbackupconf
+	
+	
+	Added Growl Notification for successful backups
+
+	
+CHANGED in 46:
+	renamed to mlbackup-v##
+
+	
+	/usr/local/mlbackup-v46.sh
+	symlink mlbackup to mlbackup-v46
+
+	/etc/maclemon/backup/globalexclusions
+	/etc/maclemon/backup/democonfig.mlbackupconf
+	
+-------------------------------------------------------------------------------
+build 45: 2006.03.27.
+ NEW in 45:
+	Changed inclusion of helper scripts to /usr/local/bin
+	
+IMPROVED: Growl notification of User if Backup had an Error.
+
+-------------------------------------------------------------------------------	
+build 44: 2006.03.26.
+
+NEW in 44:
+Growl notifications finally work. Added Growl notification for a completed backup.
+
+Added creation of a .pid file in /var/run if, and only if the script is invoked by root. This is NOT elegant and considered experimental! For now do not rely on this .pid being correct or created at all.
+
+Backup configuration is now taken from a config file. (VERY VERY quick and dirty hack. And an ugly one as such.) Will be improved in the future. Any suggestions on securely and intelligently parsing config files are welcome!
+
+CHANGE:
+Made the rsync Error message for unknown rsync errors a little easier to understand and hint the user where to find more info.
+
+CHANGE:
+Moved the global exclusions file to /etc/maclemon/backup/globalexclusions
+
+BUGFIX:
+The script would incorrectly use likenamed backups as reference for delta backups. Say an old Set was named "Backup Test" and the new set was named just "Test". Until now the script would incorrectly use the latest "Backup Test" folder as reference for the new "Test" set. This has been fixed.
+
+BUGFIX:
+The script would incorrectly remove likenamed backups if they were over the number of backups to keep. Say an old Set was named "Backup Test" and the new set was named just "Test". Until now the script would incorrectly remove the latest "Backup Test" folder if it exceeded the backup count. This has been fixed.
+
+GENERAL:
+Cleaned up the code a little, removed a lot of unnecessary commenting, clearer structure for the script now.
+
+META:
+A long standing bug has finally been fixed in the used growler.sh external script that we used for growl notification. Now growl notifications work fine.
+-------------------------------------------------------------------------------
+build 43:
+
+NEW in 43: Added --delete as standard option to Rsync. Will remove files that are absent in the SOURCE from the current backup. It will NOT remove them from prior backups. So that file stays in the kept backups as long as the number of sets hasn't been completely rotatet.
+
+Variable: MLdelete=--delete
+
+--

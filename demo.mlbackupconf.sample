@@ -1,0 +1,34 @@
+# BackLemon Configuration file
+# v46
+
+# What is the name of this backup set?
+MLbackupName="Demo"
+
+# NOTE on Naming Backups:
+# Spaces are allowed in Backup Set Names. (tested and verified)
+# If you save this script with UTF-8 Encoding, it should
+# be capable of handling japanese characters (tested and verified)
+# This script is not yet capable of handling Umlauts correctly!
+# If you know how to make this work, please contact me!
+
+
+# How many Backup Sets to keep? (Integer > 0)
+MLbackupCount=5
+
+
+
+# Configuring the SOURCE that will be backed up:
+
+# What file or directory to Backup. (No trailing Slash for directories)
+# Use quotes if spaces are in your path.
+MLsourcePath="/Users/$USER"
+
+
+
+# Configuring the Destination we will save the Backup to.
+
+# Where shall the Backups be stored (local path on the destination machine)
+MLdestPath="/Users/pepi/Projects/BackLemon/testdestination"
+
+# FUTURE: Reserved for the Host the target resides on.
+# MLdestHost=localhost

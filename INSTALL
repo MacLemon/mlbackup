@@ -1,0 +1,12 @@
+MacLemon Backup - INSTALL v46
+
+To install MacLemon backup run ./install.sh as root. You may use sudo as well.
+
+The following files will be placed on your system:
+
+/etc/maclemon/backup/demo.mlbackupconf.sample
+/etc/maclemon/backup/globalexclusions-v46
+/usr/local/bin/mlbackup-v46.sh
+/usr/local/bin/growler.sh
+/usr/local/bin/rsyncautolocator.sh
+

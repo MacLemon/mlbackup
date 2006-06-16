@@ -1,0 +1,282 @@
+#!/bin/bash
+###############################################################################
+# Name: MacLemon Backup
+# Author: Pepi Zawodsky
+# eMail: pepi@maclemon.at
+# Copyright 2005, 2006: All Rights reserved
+#
+MLbacklemonVersion="0.0.1"
+MLbacklemonBuild="46"
+# Last Change: 2006.05.01.
+#
+###############################################################################
+# Check if we run as root and set MLweAreRoot accordingly. Other parts of the script can rely on this variable to be set correctly.
+MLrootUID=0
+if [ "$UID" -ne "$MLrootUID" ]
+	then # We are not root
+		MLweAreRoot=0
+		
+	else # Yes, we are root.
+		MLweAreRoot=1
+fi
+###############################################################################
+# Setting our own internal variables, this may be moved to a global config later
+
+# Do we need to set a warning message? Reserved for future use.
+# MLwarning=0
+
+# Debug Mode. Set to 1 to get some debug messages. Not really useful yet.
+MLdebug=1
+
+# Exclude Paths and Filenames mentioned in this file.
+MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
+# These are our global settings, user exclusion file will be available at a later date.
+
+
+#### Other variables that are currently set VERY quick and dirty, to be improved
+#Rsync should user compression for non-local-only backup transport
+MLcompress=--compress
+
+# Rsync should be verbose
+# Rsync verbosity beyond -vv does NOT seem to work on Mac OS X
+MLbeVerbose=-vv
+
+# Delete trashed files from the backup so our backups don't grow infinitely?
+MLdelete=--delete
+
+###############################################################################
+# Including other external scripts, this will be improved in the future
+
+. /urs/local/bin/rsyncautolocator.sh # MLrsync is set by rsyncautolocator if not overridden
+. /urs/local/bin/growler.sh # Provides a handy growlnotify function, see script for info!
+###############################################################################
+# Getting the configuration file
+
+# Handling of the config file should be a little more elegant.
+
+# Did we get a parameter to use as a config file?
+if [ -z "$1" ]
+then # There was no config filename passed
+  echo "Usage: $0 configfile"
+  exit 255 # Error invoking backlemon. Cannot continue without a config.
+else # We were passed a config file
+	MLconfigFile=$1
+	echo Config file to use is: $MLconfigFile
+
+	# Now let's check that parameter
+	
+	# Does this file exist?
+	if [ -e $MLconfigFile ]
+	then # The file does exist 
+
+		echo "Config file $MLconfigFile exists."
+
+		# Is the config file readable by the user?
+		if [ -r $MLconfigFile ]
+		then # The config file can be read by the user invoking this script
+
+			# Load in the config (DIRTY *yuck*)
+			echo Loading the config file $MLconfigFile
+			. $MLconfigFile
+		else # The user does not have read permission for the config file
+			echo $0[$$]: The config file $MLconfigFile does exist but is not readable by $USER. Please change the mode of this file or the user running $0!
+			exit 253 # config file not readable
+			# We might do further testing of this file to give a better error
+		fi
+	else # The config file doesn't exist, FATAL
+		echo $0[$$]: The config file $MLconfigFile does not exist, Please check the path.
+		exit 254 # Config file doesn't exist
+	fi # [ -e $MLconfigFile ]
+fi # [ -z "$1" ]
+###############################################################################
+# If we're running as root we create a .pid file in /var/run
+# This should be substantially improved so we write different .pid files for different invocations of backlemon. (Depending on configuration)
+if [ "$MLweAreRoot" -eq "1" ]
+then # We are root, so let us create a .pid file
+	MLmyPidFile="/var/run/"`basename $0`".pid"
+	echo $$ > $MLmyPidFile
+fi # [ "$MLweAreRoot" -eq "1" ]
+# This .pid file is removed at the end of the script
+###############################################################################
+# Sanitizing of Input to variables.
+#
+# error handling of config file, setting defaults for missing parameters
+###############################################################################
+# Overide section
+# Here we override variables from the config or from rsyncautolocator
+# At the moment this is for debug purposes only.
+
+# override of rsync: this is still a beta
+MLrsync="/usr/bin/rsync"
+
+# Dry run, for debugging Rsync, does NOT alter any files, only pretends to.
+# MLdryRun=-n
+
+###############################################################################
+# FUTURE: Preflight scripts will be called from here.
+###############################################################################
+# asking rsync to tell us how to use extended Attributes (HFS, ResForks)
+MLextendedAttributes=`$MLsourceRsync --help | grep -e "extended" -e "attributes" | sed -e 's/^.*--/--/' -e 's/\ .*//'`
+
+# checking target
+
+if [ ! -e "$MLdestPath" ] # Does our target directory exist?
+then
+	# we should check with -d here! exists AND is Dir. Error handling later
+	# The target directory does not exist, we will try to create it.
+	echo The target Directory does not exist, trying to create one
+	MLeCreateDirectoryReturn=0
+	mkdir -p -m 750 "$MLdestPath"
+	MLeCreateDirectoryReturn=$?
+	if [ "$MLeCreateDirectoryReturn" ]	# Did that go well?
+	then
+	# No, an error occured
+		MLtheFinalErrorMessage="The target directory $MLdestPath does not exist and an attempt to create it failed. You may want to check the privileges."
+		echo $MLtheFinalErrorMessage
+		exit
+	fi
+else
+	if [ -d "$MLdestPath" ] # The destination does exist AND is a directory
+	then
+		# check if it is writeable!
+		# if yes ok, if not try to chmod it to make it writeable
+		# else fail
+		if [[ -r "$MLdestPath" && -w "$MLdestPath" && -x "$MLdestPath" ]] # Can we rwx the destination? We need it.
+		then
+			echo "$0: The destination $MLdestPath offers all privs we need."
+		else
+			echo "$0: The destination $MLdestPath need read, write and execute privs for the user $USER invoking this script to be able to backup your data."
+			exit
+		fi
+	else
+		echo "$0: The destination $MLdestPath is not a directory. We can not save backups in anything but a directory (like a file or block device)"
+		exit
+	fi
+fi
+
+# We need to find the most recent Backup as our Target for the link-dest
+# The grep shoud be a much better regexp, so we do not accidentally use a LIKE named other backup, but actually a correct old backup to refer to. Currently this will incorrectly find partial names as well as extended names!
+# FIX THIS!
+MLmostRecentSet=`ls -1tw "$MLdestPath/" | grep "^$MLbackupName-" | head -1`
+echo The most Recent Set to refer to is: $MLmostRecentSet
+
+# notifying our user of the pending backup
+growlnotify -n BackLemon -m "Your Backup will start in 0 Seconds" -t "BackLemon starting"
+#sleep 10 # Turned off for testing
+
+#Fetching the current date and time
+MLbackupDate=`date "+%Y.%m.%d-%H.%M.%S"`
+echo backing up now
+
+# backing up
+$MLsourceRsync $MLbeVerbose --rsync-path=$MLdestRsync -apogt $MLcompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/"
+MLbackupStatus=$?
+
+# Post production of the backup
+case $MLbackupStatus in
+	0)	# The last backup went ok
+		# If there is setlabel installed, we color it green (green is good)
+		MLsetlabelPath=`which setlabel`
+		if [ -e $MLsetlabelPath ] # only makes it green if setlabel command is installed
+		then
+			$MLsetlabelPath Green "$MLdestPath/$MLbackupName-$MLbackupDate/"
+		fi
+		
+		# If we have setfcomment installed, we add a nice comment to the folder
+		MLsetfcommentPath=`which setfcomment`
+		if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
+		then
+			setfcomment -c "Created by BackLemon [$0] Version $MLversion. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/"
+		fi
+		
+		# notifying our user that the backup finished successfully
+		growlnotify -n BackLemon -m "The Backup $MLbackupName was successful." -t "BackLemon finished"
+		
+		# checking if we need to remove some old ones
+		MLoldBackupCount=`ls -1w "$MLdestPath/" | grep -c "^$MLbackupName-"`
+	
+		echo Old Backup Count: $MLoldBackupCount
+		if [ "$MLoldBackupCount" -gt "$MLbackupCount" ] # There are surplus Backups, so we remove them
+		then	
+			for ((MLloopIndex="$MLoldBackupCount" ; MLloopIndex>"$MLbackupCount" ; MLloopIndex-- ))
+			do
+			# Counting down
+			MLoldestSetToBeRemoved=`ls -1trw "$MLdestPath/" | grep "^$MLbackupName-" | head -1`
+			echo Removing the Set named: $MLdestPath/$MLoldestSetToBeRemoved
+			rm -r "$MLdestPath/$MLoldestSetToBeRemoved"
+			done
+		fi
+	echo BackLemon was successful!
+	;;
+	# Error Codes we know from the rsync man page
+	1) MLeRsyncErrorMessage="Syntax or useage error" ;;
+	2) MLeRsyncErrorMessage="Protocol incompatibility" ;;
+	3) MLeRsyncErrorMessage="Errors selecting input/output files, dirs" ;;
+	4) MLeRsyncErrorMessage="Requested action not supported: an attempt was made to manipulate 64-bit files on a platform that cannot support them; or an option was specified that is supported by the client and not by the server." ;;
+	5) MLeRsyncErrorMessage="Error starting client-server protocol";;
+	6) MLeRsyncErrorMessage="Daemon unable to append to log-file" ;;
+	10) MLeRsyncErrorMessage="Error in socket I/O" ;;
+	11) MLeRsyncErrorMessage="Error in file I/O" ;;
+	12) MLeRsyncErrorMessage="Error in rsync protocol data stream" ;;
+	13) MLeRsyncErrorMessage="Errors with program diagnostics" ;;
+	14) MLeRsyncErrorMessage="Error in IPC code" ;;
+	20) MLeRsyncErrorMessage="Received SIGUSR1 or SIGINT" ;;
+	21) MLeRsyncErrorMessage="Some error returned by waitpid()" ;;
+	22) MLeRsyncErrorMessage="Error allocating core memory buffers" ;;
+	23) MLeRsyncErrorMessage="Partial transfer due to error" ;;
+	24) MLeRsyncErrorMessage="Partial transfer due to vanished source files" ;;
+	25) MLeRsyncErrorMessage="The --max-delete limit stopped deletions" ;;
+	30) MLeRsyncErrorMessage="Timeout in data send/receive";;
+
+	# Any other error that might have occured that is unspecified
+	*) MLeRsyncErrorMessage="$0: Rsync returned Error Code $MLbackupStatus: Sorry, we do not know what this error code means. You may want to check your logfiles or the man page for rsync on your system."
+	;;
+esac
+
+# echo $0: Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage
+
+if [ $MLbackupStatus -ne 0 ] # Something went wrong during the backup
+then
+	# Telling that something went wrong
+	echo $0: Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage
+	
+	# If there is setlabel installed, we color it red (red like a warning)
+	MLsetlabelPath=`which setlabel`
+	if [ -e $MLsetlabelPath ] # only makes it red if setlabel command is installed
+	then
+		$MLsetlabelPath Red "$MLdestPath/$MLbackupName-$MLbackupDate/"
+	fi # [ -e $MLsetlabelPath ]
+
+	# If we have setfcomment installed, we add a nice comment to the folder
+	# TODO: Comment should be truncated to less than 200 characters.
+	MLsetfcommentPath=`which setfcomment`
+	if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
+	then
+		setfcomment -c "Unfinished backup! Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage Created by BackLemon [$0] Version $MLbacklemonVersion($MLbacklemonBuild). Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/"
+	fi # [ -e $MLsetfcommentPath ]
+
+	# renaming the unfinished backup, so it will notbe used for the next delta backup!	
+	mv "$MLdestPath/$MLbackupName-$MLbackupDate" "$MLdestPath/ERROR-$MLbackupName-$MLbackupDate"
+	
+	# notifying our user of the backup ERROR
+growlnotify -n BackLemon -m "$MLeRsyncErrorMessage" -s -t "$MLbackupName Error $MLbackupStatus"
+
+	else
+	# notifying the user of the completed and successful backup
+	growlnotify -n BackLemon -m "$MLbackupName completed successfully." -s -t "Backup $MLbackupName finished"
+fi #[ $MLbackupStatus -ne 0 ]
+
+# cleaning up
+
+# FUTURE: Postflight script
+# FUTURE: notifications, via growl, log or mail
+
+
+if [ "$MLweAreRoot" -eq "1" ]
+then
+	# We are root, so we did create a .pid file, now let us remove it again.
+	rm $MLmyPidFile
+fi
+echo BackLemon ended
+###############################################################################
+# EOF
