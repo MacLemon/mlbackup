@@ -4,11 +4,7 @@
 # Author: Pepi Zawodsky
 # eMail: pepi@maclemon.at
 # Copyright 2005, 2006: All Rights reserved
-#
-MLbacklemonVersion="0.0.1"
-MLbacklemonBuild="46"
-# Last Change: 2006.05.01.
-#
+# Licensing not yet decided (GPL, LGPL or BSD are likely)
 ###############################################################################
 # Check if we run as root and set MLweAreRoot accordingly. Other parts of the script can rely on this variable to be set correctly.
 MLrootUID=0

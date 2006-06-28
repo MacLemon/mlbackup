@@ -32,3 +32,11 @@ MLdestPath="/Users/pepi/Projects/BackLemon/testdestination"
 
 # FUTURE: Reserved for the Host the target resides on.
 # MLdestHost=localhost
+
+# ------
+# Future implementations:
+# MLlogfile
+# MLadminEmail
+# MLuserEmail
+# MLuseGlobalExclusions
+# MLcustomRsyncOptions
