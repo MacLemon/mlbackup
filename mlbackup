@@ -43,7 +43,8 @@ MLdelete=--delete
 ###############################################################################
 # Including other external scripts, this will be improved in the future
 
-. /urs/local/bin/rsyncautolocator.sh # MLrsync is set by rsyncautolocator if not overridden
+. /usr/local/bin/rsyncautolocator.sh # MLrsync is set by rsyncautolocator if not overridden
+
 . /urs/local/bin/growler.sh # Provides a handy growlnotify function, see script for info!
 ###############################################################################
 # Getting the configuration file
