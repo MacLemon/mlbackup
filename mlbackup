@@ -28,6 +28,14 @@ MLdebug=1
 MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
 # These are our global settings, user exclusion file will be available at a later date.
 
+# .noindex prevents Spotlight from indexing this file, which would negatively affect backup performance
+
+# If the backup only takes place on localhost we should probably directly
+# create the logfiles in the backup destination (which we would need to create
+# ourselves instead of letting rsync do the job.) 
+MLrsyncLogFile=`tempfile -s .noindex` # Logfile for rsync LOG output
+MLrsyncErrFile=`tempfile -s .noindex` # Logfile for rsync ERROR output
+
 
 #### Other variables that are currently set VERY quick and dirty, to be improved
 #Rsync should user compression for non-local-only backup transport
@@ -43,9 +51,9 @@ MLdelete=--delete
 ###############################################################################
 # Including other external scripts, this will be improved in the future
 
-. /usr/local/bin/rsyncautolocator.sh # MLrsync is set by rsyncautolocator if not overridden
+# . /usr/local/bin/rsyncautolocator.sh # MLrsync is set by rsyncautolocator if not overridden
 
-. /urs/local/bin/growler.sh # Provides a handy growlnotify function, see script for info!
+. /usr/local/bin/growler.sh # Provides a handy growlnotify function, see script for info!
 ###############################################################################
 # Getting the configuration file
 
@@ -105,6 +113,8 @@ fi # [ "$MLweAreRoot" -eq "1" ]
 
 # override of rsync: this is still a beta
 MLrsync="/usr/bin/rsync"
+MLsourceRsync=$MLrsync
+
 
 # Dry run, for debugging Rsync, does NOT alter any files, only pretends to.
 # MLdryRun=-n
@@ -166,8 +176,8 @@ MLbackupDate=`date "+%Y.%m.%d-%H.%M.%S"`
 echo backing up now
 
 # backing up
-$MLsourceRsync $MLbeVerbose --rsync-path=$MLdestRsync -apogt $MLcompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/"
-MLbackupStatus=$?
+$MLsourceRsync $MLbeVerbose --rsync-path=$MLdestRsync -apogt $MLcompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/" >$MLrsyncLogFile &2>$MLrsyncErrFile
+MLbackupStatus=$? # Fetching the return code from our rsync command
 
 # Post production of the backup
 case $MLbackupStatus in
@@ -229,6 +239,11 @@ case $MLbackupStatus in
 	*) MLeRsyncErrorMessage="$0: Rsync returned Error Code $MLbackupStatus: Sorry, we do not know what this error code means. You may want to check your logfiles or the man page for rsync on your system."
 	;;
 esac
+
+# We move the logfiles to the backup destination. (currently only on localhost)
+mv $MLrsyncLogFile $MLdestPath/$MLbackupName-$MLbackupDate/rsync.log
+mv $MLrsyncErrFile $MLdestPath/$MLbackupName-$MLbackupDate/error.log
+
 
 # echo $0: Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage
 
