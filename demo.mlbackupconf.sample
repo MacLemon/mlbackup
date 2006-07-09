@@ -1,5 +1,4 @@
-# BackLemon Configuration file
-# v46
+# BackLemon Demo Configuration file
 
 # What is the name of this backup set?
 MLbackupName="Demo"
@@ -28,7 +27,7 @@ MLsourcePath="/Users/$USER"
 # Configuring the Destination we will save the Backup to.
 
 # Where shall the Backups be stored (local path on the destination machine)
-MLdestPath="/Users/pepi/Projects/BackLemon/testdestination"
+MLdestPath="/Volumes/Backup"
 
 # FUTURE: Reserved for the Host the target resides on.
 # MLdestHost=localhost
