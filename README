@@ -20,7 +20,7 @@ Additions:
 	None of these are mandatory, but they provide some comfort.
 
 	If you have growl installed, mlbackup will make use of it.
-	For more info on growl see http://grwol.info/
+	For more info on growl see http://growl.info/
 
 
 	If you have osxutils installed via fink, mlbackup will make use of it.
@@ -30,6 +30,7 @@ Additions:
 
 
 
-Known Bugs:
+Known Issues:
 	no manpage for mlbackup yet
 	If you backup to an external drive and that drive is not available when mlbackup runs there is no exception handling yet (in the works)
+	Spotlight comments are not backupped reliably if at all (rsync bug)

@@ -241,6 +241,7 @@ case $MLbackupStatus in
 esac
 
 # We move the logfiles to the backup destination. (currently only on localhost)
+# Should only move each file if it is greater than zero bytes.
 mv $MLrsyncLogFile $MLdestPath/$MLbackupName-$MLbackupDate/rsync.log
 mv $MLrsyncErrFile $MLdestPath/$MLbackupName-$MLbackupDate/error.log
 
