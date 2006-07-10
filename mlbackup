@@ -6,6 +6,9 @@
 # Copyright 2005, 2006: All Rights reserved
 # Licensing not yet decided (GPL, LGPL or BSD are likely)
 ###############################################################################
+# first thing we do is check the time to later see how long thing took
+MLtimeScriptStart=$(date +%s)
+###############################################################################
 # Check if we run as root and set MLweAreRoot accordingly. Other parts of the script can rely on this variable to be set correctly.
 MLrootUID=0
 if [ "$UID" -ne "$MLrootUID" ]
@@ -35,6 +38,7 @@ MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
 # ourselves instead of letting rsync do the job.) 
 MLrsyncLogFile=`tempfile -s .noindex` # Logfile for rsync LOG output
 MLrsyncErrFile=`tempfile -s .noindex` # Logfile for rsync ERROR output
+MLadminEmailMessage=`tempfile -s .noindex` # Email composition for Admin
 
 
 #### Other variables that are currently set VERY quick and dirty, to be improved
@@ -175,9 +179,11 @@ growlnotify -n BackLemon -m "Your Backup will start in 0 Seconds" -t "BackLemon 
 MLbackupDate=`date "+%Y.%m.%d-%H.%M.%S"`
 echo backing up now
 
+MLtimeRsyncStart=$(date +%s)
 # backing up
 $MLsourceRsync $MLbeVerbose --rsync-path=$MLdestRsync -apogt $MLcompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/" >$MLrsyncLogFile &2>$MLrsyncErrFile
 MLbackupStatus=$? # Fetching the return code from our rsync command
+MLtimeRsyncEnd=$(date +%s)
 
 # Post production of the backup
 case $MLbackupStatus in
