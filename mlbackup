@@ -42,7 +42,7 @@ MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
 # ourselves instead of letting rsync do the job.) 
 MLrsyncLogFile=`mktemp -t MLrsyncLogFile.XXXXXXXXXX` # Logfile for rsync LOG output
 MLrsyncErrFile=`mktemp -t MLrsyncErrFile.XXXXXXXXXX` # Logfile for rsync ERROR output
-MLadminEmailMessage=`tempfile -s .noindex` # Email composition for Admin
+MLadminEmailMessage=`tempfile -s .noindex` # Email composition for Backup Admin
 
 
 #### Other variables that are currently set VERY quick and dirty, to be improved
@@ -58,7 +58,7 @@ MLdelete=--delete
 
 # Be nice to other processes when compressing the logs
 # See man nice(1) for levels of niceness
-MLbeNice=-20
+MLbeNice=20
 
 if [ "$MLbeNice" -eq 0 ]
 then # nice is zero, so we do not alter the task priority
@@ -344,6 +344,13 @@ fi
 # FUTURE: Postflight script
 # FUTURE: notifications, via growl, log or mail
 
+###############################################################################
+# Almost last thing is to determine how long the backup took.
+MLtimeScriptEnd=$(date +%s)
+
+#Calculating the time difference between start and end giving us the duration
+let "MLtimeScriptDurationTotal = $MLtimeScriptEnd - $MLtimeScriptStart"
+echo Backup Took $MLtimeScriptDurationTotal seconds
 
 if [ "$MLweAreRoot" -eq "1" ]
 then
