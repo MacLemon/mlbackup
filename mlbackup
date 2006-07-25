@@ -248,8 +248,12 @@ esac
 
 # We move the logfiles to the backup destination. (currently only on localhost)
 # Should only move each file if it is greater than zero bytes.
-mv $MLrsyncLogFile $MLdestPath/$MLbackupName-$MLbackupDate/rsync.log
-mv $MLrsyncErrFile $MLdestPath/$MLbackupName-$MLbackupDate/error.log
+
+cat $MLrsyncLogFile | gzip -9 >$MLdestPath/$MLbackupName-$MLbackupDate/rsync.log.gz
+cat $MLrsyncErrFile | gzip -9 >$MLdestPath/$MLbackupName-$MLbackupDate/error.log.gz
+
+# mv $MLrsyncLogFile $MLdestPath/$MLbackupName-$MLbackupDate/rsync.log
+# mv $MLrsyncErrFile $MLdestPath/$MLbackupName-$MLbackupDate/error.log
 
 
 # echo $0: Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage
