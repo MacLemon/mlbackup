@@ -333,7 +333,7 @@ fi #[ $MLbackupStatus -ne 0 ]
 if [ -s $MLadminEmailMessage ]
 then # Something in the Message file
 	# So we move it to the Backup Directory
-	mv $MLadminEmailMessage $MLdestPath/$MLbackupName-$MLbackupDate/Notes.txt
+	mv $MLadminEmailMessage $MLdestPath/$MLbackupName-$MLbackupDate/AdminEMail.txt
 else # empty Message, just remove the tempfile
 	# nothing to shout about, so we silently remove the temporary file
 	rm $MLadminEmailMessage
