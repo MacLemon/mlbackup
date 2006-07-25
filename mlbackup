@@ -36,8 +36,8 @@ MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
 # If the backup only takes place on localhost we should probably directly
 # create the logfiles in the backup destination (which we would need to create
 # ourselves instead of letting rsync do the job.) 
-MLrsyncLogFile=`tempfile -s .noindex` # Logfile for rsync LOG output
-MLrsyncErrFile=`tempfile -s .noindex` # Logfile for rsync ERROR output
+MLrsyncLogFile=`mktemp -t MLrsyncLogFile.XXXXXXXXXX` # Logfile for rsync LOG output
+MLrsyncErrFile=`mktemp -t MLrsyncErrFile.XXXXXXXXXX` # Logfile for rsync ERROR output
 MLadminEmailMessage=`tempfile -s .noindex` # Email composition for Admin
 
 
