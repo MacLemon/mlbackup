@@ -9,6 +9,10 @@
 # first thing we do is check the time to later see how long thing took
 MLtimeScriptStart=$(date +%s)
 ###############################################################################
+# determining a few standard variables for comfort
+MLfullCommand=$0
+MLbaseCommand=$(basename $0)
+###############################################################################
 # Check if we run as root and set MLweAreRoot accordingly. Other parts of the script can rely on this variable to be set correctly.
 MLrootUID=0
 if [ "$UID" -ne "$MLrootUID" ]
@@ -58,29 +62,21 @@ MLbeNice=-20
 
 if [ "$MLbeNice" -eq 0 ]
 then # nice is zero, so we do not alter the task priority
-	echo MLbeNice is equal to zero: $MLbeNice
 	MLbeNiceCommand=""
-	echo MLbeNiceCommand: $MLbeNiceCommand
 else # nice is non zero
 	if [ "$MLbeNice" -gt 0 ]
 	then # We can always lower the priority of the tasks
-		echo MLbeNice is larger than zero: $MLbeNice
 		MLbeNiceCommand="/usr/bin/nice -n $MLbeNice "
-		echo MLbeNiceCommand: $MLbeNiceCommand
 	else 
 		if [ $MLweAreRoot -eq 1 ]
 		then # We can only increase the priority if we are running as root
-			echo MLbeNice is less than zero: $MLbeNice
 			MLbeNiceCommand="/usr/bin/nice -n $MLbeNice "			
-				echo MLbeNiceCommand: $MLbeNiceCommand
 		else # We are not root, so we will not change the priority, but tell the admin
-			echo MLbeNice is less than zero: $MLbeNice and we are not root			
 			MLbeNiceCommand=""
-				echo MLbeNiceCommand: $MLbeNiceCommand
 			# Adding a message to the admin notification eMail
 			cat <<MLEOF >>$MLadminEmailMessage
 			
-The requested increased priority of $MLbeNice for $0 could not be set since we are not running as root. Either set the variable MLbeNice to a non negative value or run $0 as root.
+The requested increased priority of $MLbeNice for $MLbaseCommand could not be set since we are not running as root. Either set the variable MLbeNice to a non negative value or run $MLbaseCommand as root.
 See man nice(1) for more info.
 			
 MLEOF
@@ -88,9 +84,6 @@ MLEOF
 		fi # [ $MLweAreRoot -eq 1 ]
 	fi # [ $MLbeNice > 0 ]
 fi # [ $MLbeNice -eq 0 ]
-
-
-
 ###############################################################################
 # Including other external scripts, this will be improved in the future
 
