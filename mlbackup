@@ -12,10 +12,10 @@ MLtimeScriptStart=$(date +%s)
 # Check if we run as root and set MLweAreRoot accordingly. Other parts of the script can rely on this variable to be set correctly.
 MLrootUID=0
 if [ "$UID" -ne "$MLrootUID" ]
-	then # We are not root
+	then # I am not root
 		MLweAreRoot=0
 		
-	else # Yes, we are root.
+	else # Bow before me, for I am root!
 		MLweAreRoot=1
 fi
 ###############################################################################
@@ -42,7 +42,7 @@ MLadminEmailMessage=`tempfile -s .noindex` # Email composition for Admin
 
 
 #### Other variables that are currently set VERY quick and dirty, to be improved
-#Rsync should user compression for non-local-only backup transport
+#Rsync should use compression for non-local-only backup transport
 MLcompress=--compress
 
 # Rsync should be verbose
@@ -52,6 +52,45 @@ MLbeVerbose=-vv
 # Delete trashed files from the backup so our backups don't grow infinitely?
 MLdelete=--delete
 
+# Be nice to other processes when compressing the logs
+# See man nice(1) for levels of niceness
+MLbeNice=-20
+
+if [ "$MLbeNice" -eq 0 ]
+then # nice is zero, so we do not alter the task priority
+	echo MLbeNice is equal to zero: $MLbeNice
+	MLbeNiceCommand=""
+	echo MLbeNiceCommand: $MLbeNiceCommand
+else # nice is non zero
+	if [ "$MLbeNice" -gt 0 ]
+	then # We can always lower the priority of the tasks
+		echo MLbeNice is larger than zero: $MLbeNice
+		MLbeNiceCommand="/usr/bin/nice -n $MLbeNice "
+		echo MLbeNiceCommand: $MLbeNiceCommand
+	else 
+		if [ $MLweAreRoot -eq 1 ]
+		then # We can only increase the priority if we are running as root
+			echo MLbeNice is less than zero: $MLbeNice
+			MLbeNiceCommand="/usr/bin/nice -n $MLbeNice "			
+				echo MLbeNiceCommand: $MLbeNiceCommand
+		else # We are not root, so we will not change the priority, but tell the admin
+			echo MLbeNice is less than zero: $MLbeNice and we are not root			
+			MLbeNiceCommand=""
+				echo MLbeNiceCommand: $MLbeNiceCommand
+			# Adding a message to the admin notification eMail
+			cat <<MLEOF >>$MLadminEmailMessage
+			
+The requested increased priority of $MLbeNice for $0 could not be set since we are not running as root. Either set the variable MLbeNice to a non negative value or run $0 as root.
+See man nice(1) for more info.
+			
+MLEOF
+			# End of message
+		fi # [ $MLweAreRoot -eq 1 ]
+	fi # [ $MLbeNice > 0 ]
+fi # [ $MLbeNice -eq 0 ]
+
+
+
 ###############################################################################
 # Including other external scripts, this will be improved in the future
 
@@ -60,7 +99,6 @@ MLdelete=--delete
 . /usr/local/bin/growler.sh # Provides a handy growlnotify function, see script for info!
 ###############################################################################
 # Getting the configuration file
-
 # Handling of the config file should be a little more elegant.
 
 # Did we get a parameter to use as a config file?
@@ -247,17 +285,21 @@ case $MLbackupStatus in
 esac
 
 # We move and compress the logfiles to the backup destination. (currently only on localhost)
+
+# Postprocessing the error.log
+if [ -s $MLrsyncErrFile ] # The error log is larger than 0 bytes, only in case of an error
+then
+	$MLbeNiceCommand cat $MLrsyncErrFile | gzip -9 >$MLdestPath/$MLbackupName-$MLbackupDate/error.log.gz
+fi # [ -s $MLrsyncErrFile ]
+rm $MLrsyncErrFile
+
+# post processing the rsync.log
 if [ -s $MLrsyncLogFile ] # The rsync log is larger than 0 bytes which is expected
 then
-	cat $MLrsyncLogFile | gzip -9 >$MLdestPath/$MLbackupName-$MLbackupDate/rsync.log.gz
+	$MLbeNiceCommand cat $MLrsyncLogFile | gzip -9 >$MLdestPath/$MLbackupName-$MLbackupDate/rsync.log.gz
 fi #[ -s $MLrsyncLogFile ]
 rm $MLrsyncLogFile
 
-if [ -s $MLrsyncErrFile ] # The error log is larger than 0 bytes, only in case of an error
-then
-	cat $MLrsyncErrFile | gzip -9 >$MLdestPath/$MLbackupName-$MLbackupDate/error.log.gz
-fi # [ -s $MLrsyncErrFile ]
-rm $MLrsyncErrFile
 
 # echo $0: Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage
 
@@ -291,6 +333,18 @@ growlnotify -n BackLemon -m "$MLeRsyncErrorMessage" -s -t "$MLbackupName Error $
 	# notifying the user of the completed and successful backup
 	growlnotify -n BackLemon -m "$MLbackupName completed successfully." -s -t "Backup $MLbackupName finished"
 fi #[ $MLbackupStatus -ne 0 ]
+
+
+# At the moment we just move the MLadminEmailMessage into the Backup Dir
+# No emailing yet 
+if [ -s $MLadminEmailMessage ]
+then # Something in the Message file
+	# So we move it to the Backup Directory
+	mv $MLadminEmailMessage $MLdestPath/$MLbackupName-$MLbackupDate/Notes.txt
+else # empty Message, just remove the tempfile
+	# nothing to shout about, so we silently remove the temporary file
+	rm $MLadminEmailMessage
+fi
 
 # cleaning up
 
