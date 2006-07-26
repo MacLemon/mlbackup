@@ -10,7 +10,7 @@
 MLtimeScriptStart=$(date +%s)
 ###############################################################################
 # Debug Mode. Set to 1 to get some debug messages set to 0 to skip them.
-MLdebug=1
+MLdebug=0
 ###############################################################################
 # determining a few standard variables for comfortable use later
 MLfullCommand=$0
@@ -18,7 +18,7 @@ MLbaseCommand=$(basename $0)
 ###############################################################################
 # Error and exit codes used
 # Everything Ok returns 0
-# Any rsync Error returns the return Value of rsync
+# Any rsync error returns the return value of rsync
 # Known rsync error codes are 1-30
 # Any other error returns one of these (128-254):
 MLE_DestinationNotWriteable=250
@@ -71,11 +71,7 @@ function debug (){
 	fi
 }
 ###############################################################################
-# Setting our own internal variables, this may be moved to a global config later
-
-# Exclude Paths and Filenames mentioned in this file.
-MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
-# These are our global settings, user exclusion file will be available at a later date.
+# Creating a few temporary files we need
 
 MLadminEmailMessage=$(mktemp -t MLadminEmailMessage.XXXXXXXXXX) # Email composition for Backup Admin
 debug "MLadminEmailMessage = $MLadminEmailMessage"
@@ -90,7 +86,8 @@ MLrsyncErrFile=$(mktemp -t MLrsyncErrFile.XXXXXXXXXX) # Logfile for rsync ERR
 debug "MLrsyncErrFile = $MLrsyncErrFile"
 
 ###############################################################################
-# Other variables that are currently set VERY quick and dirty, to be improved
+# Setting our own internal variables.
+# To be improved. Some of these may be moved to the config file later.
 
 # Path to rsync
 MLrsync="/usr/bin/rsync" # For Mac OS X Tiger (10.4 and up)
@@ -112,6 +109,10 @@ MLbeVerbose="-vv"
 
 # Delete trashed files from the backup so our backups don't grow infinitely?
 MLdelete="--delete"
+
+# Exclude Paths and Filenames mentioned in this file.
+MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
+# These are our global settings, user exclusion file will be available at a later date.
 
 # Be nice to other processes when compressing the logs
 # See man nice(1) for levels of niceness
@@ -304,6 +305,9 @@ rm $MLrsyncLogFile
 case $MLbackupStatus in
 	0)	# The last backup went ok
 		# If there is setlabel installed, we color it green (green is good)
+		MLeRsyncErrorMessage=""
+		addToFile "$MLadminEmailMessage" "Rsync returned $MLbackupStatus 
+		The Backup $MLbackupName went OK!"
 		MLsetlabelPath=$(which setlabel)
 		if [ -e $MLsetlabelPath ] # only makes it green if setlabel command is installed
 		then
@@ -366,6 +370,7 @@ esac
 
 
 debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"
+addToFile "$MLadminEmailMessage" "Rsync returned $MLbackupStatus $MLeRsyncErrorMessage"
 
 if [ $MLbackupStatus -ne 0 ] # Something went wrong during the backup
 then
@@ -431,7 +436,7 @@ fi
 
 # sending the admin eMail Notification
 MLhostname=$(hostname)
-cat $MLdestPath/$MLbackupName-$MLbackupDate/AdminEMail.txt | mail -s "$MLhostname $MLbackupName Report" $MLadminEmail
+cat $MLdestPath/$MLbackupName-$MLbackupDate/AdminEMail.txt | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
 
 
 if [ "$MLweAreRoot" -eq "1" ]
