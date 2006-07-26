@@ -99,6 +99,7 @@ function appendToFile (){
 	echo "$2" >> "$1"
 }
 
+#------------------------------------------------------------------------------
 # function prependToFile (){
 # Prepends a given Text at the beginning of a given file
 # usage prependToFile ("path/to/filename" "Message to prepend")
@@ -109,6 +110,15 @@ function appendToFile (){
 
 # }
 
+#------------------------------------------------------------------------------
+function debug (){
+# outputs a debugging message to stdout if the MLdebug Flag is set to 1
+# usage: debug("Your debugging Message")
+	if [ $MLdebug -eq 1 ] # Is the debug flag set?
+	then # Output everything that is passed to stdout:
+		echo $MLbaseCommand[$$] DEBUG: $@
+	fi
+}
 
 ###############################################################################
 # Including other external scripts, this will be improved in the future
