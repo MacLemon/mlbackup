@@ -15,6 +15,7 @@ MLdebug=0
 # determining a few standard variables for comfortable use later
 MLfullCommand=$0
 MLbaseCommand=$(basename $0)
+MLhostname=$(hostname)
 ###############################################################################
 # Error and exit codes used
 # Everything Ok returns 0
@@ -414,6 +415,8 @@ then # Yes, something is in the Message file
 	mv $MLadminEmailMessage $MLdestPath/$MLbackupName-$MLbackupDate/AdminEMail.txt
 else # No, the message is empty, very unlikely
 	# nothing to shout about, so we silently remove the temporary file
+	# We can NEVER get here in debug mode thats why we use echo here!
+	echo "MLadminEmailMessage was empty, we just remove the temporary file."
 	rm $MLadminEmailMessage
 fi
 
@@ -435,7 +438,6 @@ else # zero, two or more seconds
 fi
 
 # sending the admin eMail Notification
-MLhostname=$(hostname)
 cat $MLdestPath/$MLbackupName-$MLbackupDate/AdminEMail.txt | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
 
 
