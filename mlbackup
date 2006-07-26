@@ -6,10 +6,10 @@
 # Copyright 2005, 2006: All Rights reserved
 # Licensing not yet decided (GPL, LGPL or BSD are likely)
 ###############################################################################
-# first thing we do is check the time to later see how long thing took
+# first thing we do is check the time to later see how long things took
 MLtimeScriptStart=$(date +%s)
 ###############################################################################
-# determining a few standard variables for comfort
+# determining a few standard variables for comfortable use later
 MLfullCommand=$0
 MLbaseCommand=$(basename $0)
 ###############################################################################
@@ -28,7 +28,7 @@ fi
 # Do we need to set a warning message? Reserved for future use.
 # MLwarning=0
 
-# Debug Mode. Set to 1 to get some debug messages. Not really useful yet.
+# Debug Mode. Set to 1 to get some debug messages. Not really used yet. May end up as verbosity switch
 MLdebug=1
 
 # Exclude Paths and Filenames mentioned in this file.
@@ -50,11 +50,11 @@ MLadminEmailMessage=$(mktemp -t MLadminEmailMessage.XXXXXXXXXX) # Email composit
 echo MLadminEmailMessage = $MLadminEmailMessage
 
 #### Other variables that are currently set VERY quick and dirty, to be improved
-#Rsync should use compression for non-local-only backup transport
+#Rsync should use compression for non-local-only backup transport (SSH)
 MLcompress=--compress
 
 # Rsync should be verbose
-# Rsync verbosity beyond -vv does NOT seem to work on Mac OS X
+# Rsync verbosity beyond -vv does NOT seem to work on Mac OS X, I am afraid this is an rsync bug
 MLbeVerbose=-vv
 
 # Delete trashed files from the backup so our backups don't grow infinitely?
@@ -63,6 +63,7 @@ MLdelete=--delete
 # Be nice to other processes when compressing the logs
 # See man nice(1) for levels of niceness
 MLbeNice=20
+# we should check if MLbeNice is an integer in the range of -20 MLbeNice +20.
 
 if [ "$MLbeNice" -eq 0 ]
 then # nice is zero, so we do not alter the task priority
@@ -80,7 +81,7 @@ else # nice is non zero
 			# Adding a message to the admin notification eMail
 			cat <<MLEOF >>$MLadminEmailMessage
 			
-The requested increased priority of $MLbeNice for $MLbaseCommand could not be set since we are not running as root. Either set the variable MLbeNice to a non negative value or run $MLbaseCommand as root.
+The requested increased priority of $MLbeNice for $MLbaseCommand could not be set since we are not running as root. Either set the variable MLbeNice to a non negative integer value or run $MLbaseCommand as root.
 See man nice(1) for more info.
 			
 MLEOF
@@ -144,7 +145,7 @@ else # We were passed a config file
 			echo Loading the config file $MLconfigFile
 			. $MLconfigFile
 		else # The user does not have read permission for the config file
-			echo $0[$$]: The config file $MLconfigFile does exist but is not readable by $USER. Please change the mode of this file or the user running $0!
+			echo $0[$$]: The config file $MLconfigFile does exist but is not readable by $USER. Please change the mode or owner of the configuration file or use another user to run $0!
 			exit 253 # config file not readable
 			# We might do further testing of this file to give a better error
 		fi
@@ -209,8 +210,7 @@ else
 	if [ -d "$MLdestPath" ] # The destination does exist AND is a directory
 	then
 		# check if it is writeable!
-		# if yes ok, if not try to chmod it to make it writeable
-		# else fail
+		# if yes ok, else fail
 		if [[ -r "$MLdestPath" && -w "$MLdestPath" && -x "$MLdestPath" ]] # Can we rwx the destination? We need it.
 		then
 			echo "$0: The destination $MLdestPath offers all privs we need."
@@ -227,7 +227,7 @@ fi
 # We need to find the most recent Backup as our Target for the link-dest
 # The grep shoud be a much better regexp, so we do not accidentally use a LIKE named other backup, but actually a correct old backup to refer to. Currently this will incorrectly find partial names as well as extended names!
 # FIX THIS!
-MLmostRecentSet=S(ls -1tw "$MLdestPath/" | grep "^$MLbackupName-" | head -1)
+MLmostRecentSet=$(ls -1tw "$MLdestPath/" | grep "^$MLbackupName-" | head -1)
 echo The most Recent Set to refer to is: $MLmostRecentSet
 
 
