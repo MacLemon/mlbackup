@@ -51,3 +51,5 @@ Known Issues:
 	Spotlight comments are not backupped reliably if at all (rsync bug)
 
 	If a surplus backup cannot be successfully deleted during backup rotation, the script loops infinitely.
+	
+	Sending the eMail report in case of a broken backup will result in an emtpy message body. The message will still be correctly saved to the backup directory. (Yes this is dumb)

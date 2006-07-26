@@ -15,13 +15,10 @@ MLbackupName="Demo"
 MLbackupCount=5
 
 
-
 # Configuring the SOURCE that will be backed up:
 
 # What file or directory to Backup. (No trailing Slash for directories)
-# Use quotes if spaces are in your path.
-MLsourcePath="/Users/$USER"
-
+MLsourcePath="$HOME"
 
 
 # Configuring the Destination we will save the Backup to.

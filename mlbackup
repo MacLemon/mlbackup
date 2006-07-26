@@ -429,6 +429,9 @@ else # zero, two or more seconds
 	debug "Backup took $MLtimeScriptDurationTotal seconds."
 fi
 
+# sending the admin eMail Notification
+MLhostname=$(hostname)
+cat $MLdestPath/$MLbackupName-$MLbackupDate/AdminEMail.txt | mail -s "$MLhostname $MLbackupName Report" $MLadminEmail
 
 
 if [ "$MLweAreRoot" -eq "1" ]
