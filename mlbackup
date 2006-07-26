@@ -63,12 +63,11 @@ function debug (){
 # usage: debug "Your debugging Message"
 	if [ $MLdebug -eq 1 ] # Is the debug flag set?
 	then # Output everything that is passed to stdout:
-		echo $MLbaseCommand[$$] DEBUG: $@
+		MLtheDebugMessage="$(date) $MLbaseCommand[$$] DEBUG: $@"
+		echo $MLtheDebugMessage
 		
 		# same message passed to the admin eMail Message
-		appendToFile "$MLadminEmailMessage" "
-$MLbaseCommand[$$] DEBUG: $@
-"
+		appendToFile "$MLadminEmailMessage" "$MLtheDebugMessage"
 	fi
 }
 ###############################################################################
@@ -78,6 +77,9 @@ $MLbaseCommand[$$] DEBUG: $@
 MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
 # These are our global settings, user exclusion file will be available at a later date.
 
+MLadminEmailMessage=$(mktemp -t MLadminEmailMessage.XXXXXXXXXX) # Email composition for Backup Admin
+debug "MLadminEmailMessage = $MLadminEmailMessage"
+
 # If the backup only takes place on localhost we should probably directly
 # create the logfiles in the backup destination (which we would need to create
 # ourselves instead of letting rsync do the job.) 
@@ -86,9 +88,6 @@ debug "MLrsyncLogFile = $MLrsyncLogFile"
 
 MLrsyncErrFile=$(mktemp -t MLrsyncErrFile.XXXXXXXXXX) # Logfile for rsync ERR
 debug "MLrsyncErrFile = $MLrsyncErrFile"
-
-MLadminEmailMessage=$(mktemp -t MLadminEmailMessage.XXXXXXXXXX) # Email composition for Backup Admin
-debug "MLadminEmailMessage = $MLadminEmailMessage"
 
 #### Other variables that are currently set VERY quick and dirty, to be improved
 
@@ -398,19 +397,19 @@ fi #[ $MLbackupStatus -ne 0 ]
 
 # At the moment we just move the MLadminEmailMessage into the Backup Dir
 # No emailing yet 
-if [ -s $MLadminEmailMessage ]
-then # Something in the Message file
-	# So we move it to the Backup Directory
+# BUG: Breaks if Backup was renamed due to error...
+# I should REALLY improve on Backup error postprocessing. *embarrassing*
+if [ -s $MLadminEmailMessage ] # admin eMail message greater than 0 bytes?
+then # Yes, something is in the Message file
+	# So we move it to the Backup Directory and rename it accordingly
 	mv $MLadminEmailMessage $MLdestPath/$MLbackupName-$MLbackupDate/AdminEMail.txt
-else # empty Message, just remove the tempfile
+else # No, the message is empty, very unlikely
 	# nothing to shout about, so we silently remove the temporary file
 	rm $MLadminEmailMessage
 fi
 
-# cleaning up
-
+# cleaning up, or so
 # FUTURE: Postflight script
-# FUTURE: notifications, via growl, log or mail
 
 ###############################################################################
 # Almost last thing is to determine how long the backup took.
