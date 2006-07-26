@@ -30,8 +30,8 @@ fi
 
 function appendToFile (){
 # Appends a given text at the end of a given file
-# usage: appendToFile ( "path/to/filename" "Message to append")
-# caveat: No error checking yet
+# usage: appendToFile "path/to/filename" "Message to append"
+# caveat: No error checking yet (should check for existence of file and writeability, should output to console in case of problems)
 	echo "$2" >> "$1"
 }
 
@@ -48,7 +48,7 @@ function appendToFile (){
 
 #------------------------------------------------------------------------------
 function debug (){
-# outputs a debugging message to stdout if the MLdebug Flag is set to 1
+# outputs a debugging message to console if the MLdebug Flag is set to 1
 # usage: debug "Your debugging Message"
 	if [ $MLdebug -eq 1 ] # Is the debug flag set?
 	then # Output everything that is passed to stdout:
@@ -61,8 +61,6 @@ function debug (){
 # Exclude Paths and Filenames mentioned in this file.
 MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
 # These are our global settings, user exclusion file will be available at a later date.
-
-# .noindex prevents Spotlight from indexing this file, which would negatively affect backup performance
 
 # If the backup only takes place on localhost we should probably directly
 # create the logfiles in the backup destination (which we would need to create
@@ -89,7 +87,7 @@ MLdelete=--delete
 
 # Be nice to other processes when compressing the logs
 # See man nice(1) for levels of niceness
-MLbeNice=20
+MLbeNice=-20
 # we should check if MLbeNice is an integer in the range of -20 MLbeNice +20.
 
 if [ "$MLbeNice" -eq 0 ]
@@ -106,13 +104,11 @@ else # nice is non zero
 		else # We are not root, so we will not change the priority, but tell the admin
 			MLbeNiceCommand=""
 			# Adding a message to the admin notification eMail
-			cat <<MLEOF >>$MLadminEmailMessage
-			
+			appendToFile "$MLadminEmailMessage"  "
 The requested increased priority of $MLbeNice for $MLbaseCommand could not be set since we are not running as root. Either set the variable MLbeNice to a non negative integer value or run $MLbaseCommand as root.
 See man nice(1) for more info.
-			
-MLEOF
-			# End of message
+"
+# End of message. Take care of the quotes!
 		fi # [ $MLweAreRoot -eq 1 ]
 	fi # [ $MLbeNice > 0 ]
 fi # [ $MLbeNice -eq 0 ]
