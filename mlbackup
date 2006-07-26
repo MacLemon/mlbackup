@@ -306,7 +306,7 @@ case $MLbackupStatus in
 	0)	# The last backup went ok
 		# If there is setlabel installed, we color it green (green is good)
 		MLeRsyncErrorMessage=""
-		addToFile "$MLadminEmailMessage" "Rsync returned $MLbackupStatus 
+		appendToFile "$MLadminEmailMessage" "Rsync returned $MLbackupStatus 
 		The Backup $MLbackupName went OK!"
 		MLsetlabelPath=$(which setlabel)
 		if [ -e $MLsetlabelPath ] # only makes it green if setlabel command is installed
@@ -370,7 +370,7 @@ esac
 
 
 debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"
-addToFile "$MLadminEmailMessage" "Rsync returned $MLbackupStatus $MLeRsyncErrorMessage"
+appendToFile "$MLadminEmailMessage" "Rsync returned $MLbackupStatus $MLeRsyncErrorMessage"
 
 if [ $MLbackupStatus -ne 0 ] # Something went wrong during the backup
 then
