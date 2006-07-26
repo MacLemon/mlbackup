@@ -91,15 +91,19 @@ MLadminEmailMessage=$(mktemp -t MLadminEmailMessage.XXXXXXXXXX) # Email composit
 debug "MLadminEmailMessage = $MLadminEmailMessage"
 
 #### Other variables that are currently set VERY quick and dirty, to be improved
+
+# The options to invoke rsync with.
+MLrsyncOptions="-apogt"
+
 #Rsync should use compression for non-local-only backup transport (SSH)
-MLcompress=--compress
+MLrsyncCompress="--compress"
 
 # Rsync should be verbose
 # Rsync verbosity beyond -vv does NOT seem to work on Mac OS X, I am afraid this is an rsync bug
-MLbeVerbose=-vv
+MLbeVerbose="-vv"
 
 # Delete trashed files from the backup so our backups don't grow infinitely?
-MLdelete=--delete
+MLdelete="--delete"
 
 # Be nice to other processes when compressing the logs
 # See man nice(1) for levels of niceness
@@ -193,7 +197,7 @@ fi # [ "$MLweAreRoot" -eq "1" ]
 # override of rsync: this is still a beta
 MLrsync="/usr/bin/rsync"
 MLsourceRsync=$MLrsync
-MLdestRsync=$MLrsync
+MLdestRsync="--rsync-path=$MLrsync"
 
 # Dry run, for debugging Rsync, does NOT alter any files, only pretends to.
 # MLdryRun=-n
@@ -249,13 +253,12 @@ debug "The most Recent Set to refer to is: $MLmostRecentSet"
 
 MLgrowlNotifyDelay=10
 # notifying our user of the pending backup
-if [ $MLdebug -eq 1 ] # Are we in debug mode?
-then	# We are in debug mode, so we skip the delay!
-	MLgrowlNotifyDelay=0
+if [ $MLdebug -eq 0 ] # Are we in debug mode?
+then	# We are NOT in debug mode, so we display a growl and wait a moment
+	growlnotify -n BackLemon -m "Your Backup will start in $MLgrowlNotifyDelay Seconds" -t "BackLemon starting"
+	sleep $MLgrowlNotifyDelay
 fi
 
-growlnotify -n BackLemon -m "Your Backup will start in $MLgrowlNotifyDelay Seconds" -t "BackLemon starting"
-sleep $MLgrowlNotifyDelay # MLgrowlNotifyDelay automatically set 0 if MLdebug=1
 
 #Fetching the current date and time
 MLbackupDate=$(date "+%Y.%m.%d-%H.%M.%S")
@@ -263,12 +266,18 @@ debug "Rsync starting now."
 
 MLtimeRsyncStart=$(date +%s)
 # backing up
-$MLsourceRsync $MLbeVerbose --rsync-path=$MLdestRsync -apogt $MLcompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/" >$MLrsyncLogFile 2>$MLrsyncErrFile
+
+$MLsourceRsync $MLbeVerbose $MLdestRsync $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/" >$MLrsyncLogFile 2>$MLrsyncErrFile
 MLbackupStatus=$? # Fetching the return code from our rsync command
-MLtimeRsyncEnd=$(date +%s)
+MLtimeRsyncEnd=$(date +%s) # Fetching a timestamp after rsync for timing stats
 
 let "MLtimeRsyncDuration = $MLtimeRsyncEnd - $MLtimeRsyncStart"
-debug "rsync took $MLtimeRsyncDuration seconds."
+if [ $MLtimeRsyncDuration -eq 1 ] # Just to care for proper language
+then # It was only one second
+	debug "rsync took $MLtimeRsyncDuration second."
+else # zero, two or more seconds
+	debug "rsync took $MLtimeRsyncDuration seconds."
+fi
 
 
 # Post production of the backup
@@ -409,7 +418,15 @@ MLtimeScriptEnd=$(date +%s)
 
 #Calculating the time difference between start and end giving us the duration
 let "MLtimeScriptDurationTotal = $MLtimeScriptEnd - $MLtimeScriptStart"
-debug "Backup Took $MLtimeScriptDurationTotal seconds"
+
+if [ $MLtimeScriptDurationTotal -eq 1 ] # Just to care for proper language
+then # It was only one second
+	debug "Backup took $MLtimeScriptDurationTotal second."
+else # zero, two or more seconds
+	debug "Backup took $MLtimeScriptDurationTotal seconds."
+fi
+
+
 
 if [ "$MLweAreRoot" -eq "1" ]
 then
