@@ -9,7 +9,7 @@
 # first thing we do is check the time to later see how long things took
 MLtimeScriptStart=$(date +%s)
 ###############################################################################
-# Debug Mode. Set to 1 to get some debug messages. Not really used yet. May end up as verbosity switch
+# Debug Mode. Set to 1 to get some debug messages set to 0 to skip them.
 MLdebug=1
 ###############################################################################
 # determining a few standard variables for comfortable use later
