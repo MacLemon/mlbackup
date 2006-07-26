@@ -106,7 +106,7 @@ MLdelete="--delete"
 
 # Be nice to other processes when compressing the logs
 # See man nice(1) for levels of niceness
-MLbeNice=-20
+MLbeNice=20
 # should check if MLbeNice is an integer in the range of -20 < MLbeNice < +20.
 
 if [ "$MLbeNice" -eq 0 ]
@@ -124,7 +124,7 @@ else # nice is non zero
 			MLbeNiceCommand=""
 			# Adding a message to the admin notification eMail
 			appendToFile "$MLadminEmailMessage"  "
-The requested increased priority of $MLbeNice for $MLbaseCommand could not be set since we are not running as root. Either set the variable MLbeNice to a non negative integer value or run $MLbaseCommand as root.
+INFO: The requested increased priority of $MLbeNice for $MLbaseCommand could not be set since we are not running as root. Either set the variable MLbeNice to a non negative integer value or run $MLbaseCommand as root.
 See man nice(1) for more info.
 "
 # End of message. Take care of the quotes!
