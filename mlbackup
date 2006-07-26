@@ -4,7 +4,7 @@
 # Author: Pepi Zawodsky
 # eMail: pepi@maclemon.at
 # Copyright 2005, 2006: All Rights reserved
-# Licensing not yet decided (GPL, LGPL or BSD are likely)
+# Future licensing not yet decided (GPL, LGPL or BSD are likely) Suggestions?
 ###############################################################################
 # first thing we do is check the time to later see how long things took
 MLtimeScriptStart=$(date +%s)
@@ -89,7 +89,16 @@ debug "MLrsyncLogFile = $MLrsyncLogFile"
 MLrsyncErrFile=$(mktemp -t MLrsyncErrFile.XXXXXXXXXX) # Logfile for rsync ERR
 debug "MLrsyncErrFile = $MLrsyncErrFile"
 
-#### Other variables that are currently set VERY quick and dirty, to be improved
+###############################################################################
+# Other variables that are currently set VERY quick and dirty, to be improved
+
+# Path to rsync
+MLrsync="/usr/bin/rsync" # For Mac OS X Tiger (10.4 and up)
+MLsourceRsync=$MLrsync
+MLdestRsync="--rsync-path=$MLrsync"
+
+# Dry run, for debugging Rsync, does NOT alter any files, only pretends to.
+# MLdryRun=-n
 
 # The options to invoke rsync with.
 MLrsyncOptions="-apogt"
@@ -134,8 +143,6 @@ fi # [ $MLbeNice -eq 0 ]
 debug "MLbeNice = $MLbeNice ; MLbeNiceCommand = $MLbeNiceCommand"
 ###############################################################################
 # Including other external scripts, this will be improved in the future
-
-# . /usr/local/bin/rsyncautolocator.sh # MLrsync is set by rsyncautolocator if not overridden
 
 . /usr/local/bin/growler.sh # Provides a handy growlnotify function, see script for info!
 ###############################################################################
@@ -188,19 +195,6 @@ fi # [ "$MLweAreRoot" -eq "1" ]
 # Sanitizing of Input to variables.
 #
 # error handling of config file, setting defaults for missing parameters
-###############################################################################
-# Overide section
-# Here we override variables from the config or from rsyncautolocator
-# At the moment this is for debug purposes only.
-
-# override of rsync: this is still a beta
-MLrsync="/usr/bin/rsync"
-MLsourceRsync=$MLrsync
-MLdestRsync="--rsync-path=$MLrsync"
-
-# Dry run, for debugging Rsync, does NOT alter any files, only pretends to.
-# MLdryRun=-n
-
 ###############################################################################
 # FUTURE: Preflight scripts will be called from here.
 ###############################################################################
@@ -306,6 +300,7 @@ rm $MLrsyncLogFile
 
 ###############################################################################
 # Post processing of the backup:
+
 case $MLbackupStatus in
 	0)	# The last backup went ok
 		# If there is setlabel installed, we color it green (green is good)
