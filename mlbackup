@@ -216,6 +216,10 @@ $MLsourceRsync $MLbeVerbose --rsync-path=$MLdestRsync -apogt $MLcompress $MLdryR
 MLbackupStatus=$? # Fetching the return code from our rsync command
 MLtimeRsyncEnd=$(date +%s)
 
+let "MLtimeRsyncDuration = $MLtimeRsyncEnd - $MLtimeRsyncStart"
+echo rsync took $MLtimeRsyncDuration seconds.
+
+
 # Post production of the backup
 case $MLbackupStatus in
 	0)	# The last backup went ok
@@ -253,7 +257,7 @@ case $MLbackupStatus in
 	echo BackLemon was successful!
 	;;
 	# Error Codes we know from the rsync man page
-	1) MLeRsyncErrorMessage="Syntax or useage error" ;;
+	1) MLeRsyncErrorMessage="Syntax or usage error" ;;
 	2) MLeRsyncErrorMessage="Protocol incompatibility" ;;
 	3) MLeRsyncErrorMessage="Errors selecting input/output files, dirs" ;;
 	4) MLeRsyncErrorMessage="Requested action not supported: an attempt was made to manipulate 64-bit files on a platform that cannot support them; or an option was specified that is supported by the client and not by the server." ;;
