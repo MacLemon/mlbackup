@@ -40,13 +40,13 @@ MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
 # If the backup only takes place on localhost we should probably directly
 # create the logfiles in the backup destination (which we would need to create
 # ourselves instead of letting rsync do the job.) 
-MLrsyncLogFile=`mktemp -t MLrsyncLogFile.XXXXXXXXXX` # Logfile for rsync LOG output
+MLrsyncLogFile=$(mktemp -t MLrsyncLogFile.XXXXXXXXXX) # Logfile for rsync LOG output
 echo MLrsyncLogFile = $MLrsyncLogFile
 
-MLrsyncErrFile=`mktemp -t MLrsyncErrFile.XXXXXXXXXX` # Logfile for rsync ERROR output
+MLrsyncErrFile=$(mktemp -t MLrsyncErrFile.XXXXXXXXXX) # Logfile for rsync ERROR output
 echo MLrsyncErrFile = $MLrsyncErrFile
 
-MLadminEmailMessage=`mktemp -t MLadminEmailMessage.XXXXXXXXXX` # Email composition for Backup Admin
+MLadminEmailMessage=$(mktemp -t MLadminEmailMessage.XXXXXXXXXX) # Email composition for Backup Admin
 echo MLadminEmailMessage = $MLadminEmailMessage
 
 #### Other variables that are currently set VERY quick and dirty, to be improved
@@ -158,7 +158,7 @@ fi # [ -z "$1" ]
 # This should be substantially improved so we write different .pid files for different invocations of backlemon. (Depending on configuration)
 if [ "$MLweAreRoot" -eq "1" ]
 then # We are root, so let us create a .pid file
-	MLmyPidFile="/var/run/"`basename $0`".pid"
+	MLmyPidFile="/var/run/"$MLbaseCommand".pid"
 	echo $$ > $MLmyPidFile
 fi # [ "$MLweAreRoot" -eq "1" ]
 # This .pid file is removed at the end of the script
@@ -185,7 +185,7 @@ MLdestRsync=$MLrsync
 # FUTURE: Preflight scripts will be called from here.
 ###############################################################################
 # asking rsync to tell us how to use extended Attributes (HFS, ResForks)
-MLextendedAttributes=`$MLsourceRsync --help | grep -e "extended" -e "attributes" | sed -e 's/^.*--/--/' -e 's/\ .*//'`
+MLextendedAttributes=$($MLsourceRsync --help | grep -e "extended" -e "attributes" | sed -e 's/^.*--/--/' -e 's/\ .*//')
 
 # checking target
 
@@ -227,7 +227,7 @@ fi
 # We need to find the most recent Backup as our Target for the link-dest
 # The grep shoud be a much better regexp, so we do not accidentally use a LIKE named other backup, but actually a correct old backup to refer to. Currently this will incorrectly find partial names as well as extended names!
 # FIX THIS!
-MLmostRecentSet=`ls -1tw "$MLdestPath/" | grep "^$MLbackupName-" | head -1`
+MLmostRecentSet=S(ls -1tw "$MLdestPath/" | grep "^$MLbackupName-" | head -1)
 echo The most Recent Set to refer to is: $MLmostRecentSet
 
 
@@ -237,7 +237,7 @@ growlnotify -n BackLemon -m "Your Backup will start in $MLgrowlNotifyDelay Secon
 sleep $MLgrowlNotifyDelay # Set MLgrowlNotifyDelay to 0 for testing.
 
 #Fetching the current date and time
-MLbackupDate=`date "+%Y.%m.%d-%H.%M.%S"`
+MLbackupDate=$(date "+%Y.%m.%d-%H.%M.%S")
 echo backing up now
 
 MLtimeRsyncStart=$(date +%s)
@@ -254,14 +254,14 @@ echo rsync took $MLtimeRsyncDuration seconds.
 case $MLbackupStatus in
 	0)	# The last backup went ok
 		# If there is setlabel installed, we color it green (green is good)
-		MLsetlabelPath=`which setlabel`
+		MLsetlabelPath=$(which setlabel)
 		if [ -e $MLsetlabelPath ] # only makes it green if setlabel command is installed
 		then
 			$MLsetlabelPath Green "$MLdestPath/$MLbackupName-$MLbackupDate/"
 		fi
 		
 		# If we have setfcomment installed, we add a nice comment to the folder
-		MLsetfcommentPath=`which setfcomment`
+		MLsetfcommentPath=$(which setfcomment)
 		if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
 		then
 			setfcomment -c "Created by BackLemon [$0] Version $MLversion. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/"
@@ -271,7 +271,7 @@ case $MLbackupStatus in
 		growlnotify -n BackLemon -m "The Backup $MLbackupName was successful." -t "BackLemon finished"
 		
 		# checking if we need to remove some old ones
-		MLoldBackupCount=`ls -1w "$MLdestPath/" | grep -c "^$MLbackupName-"`
+		MLoldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^$MLbackupName-")
 	
 		echo Old Backup Count: $MLoldBackupCount
 		if [ "$MLoldBackupCount" -gt "$MLbackupCount" ] # There are surplus Backups, so we remove them
@@ -279,9 +279,11 @@ case $MLbackupStatus in
 			for ((MLloopIndex="$MLoldBackupCount" ; MLloopIndex>"$MLbackupCount" ; MLloopIndex-- ))
 			do
 			# Counting down
-			MLoldestSetToBeRemoved=`ls -1trw "$MLdestPath/" | grep "^$MLbackupName-" | head -1`
+			MLoldestSetToBeRemoved=$(ls -1trw "$MLdestPath/" | grep "^$MLbackupName-" | head -1)
 			echo Removing the Set named: $MLdestPath/$MLoldestSetToBeRemoved
 			rm -r "$MLdestPath/$MLoldestSetToBeRemoved"
+			# We should check if removing an oldbackup worked correctly, if a user has set the
+			# locked bit, rm will fail on that file, which will take up space over time.
 			done
 		fi
 	echo BackLemon was successful!
@@ -336,7 +338,7 @@ then
 	echo $0: Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage
 	
 	# If there is setlabel installed, we color it red (red like a warning)
-	MLsetlabelPath=`which setlabel`
+	MLsetlabelPath=$(which setlabel)
 	if [ -e $MLsetlabelPath ] # only makes it red if setlabel command is installed
 	then
 		$MLsetlabelPath Red "$MLdestPath/$MLbackupName-$MLbackupDate/"
@@ -344,7 +346,7 @@ then
 
 	# If we have setfcomment installed, we add a nice comment to the folder
 	# TODO: Comment should be truncated to less than 200 characters.
-	MLsetfcommentPath=`which setfcomment`
+	MLsetfcommentPath=$(which setfcomment)
 	if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
 	then
 		setfcomment -c "Unfinished backup! Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage Created by BackLemon [$0] Version $MLbacklemonVersion($MLbacklemonBuild). Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/"
