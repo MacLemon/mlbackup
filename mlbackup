@@ -31,15 +31,15 @@ fi
 function appendToFile (){
 # Appends a given text at the end of a given file
 # usage: appendToFile ( "path/to/filename" "Message to append")
-# No error checking yet
+# caveat: No error checking yet
 	echo "$2" >> "$1"
 }
 
 #------------------------------------------------------------------------------
 # function prependToFile (){
 # Prepends a given Text at the beginning of a given file
-# usage prependToFile ("path/to/filename" "Message to prepend")
-# No error checking yet
+# usage: prependToFile "path/to/filename" "Message to prepend"
+# caveat: No error checking yet
 	
 # Pushed back a moment, current found solutions are not elegant and require at least 
 # one second temporary file.
@@ -49,7 +49,7 @@ function appendToFile (){
 #------------------------------------------------------------------------------
 function debug (){
 # outputs a debugging message to stdout if the MLdebug Flag is set to 1
-# usage: debug("Your debugging Message")
+# usage: debug "Your debugging Message"
 	if [ $MLdebug -eq 1 ] # Is the debug flag set?
 	then # Output everything that is passed to stdout:
 		echo $MLbaseCommand[$$] DEBUG: $@
@@ -67,14 +67,14 @@ MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
 # If the backup only takes place on localhost we should probably directly
 # create the logfiles in the backup destination (which we would need to create
 # ourselves instead of letting rsync do the job.) 
-MLrsyncLogFile=$(mktemp -t MLrsyncLogFile.XXXXXXXXXX) # Logfile for rsync LOG output
-echo MLrsyncLogFile = $MLrsyncLogFile
+MLrsyncLogFile=$(mktemp -t MLrsyncLogFile.XXXXXXXXXX) # Logfile for rsync LOG 
+debug "MLrsyncLogFile = $MLrsyncLogFile"
 
-MLrsyncErrFile=$(mktemp -t MLrsyncErrFile.XXXXXXXXXX) # Logfile for rsync ERROR output
-echo MLrsyncErrFile = $MLrsyncErrFile
+MLrsyncErrFile=$(mktemp -t MLrsyncErrFile.XXXXXXXXXX) # Logfile for rsync ERR
+debug "MLrsyncErrFile = $MLrsyncErrFile"
 
 MLadminEmailMessage=$(mktemp -t MLadminEmailMessage.XXXXXXXXXX) # Email composition for Backup Admin
-echo MLadminEmailMessage = $MLadminEmailMessage
+debug "MLadminEmailMessage = $MLadminEmailMessage"
 
 #### Other variables that are currently set VERY quick and dirty, to be improved
 #Rsync should use compression for non-local-only backup transport (SSH)
@@ -129,26 +129,25 @@ fi # [ $MLbeNice -eq 0 ]
 # Did we get a parameter to use as a config file?
 if [ -z "$1" ]
 then # There was no config filename passed
-  echo "Usage: $0 configfile"
+  echo "Usage: $0 path/to/configfile"
   exit 255 # Error invoking backlemon. Cannot continue without a config.
 else # We were passed a config file
 	MLconfigFile=$1
-	echo Config file to use is: $MLconfigFile
+	debug "Config file to use is: $MLconfigFile"
 
 	# Now let's check that parameter
 	
 	# Does this file exist?
 	if [ -e $MLconfigFile ]
 	then # The file does exist 
-
-		echo "Config file $MLconfigFile exists."
-
+		debug "Config file $MLconfigFile exists."
+		
 		# Is the config file readable by the user?
 		if [ -r $MLconfigFile ]
 		then # The config file can be read by the user invoking this script
 
 			# Load in the config (DIRTY *yuck*)
-			echo Loading the config file $MLconfigFile
+			debug "Loading the config file $MLconfigFile"
 			. $MLconfigFile
 		else # The user does not have read permission for the config file
 			echo $0[$$]: The config file $MLconfigFile does exist but is not readable by $USER. Please change the mode or owner of the configuration file or use another user to run $0!
@@ -219,9 +218,9 @@ else
 		# if yes ok, else fail
 		if [[ -r "$MLdestPath" && -w "$MLdestPath" && -x "$MLdestPath" ]] # Can we rwx the destination? We need it.
 		then
-			echo "$0: The destination $MLdestPath offers all privs we need."
+			debug "The destination $MLdestPath offers all privs we need."
 		else
-			echo "$0: The destination $MLdestPath need read, write and execute privs for the user $USER invoking this script to be able to backup your data."
+			echo "The destination $MLdestPath need read, write and execute privs for the user $USER invoking this script to be able to backup your data."
 			exit
 		fi
 	else
@@ -234,17 +233,22 @@ fi
 # The grep shoud be a much better regexp, so we do not accidentally use a LIKE named other backup, but actually a correct old backup to refer to. Currently this will incorrectly find partial names as well as extended names!
 # FIX THIS!
 MLmostRecentSet=$(ls -1tw "$MLdestPath/" | grep "^$MLbackupName-" | head -1)
-echo The most Recent Set to refer to is: $MLmostRecentSet
+debug "The most Recent Set to refer to is: $MLmostRecentSet"
 
 
-MLgrowlNotifyDelay=0
+MLgrowlNotifyDelay=10
 # notifying our user of the pending backup
+if [ $MLdebug -eq 1 ] # Are we in debug mode?
+then	# We are in debug mode, so we skip the delay!
+	MLgrowlNotifyDelay=0
+fi
+
 growlnotify -n BackLemon -m "Your Backup will start in $MLgrowlNotifyDelay Seconds" -t "BackLemon starting"
-sleep $MLgrowlNotifyDelay # Set MLgrowlNotifyDelay to 0 for testing.
+sleep $MLgrowlNotifyDelay # MLgrowlNotifyDelay automatically set 0 if MLdebug=1
 
 #Fetching the current date and time
 MLbackupDate=$(date "+%Y.%m.%d-%H.%M.%S")
-echo backing up now
+debug "Rsync starting now."
 
 MLtimeRsyncStart=$(date +%s)
 # backing up
@@ -253,7 +257,7 @@ MLbackupStatus=$? # Fetching the return code from our rsync command
 MLtimeRsyncEnd=$(date +%s)
 
 let "MLtimeRsyncDuration = $MLtimeRsyncEnd - $MLtimeRsyncStart"
-echo rsync took $MLtimeRsyncDuration seconds.
+debug "rsync took $MLtimeRsyncDuration seconds."
 
 
 # Post production of the backup
@@ -270,7 +274,7 @@ case $MLbackupStatus in
 		MLsetfcommentPath=$(which setfcomment)
 		if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
 		then
-			setfcomment -c "Created by BackLemon [$0] Version $MLversion. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/"
+			setfcomment -c "Created by $MLbaseCommand $MLversion. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/"
 		fi
 		
 		# notifying our user that the backup finished successfully
@@ -279,20 +283,21 @@ case $MLbackupStatus in
 		# checking if we need to remove some old ones
 		MLoldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^$MLbackupName-")
 	
-		echo Old Backup Count: $MLoldBackupCount
+		debug "Old Backup Count: $MLoldBackupCount"
 		if [ "$MLoldBackupCount" -gt "$MLbackupCount" ] # There are surplus Backups, so we remove them
-		then	
+		then
+			debug "There are surplus old backups, starting to remove them."
 			for ((MLloopIndex="$MLoldBackupCount" ; MLloopIndex>"$MLbackupCount" ; MLloopIndex-- ))
 			do
 			# Counting down
 			MLoldestSetToBeRemoved=$(ls -1trw "$MLdestPath/" | grep "^$MLbackupName-" | head -1)
-			echo Removing the Set named: $MLdestPath/$MLoldestSetToBeRemoved
+			debug "Removing the Set named: $MLdestPath/$MLoldestSetToBeRemoved"
 			rm -r "$MLdestPath/$MLoldestSetToBeRemoved"
 			# We should check if removing an oldbackup worked correctly, if a user has set the
 			# locked bit, rm will fail on that file, which will take up space over time.
 			done
 		fi
-	echo BackLemon was successful!
+	debug "BackLemon was successful!"
 	;;
 	# Error Codes we know from the rsync man page
 	1) MLeRsyncErrorMessage="Syntax or usage error" ;;
@@ -320,6 +325,7 @@ case $MLbackupStatus in
 esac
 
 # We move and compress the logfiles to the backup destination. (currently only on localhost)
+debug "Compressing the logfiles."
 
 # Postprocessing the error.log
 if [ -s $MLrsyncErrFile ] # The error log is larger than 0 bytes, only in case of an error
@@ -336,12 +342,12 @@ fi #[ -s $MLrsyncLogFile ]
 rm $MLrsyncLogFile
 
 
-# echo $0: Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage
+debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"
 
 if [ $MLbackupStatus -ne 0 ] # Something went wrong during the backup
 then
 	# Telling that something went wrong
-	echo $0: Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage
+	debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"
 	
 	# If there is setlabel installed, we color it red (red like a warning)
 	MLsetlabelPath=$(which setlabel)
@@ -355,7 +361,7 @@ then
 	MLsetfcommentPath=$(which setfcomment)
 	if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
 	then
-		setfcomment -c "Unfinished backup! Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage Created by BackLemon [$0] Version $MLbacklemonVersion($MLbacklemonBuild). Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/"
+		setfcomment -c "Unfinished backup! Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage Created by $MLbaseCommand $MLbacklemonVersion($MLbacklemonBuild). Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/"
 	fi # [ -e $MLsetfcommentPath ]
 
 	# renaming the unfinished backup, so it will notbe used for the next delta backup!	
@@ -392,13 +398,13 @@ MLtimeScriptEnd=$(date +%s)
 
 #Calculating the time difference between start and end giving us the duration
 let "MLtimeScriptDurationTotal = $MLtimeScriptEnd - $MLtimeScriptStart"
-echo Backup Took $MLtimeScriptDurationTotal seconds
+debug "Backup Took $MLtimeScriptDurationTotal seconds"
 
 if [ "$MLweAreRoot" -eq "1" ]
 then
 	# We are root, so we did create a .pid file, now let us remove it again.
 	rm $MLmyPidFile
 fi
-echo BackLemon ended
+debug "BackLemon ended"
 ###############################################################################
 # EOF
