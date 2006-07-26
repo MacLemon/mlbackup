@@ -41,9 +41,13 @@ MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
 # create the logfiles in the backup destination (which we would need to create
 # ourselves instead of letting rsync do the job.) 
 MLrsyncLogFile=`mktemp -t MLrsyncLogFile.XXXXXXXXXX` # Logfile for rsync LOG output
-MLrsyncErrFile=`mktemp -t MLrsyncErrFile.XXXXXXXXXX` # Logfile for rsync ERROR output
-MLadminEmailMessage=`tempfile -s .noindex` # Email composition for Backup Admin
+echo MLrsyncLogFile = $MLrsyncLogFile
 
+MLrsyncErrFile=`mktemp -t MLrsyncErrFile.XXXXXXXXXX` # Logfile for rsync ERROR output
+echo MLrsyncErrFile = $MLrsyncErrFile
+
+MLadminEmailMessage=`mktemp -t MLadminEmailMessage.XXXXXXXXXX` # Email composition for Backup Admin
+echo MLadminEmailMessage = $MLadminEmailMessage
 
 #### Other variables that are currently set VERY quick and dirty, to be improved
 #Rsync should use compression for non-local-only backup transport
@@ -84,6 +88,27 @@ MLEOF
 		fi # [ $MLweAreRoot -eq 1 ]
 	fi # [ $MLbeNice > 0 ]
 fi # [ $MLbeNice -eq 0 ]
+###############################################################################
+# defining our own functions:
+
+function appendToFile (){
+# Appends a given text at the end of a given file
+# usage: appendToFile ( "path/to/filename" "Message to append")
+# No error checking yet
+	echo "$2" >> "$1"
+}
+
+# function prependToFile (){
+# Prepends a given Text at the beginning of a given file
+# usage prependToFile ("path/to/filename" "Message to prepend")
+# No error checking yet
+	
+# Pushed back a moment, current found solutions are not elegant and require at least 
+# one second temporary file.
+
+# }
+
+
 ###############################################################################
 # Including other external scripts, this will be improved in the future
 
@@ -137,6 +162,7 @@ then # We are root, so let us create a .pid file
 	echo $$ > $MLmyPidFile
 fi # [ "$MLweAreRoot" -eq "1" ]
 # This .pid file is removed at the end of the script
+# Would be nice to be able to write .pid files if not beeing root as well.
 ###############################################################################
 # Sanitizing of Input to variables.
 #
@@ -149,6 +175,7 @@ fi # [ "$MLweAreRoot" -eq "1" ]
 # override of rsync: this is still a beta
 MLrsync="/usr/bin/rsync"
 MLsourceRsync=$MLrsync
+MLdestRsync=$MLrsync
 
 
 # Dry run, for debugging Rsync, does NOT alter any files, only pretends to.
@@ -168,7 +195,8 @@ then
 	# The target directory does not exist, we will try to create it.
 	echo The target Directory does not exist, trying to create one
 	MLeCreateDirectoryReturn=0
-	mkdir -p -m 750 "$MLdestPath"
+	mkdir -m 750 "$MLdestPath"
+	# removed -p from Target creation, should help with missing target Volumes
 	MLeCreateDirectoryReturn=$?
 	if [ "$MLeCreateDirectoryReturn" ]	# Did that go well?
 	then
@@ -202,9 +230,11 @@ fi
 MLmostRecentSet=`ls -1tw "$MLdestPath/" | grep "^$MLbackupName-" | head -1`
 echo The most Recent Set to refer to is: $MLmostRecentSet
 
+
+MLgrowlNotifyDelay=0
 # notifying our user of the pending backup
-growlnotify -n BackLemon -m "Your Backup will start in 0 Seconds" -t "BackLemon starting"
-#sleep 10 # Turned off for testing
+growlnotify -n BackLemon -m "Your Backup will start in $MLgrowlNotifyDelay Seconds" -t "BackLemon starting"
+sleep $MLgrowlNotifyDelay # Set MLgrowlNotifyDelay to 0 for testing.
 
 #Fetching the current date and time
 MLbackupDate=`date "+%Y.%m.%d-%H.%M.%S"`
@@ -212,7 +242,7 @@ echo backing up now
 
 MLtimeRsyncStart=$(date +%s)
 # backing up
-$MLsourceRsync $MLbeVerbose --rsync-path=$MLdestRsync -apogt $MLcompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/" >$MLrsyncLogFile &2>$MLrsyncErrFile
+$MLsourceRsync $MLbeVerbose --rsync-path=$MLdestRsync -apogt $MLcompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/" >$MLrsyncLogFile 2>$MLrsyncErrFile
 MLbackupStatus=$? # Fetching the return code from our rsync command
 MLtimeRsyncEnd=$(date +%s)
 
