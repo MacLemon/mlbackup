@@ -9,6 +9,9 @@
 # first thing we do is check the time to later see how long things took
 MLtimeScriptStart=$(date +%s)
 ###############################################################################
+# Debug Mode. Set to 1 to get some debug messages. Not really used yet. May end up as verbosity switch
+MLdebug=1
+###############################################################################
 # determining a few standard variables for comfortable use later
 MLfullCommand=$0
 MLbaseCommand=$(basename $0)
@@ -23,13 +26,37 @@ if [ "$UID" -ne "$MLrootUID" ]
 		MLweAreRoot=1
 fi
 ###############################################################################
+# defining our own functions:
+
+function appendToFile (){
+# Appends a given text at the end of a given file
+# usage: appendToFile ( "path/to/filename" "Message to append")
+# No error checking yet
+	echo "$2" >> "$1"
+}
+
+#------------------------------------------------------------------------------
+# function prependToFile (){
+# Prepends a given Text at the beginning of a given file
+# usage prependToFile ("path/to/filename" "Message to prepend")
+# No error checking yet
+	
+# Pushed back a moment, current found solutions are not elegant and require at least 
+# one second temporary file.
+
+# }
+
+#------------------------------------------------------------------------------
+function debug (){
+# outputs a debugging message to stdout if the MLdebug Flag is set to 1
+# usage: debug("Your debugging Message")
+	if [ $MLdebug -eq 1 ] # Is the debug flag set?
+	then # Output everything that is passed to stdout:
+		echo $MLbaseCommand[$$] DEBUG: $@
+	fi
+}
+###############################################################################
 # Setting our own internal variables, this may be moved to a global config later
-
-# Do we need to set a warning message? Reserved for future use.
-# MLwarning=0
-
-# Debug Mode. Set to 1 to get some debug messages. Not really used yet. May end up as verbosity switch
-MLdebug=1
 
 # Exclude Paths and Filenames mentioned in this file.
 MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
@@ -89,37 +116,6 @@ MLEOF
 		fi # [ $MLweAreRoot -eq 1 ]
 	fi # [ $MLbeNice > 0 ]
 fi # [ $MLbeNice -eq 0 ]
-###############################################################################
-# defining our own functions:
-
-function appendToFile (){
-# Appends a given text at the end of a given file
-# usage: appendToFile ( "path/to/filename" "Message to append")
-# No error checking yet
-	echo "$2" >> "$1"
-}
-
-#------------------------------------------------------------------------------
-# function prependToFile (){
-# Prepends a given Text at the beginning of a given file
-# usage prependToFile ("path/to/filename" "Message to prepend")
-# No error checking yet
-	
-# Pushed back a moment, current found solutions are not elegant and require at least 
-# one second temporary file.
-
-# }
-
-#------------------------------------------------------------------------------
-function debug (){
-# outputs a debugging message to stdout if the MLdebug Flag is set to 1
-# usage: debug("Your debugging Message")
-	if [ $MLdebug -eq 1 ] # Is the debug flag set?
-	then # Output everything that is passed to stdout:
-		echo $MLbaseCommand[$$] DEBUG: $@
-	fi
-}
-
 ###############################################################################
 # Including other external scripts, this will be improved in the future
 
