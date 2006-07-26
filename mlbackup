@@ -278,8 +278,34 @@ else # zero, two or more seconds
 	debug "rsync took $MLtimeRsyncDuration seconds."
 fi
 
+###############################################################################
+# Post processing the recorded logfiles:
+# We move and compress the logfiles to the backup destination. (currently only on localhost)
+debug "Compressing the logfiles and moving them to the backup destination."
 
-# Post production of the backup
+# Postprocessing the error.log
+if [ -s $MLrsyncErrFile ] # Non zero byte error.log? Only in case of errors
+then # Yes, there were errors recorded.
+	$MLbeNiceCommand cat $MLrsyncErrFile | gzip -9 >$MLdestPath/$MLbackupName-$MLbackupDate/error.log.gz
+else
+	debug "The error.log $MLrsyncErrFile was empty, looks good."
+fi # [ -s $MLrsyncErrFile ]
+# removing the error.log tempfile
+rm $MLrsyncErrFile
+
+# post processing the rsync.log
+if [ -s $MLrsyncLogFile ] # Non zero bytes rsync.log? (Expected)
+then # Yes, of course, compress and move to the backup folder
+	$MLbeNiceCommand cat $MLrsyncLogFile | gzip -9 >$MLdestPath/$MLbackupName-$MLbackupDate/rsync.log.gz
+else
+	debug "The rsync.log $MLrsyncLogFile was empty, this is extremely unlikely!"
+fi #[ -s $MLrsyncLogFile ]
+# Removing the rsync.log tempfile
+rm $MLrsyncLogFile
+
+
+###############################################################################
+# Post processing of the backup:
 case $MLbackupStatus in
 	0)	# The last backup went ok
 		# If there is setlabel installed, we color it green (green is good)
@@ -313,7 +339,7 @@ case $MLbackupStatus in
 			debug "Removing the Set named: $MLdestPath/$MLoldestSetToBeRemoved"
 			rm -r "$MLdestPath/$MLoldestSetToBeRemoved"
 			# We should check if removing an oldbackup worked correctly, if a user has set the
-			# locked bit, rm will fail on that file, which will take up space over time.
+			# locked bit, rm will fail on that file, which will take up space over time. and more important will have this part looooop and hang. Maybe better write them all to an array and try to delete in one rush.
 			done
 		fi
 	debug "BackLemon was successful!"
@@ -342,23 +368,6 @@ case $MLbackupStatus in
 	*) MLeRsyncErrorMessage="$0: Rsync returned Error Code $MLbackupStatus: Sorry, we do not know what this error code means. You may want to check your logfiles or the man page for rsync on your system."
 	;;
 esac
-
-# We move and compress the logfiles to the backup destination. (currently only on localhost)
-debug "Compressing the logfiles."
-
-# Postprocessing the error.log
-if [ -s $MLrsyncErrFile ] # The error log is larger than 0 bytes, only in case of an error
-then
-	$MLbeNiceCommand cat $MLrsyncErrFile | gzip -9 >$MLdestPath/$MLbackupName-$MLbackupDate/error.log.gz
-fi # [ -s $MLrsyncErrFile ]
-rm $MLrsyncErrFile
-
-# post processing the rsync.log
-if [ -s $MLrsyncLogFile ] # The rsync log is larger than 0 bytes which is expected
-then
-	$MLbeNiceCommand cat $MLrsyncLogFile | gzip -9 >$MLdestPath/$MLbackupName-$MLbackupDate/rsync.log.gz
-fi #[ -s $MLrsyncLogFile ]
-rm $MLrsyncLogFile
 
 
 debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"

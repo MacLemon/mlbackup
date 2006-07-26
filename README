@@ -1,36 +1,53 @@
-MacLemon Backup - README v46
-Please send feedback and suggestions to pepi@maclemon.at
+MacLemon Backup - README
+
+
+Do you like MacLemon Backup? Tell us why, we love to be praised and worshipped!
+Don't like MacLemon Backup? Tell us how we can improve it!
+
+Please send all feedback and suggestions to pepi@maclemon.at
 
 
 Disclaimer:
+--------------------------------------------------------------------------------
 	This software is provided as-is. It is in early alpha status and should be treated as such. Please do not solely rely on the backups made with MacLemon Backup.
 
 
+Target Audience:
+--------------------------------------------------------------------------------
+Admins and Geek Users who like a nice intelligent and incremental backup through the shell. Can be run from cron (or launchd) if you like. This is NOT INTENDED for normal users (yet).
+
+
+
 Installation:
+--------------------------------------------------------------------------------
 	See INSTALL on how to install all the necessary files to use MacLemon backup.
 
 
+
 Usage:
-	Create a config file for your backup.
-	Copy the included sampleconfig and edit the values accordingly.
-	The sample config you can find in /etc/maclemon/backup/demo.mlbackupconf.sample is (hopefully) well enough documented.
+--------------------------------------------------------------------------------
+	Create a config file for your backup, for example by copying the included sampleconfig and edit the values accordingly.
+You can find the sample config in /etc/maclemon/backup/demo.mlbackupconf.sample  It hopefully is self-explanatory, if not, please tell us how to improve it!
+
 
 
 Additions:
+--------------------------------------------------------------------------------
 	None of these are mandatory, but they provide some comfort.
 
-	If you have growl installed, mlbackup will make use of it.
-	For more info on growl see http://growl.info/
+	If you have growl (and growlnotify) installed, mlbackup will try to make use of it. For more info on growl see http://growl.info/
 
-
-	If you have osxutils installed via fink, mlbackup will make use of it.
-	For more info on osxutils see http://sourceforge.net/projects/osxutils/
-	You can run `fink install osxutils` to install them if you have fink.
-	See http://fink.sf.net/ for info on fink.
+	If you have osxutils installed via fink, mlbackup will try to make use of them. For more info on osxutils see http://sourceforge.net/projects/osxutils/ You can run `fink install osxutils` to install them if you have fink.
+See http://fink.sf.net/ for info on fink.
 
 
 
 Known Issues:
+--------------------------------------------------------------------------------
 	no manpage for mlbackup yet
-	If you backup to an external drive and that drive is not available when mlbackup runs there is no exception handling yet (in the works)
+
+	If you backup to an external drive and that drive is not available when mlbackup runs there is no exception handling yet which will result in VERY BAD THINGS! So make sure your external drives are available until I'm done coding the exception handling.
+
 	Spotlight comments are not backupped reliably if at all (rsync bug)
+
+	If a surplus backup cannot be successfully deleted during backup rotation, the script loops infinitely.
