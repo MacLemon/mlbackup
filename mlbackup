@@ -16,6 +16,17 @@ MLdebug=1
 MLfullCommand=$0
 MLbaseCommand=$(basename $0)
 ###############################################################################
+# Error and exit codes used
+# Everything Ok returns 0
+# Any rsync Error returns the return Value of rsync
+# Known rsync error codes are 1-30
+# Any other error returns one of these (128-254):
+MLE_DestinationNotWriteable=250
+MLE_NoConfigFileParameter=251
+MLE_DestinationIsNoDirectory=252
+MLE_ConfigFileNotReadable=253
+MLE_ConfigFileNotFound=254
+###############################################################################
 # Check if we run as root and set MLweAreRoot accordingly. Other parts of the script can rely on this variable to be set correctly.
 MLrootUID=0
 if [ "$UID" -ne "$MLrootUID" ]
@@ -53,6 +64,11 @@ function debug (){
 	if [ $MLdebug -eq 1 ] # Is the debug flag set?
 	then # Output everything that is passed to stdout:
 		echo $MLbaseCommand[$$] DEBUG: $@
+		
+		# same message passed to the admin eMail Message
+		appendToFile "$MLadminEmailMessage" "
+$MLbaseCommand[$$] DEBUG: $@
+"
 	fi
 }
 ###############################################################################
@@ -88,7 +104,7 @@ MLdelete=--delete
 # Be nice to other processes when compressing the logs
 # See man nice(1) for levels of niceness
 MLbeNice=-20
-# we should check if MLbeNice is an integer in the range of -20 MLbeNice +20.
+# should check if MLbeNice is an integer in the range of -20 < MLbeNice < +20.
 
 if [ "$MLbeNice" -eq 0 ]
 then # nice is zero, so we do not alter the task priority
@@ -112,6 +128,7 @@ See man nice(1) for more info.
 		fi # [ $MLweAreRoot -eq 1 ]
 	fi # [ $MLbeNice > 0 ]
 fi # [ $MLbeNice -eq 0 ]
+debug "MLbeNice = $MLbeNice ; MLbeNiceCommand = $MLbeNiceCommand"
 ###############################################################################
 # Including other external scripts, this will be improved in the future
 
@@ -125,34 +142,33 @@ fi # [ $MLbeNice -eq 0 ]
 # Did we get a parameter to use as a config file?
 if [ -z "$1" ]
 then # There was no config filename passed
-  echo "Usage: $0 path/to/configfile"
-  exit 255 # Error invoking backlemon. Cannot continue without a config.
+  echo "Usage: $MLbaseCommand path/to/configfile"
+  exit $MLE_NoConfigFileParameter # Error invoking backlemon. Cannot continue without a config.
 else # We were passed a config file
 	MLconfigFile=$1
 	debug "Config file to use is: $MLconfigFile"
 
 	# Now let's check that parameter
-	
 	# Does this file exist?
 	if [ -e $MLconfigFile ]
 	then # The file does exist 
 		debug "Config file $MLconfigFile exists."
 		
-		# Is the config file readable by the user?
+		# Is the config file readable by the user invoking the script?
 		if [ -r $MLconfigFile ]
 		then # The config file can be read by the user invoking this script
 
-			# Load in the config (DIRTY *yuck*)
+			# Load in the config (DIRTY *yuck*) Better use the defaults system
 			debug "Loading the config file $MLconfigFile"
 			. $MLconfigFile
 		else # The user does not have read permission for the config file
-			echo $0[$$]: The config file $MLconfigFile does exist but is not readable by $USER. Please change the mode or owner of the configuration file or use another user to run $0!
-			exit 253 # config file not readable
+			echo $MLbaseCommand[$$]:FATAL The config file $MLconfigFile does exist but is not readable by $USER. Please change the mode or owner of the configuration file or use a different user to run $MLbaseCommand!
+			exit $MLE_ConfigFileNotReadable # config file not readable
 			# We might do further testing of this file to give a better error
 		fi
 	else # The config file doesn't exist, FATAL
-		echo $0[$$]: The config file $MLconfigFile does not exist, Please check the path.
-		exit 254 # Config file doesn't exist
+		echo $MLbaseCommand[$$]:FATAL The config file $MLconfigFile could not be found. Please check the path!
+		exit $MLE_ConfigFileNotFound # Config file not found
 	fi # [ -e $MLconfigFile ]
 fi # [ -z "$1" ]
 ###############################################################################
@@ -178,7 +194,6 @@ fi # [ "$MLweAreRoot" -eq "1" ]
 MLrsync="/usr/bin/rsync"
 MLsourceRsync=$MLrsync
 MLdestRsync=$MLrsync
-
 
 # Dry run, for debugging Rsync, does NOT alter any files, only pretends to.
 # MLdryRun=-n
@@ -217,11 +232,11 @@ else
 			debug "The destination $MLdestPath offers all privs we need."
 		else
 			echo "The destination $MLdestPath need read, write and execute privs for the user $USER invoking this script to be able to backup your data."
-			exit
+			exit $MLE_DestinationNotWriteable
 		fi
 	else
-		echo "$0: The destination $MLdestPath is not a directory. We can not save backups in anything but a directory (like a file or block device)"
-		exit
+		echo "$MLbaseCommand: The destination $MLdestPath is not a directory. We can not save backups in anything but a directory (like a file or block device)"
+		exit $MLE_DestinationIsNoDirectory
 	fi
 fi
 
