@@ -248,7 +248,7 @@ fi
 
 #Fetching the current date and time
 MLbackupDate=$(date "+%Y.%m.%d-%H.%M.%S")
-debug "Rsync starting now."
+
 
 # Creating the Final Destination directory:
 # the .noindex trick keeps Spotlight from indexing while we backup
@@ -258,9 +258,10 @@ mkdir $MLfinalTarget
 
 
 
-
+debug "Rsync starting now."
 MLtimeRsyncStart=$(date +%s)
 # backing up
+debug The rsync command is: $MLsourceRsync $MLbeVerbose $MLdestRsync $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/"
 
 $MLsourceRsync $MLbeVerbose $MLdestRsync $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >$MLrsyncLogFile 2>$MLrsyncErrFile
 MLbackupStatus=$? # Fetching the return code from our rsync command
@@ -302,7 +303,7 @@ rm $MLrsyncLogFile
 
 ###############################################################################
 # Post processing of the backup:
-
+debug "Backup postprocessing"
 case $MLbackupStatus in
 	0)	# The last backup went ok
 		# If there is setlabel installed, we color it green (green is good)
@@ -312,14 +313,14 @@ case $MLbackupStatus in
 		MLsetlabelPath=$(which setlabel)
 		if [ -e $MLsetlabelPath ] # only makes it green if setlabel command is installed
 		then
-			$MLsetlabelPath Green "$MLdestPath/$MLfinalTarget/"
+			$MLsetlabelPath Green "$MLfinalTarget/"
 		fi
 		
 		# If we have setfcomment installed, we add a nice comment to the folder
 		MLsetfcommentPath=$(which setfcomment)
 		if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
 		then
-			setfcomment -c "Created by $MLbaseCommand $MLversion. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/"
+			setfcomment -c "Created by $MLbaseCommand $MLversion. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
 		fi
 		
 		# notifying our user that the backup finished successfully
