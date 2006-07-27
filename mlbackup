@@ -22,6 +22,7 @@ MLhostname=$(hostname)
 # Any rsync error returns the return value of rsync
 # Known rsync error codes are 1-30
 # Any other error returns one of these (128-254):
+MLE_DestinationNotFound=249
 MLE_DestinationNotWriteable=250
 MLE_NoConfigFileParameter=251
 MLE_DestinationIsNoDirectory=252
@@ -205,29 +206,14 @@ MLextendedAttributes=$($MLsourceRsync --help | grep -e "extended" -e "attributes
 
 # checking target
 
-if [ ! -e "$MLdestPath" ] # Does our target directory exist?
-then
-	# we should check with -d here! exists AND is Dir. Error handling later
-	# The target directory does not exist, we will try to create it.
-	echo The target Directory does not exist, trying to create one
-	MLeCreateDirectoryReturn=0
-	mkdir -m 750 "$MLdestPath"
-	# removed -p from Target creation, should help with missing target Volumes
-	MLeCreateDirectoryReturn=$?
-	if [ "$MLeCreateDirectoryReturn" ]	# Did that go well?
-	then
-	# No, an error occured
-		MLtheFinalErrorMessage="The target directory $MLdestPath does not exist and an attempt to create it failed. You may want to check the privileges."
-		echo $MLtheFinalErrorMessage
-		exit
-	fi
-else
-	if [ -d "$MLdestPath" ] # The destination does exist AND is a directory
-	then
+if [ -e "$MLdestPath" ] # Does our target exist?
+then # Yes, it does exist,
+	if [ -d "$MLdestPath" ] # Is it a directory as well?
+	then # Yes, it IS a directory.
 		# check if it is writeable!
 		# if yes ok, else fail
 		if [[ -r "$MLdestPath" && -w "$MLdestPath" && -x "$MLdestPath" ]] # Can we rwx the destination? We need it.
-		then
+		then # Great, everything we need!
 			debug "The destination $MLdestPath offers all privs we need."
 		else
 			echo "The destination $MLdestPath need read, write and execute privs for the user $USER invoking this script to be able to backup your data."
@@ -237,6 +223,11 @@ else
 		echo "$MLbaseCommand: The destination $MLdestPath is not a directory. We can not save backups in anything but a directory (like a file or block device)"
 		exit $MLE_DestinationIsNoDirectory
 	fi
+else # No, the target does not exist
+	debug "FATAL: The target $MLdestPath could not be found."
+	debug "If your target is on an external volume, make sure it is mounted!"
+	echo "The target $MLdestPath could not be found! If your target is on an external volume, make sure it is mounted!" | mail -s "$MLhostname $MLbackupName: Target missing" $MLadminEmail
+	exit $MLE_DestinationNotFound
 fi
 
 # We need to find the most recent Backup as our Target for the link-dest
@@ -259,10 +250,19 @@ fi
 MLbackupDate=$(date "+%Y.%m.%d-%H.%M.%S")
 debug "Rsync starting now."
 
+# Creating the Final Destination directory:
+# the .noindex trick keeps Spotlight from indexing while we backup
+MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate.noindex"
+debug "MLfinalTarget = $MLfinalTarget"
+mkdir $MLfinalTarget
+
+
+
+
 MLtimeRsyncStart=$(date +%s)
 # backing up
 
-$MLsourceRsync $MLbeVerbose $MLdestRsync $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/" >$MLrsyncLogFile 2>$MLrsyncErrFile
+$MLsourceRsync $MLbeVerbose $MLdestRsync $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >$MLrsyncLogFile 2>$MLrsyncErrFile
 MLbackupStatus=$? # Fetching the return code from our rsync command
 MLtimeRsyncEnd=$(date +%s) # Fetching a timestamp after rsync for timing stats
 
@@ -282,7 +282,7 @@ debug "Compressing the logfiles and moving them to the backup destination."
 # Postprocessing the error.log
 if [ -s $MLrsyncErrFile ] # Non zero byte error.log? Only in case of errors
 then # Yes, there were errors recorded.
-	$MLbeNiceCommand cat $MLrsyncErrFile | gzip -9 >$MLdestPath/$MLbackupName-$MLbackupDate/error.log.gz
+	$MLbeNiceCommand cat $MLrsyncErrFile | gzip -9 >$MLfinalTarget/error.log.gz
 else
 	debug "The error.log $MLrsyncErrFile was empty, looks good."
 fi # [ -s $MLrsyncErrFile ]
@@ -292,7 +292,7 @@ rm $MLrsyncErrFile
 # post processing the rsync.log
 if [ -s $MLrsyncLogFile ] # Non zero bytes rsync.log? (Expected)
 then # Yes, of course, compress and move to the backup folder
-	$MLbeNiceCommand cat $MLrsyncLogFile | gzip -9 >$MLdestPath/$MLbackupName-$MLbackupDate/rsync.log.gz
+	$MLbeNiceCommand cat $MLrsyncLogFile | gzip -9 >$MLfinalTarget/rsync.log.gz
 else
 	debug "The rsync.log $MLrsyncLogFile was empty, this is extremely unlikely!"
 fi #[ -s $MLrsyncLogFile ]
@@ -312,7 +312,7 @@ case $MLbackupStatus in
 		MLsetlabelPath=$(which setlabel)
 		if [ -e $MLsetlabelPath ] # only makes it green if setlabel command is installed
 		then
-			$MLsetlabelPath Green "$MLdestPath/$MLbackupName-$MLbackupDate/"
+			$MLsetlabelPath Green "$MLdestPath/$MLfinalTarget/"
 		fi
 		
 		# If we have setfcomment installed, we add a nice comment to the folder
@@ -382,7 +382,7 @@ then
 	MLsetlabelPath=$(which setlabel)
 	if [ -e $MLsetlabelPath ] # only makes it red if setlabel command is installed
 	then
-		$MLsetlabelPath Red "$MLdestPath/$MLbackupName-$MLbackupDate/"
+		$MLsetlabelPath Red "$MLfinalTarget/"
 	fi # [ -e $MLsetlabelPath ]
 
 	# If we have setfcomment installed, we add a nice comment to the folder
@@ -394,13 +394,15 @@ then
 	fi # [ -e $MLsetfcommentPath ]
 
 	# renaming the unfinished backup, so it will notbe used for the next delta backup!	
-	mv "$MLdestPath/$MLbackupName-$MLbackupDate" "$MLdestPath/ERROR-$MLbackupName-$MLbackupDate"
-	
+	mv "$MLfinalTarget" "$MLdestPath/ERROR-$MLbackupName-$MLbackupDate"
+	MLfinalTarget="$MLdestPath/ERROR-$MLbackupName-$MLbackupDate"
 	# notifying our user of the backup ERROR
 growlnotify -n BackLemon -m "$MLeRsyncErrorMessage" -s -t "$MLbackupName Error $MLbackupStatus"
 
 	else
 	# notifying the user of the completed and successful backup
+	mv "$MLfinalTarget" "$MLdestPath/$MLbackupName-$MLbackupDate"
+	MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate"
 	growlnotify -n BackLemon -m "$MLbackupName completed successfully." -s -t "Backup $MLbackupName finished"
 fi #[ $MLbackupStatus -ne 0 ]
 
@@ -412,7 +414,7 @@ fi #[ $MLbackupStatus -ne 0 ]
 if [ -s $MLadminEmailMessage ] # admin eMail message greater than 0 bytes?
 then # Yes, something is in the Message file
 	# So we move it to the Backup Directory and rename it accordingly
-	mv $MLadminEmailMessage $MLdestPath/$MLbackupName-$MLbackupDate/AdminEMail.txt
+	mv $MLadminEmailMessage $MLfinalTarget/AdminEMail.txt
 else # No, the message is empty, very unlikely
 	# nothing to shout about, so we silently remove the temporary file
 	# We can NEVER get here in debug mode thats why we use echo here!
