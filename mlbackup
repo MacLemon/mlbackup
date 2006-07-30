@@ -107,7 +107,7 @@ MLrsyncCompress="--compress"
 
 # Rsync should be verbose
 # Rsync verbosity beyond -vv does NOT seem to work on Mac OS X, I am afraid this is an rsync bug
-MLbeVerbose="-vv"
+MLbeVerbose="-v"
 
 # Delete trashed files from the backup so our backups don't grow infinitely?
 MLdelete="--delete"
@@ -308,8 +308,7 @@ case $MLbackupStatus in
 	0)	# The last backup went ok
 		# If there is setlabel installed, we color it green (green is good)
 		MLeRsyncErrorMessage=""
-		appendToFile "$MLadminEmailMessage" "Rsync returned $MLbackupStatus 
-		The Backup $MLbackupName went OK!"
+		appendToFile "$MLadminEmailMessage" "The Backup $MLbackupName went OK!"
 		MLsetlabelPath=$(which setlabel)
 		if [ -e $MLsetlabelPath ] # only makes it green if setlabel command is installed
 		then
@@ -416,6 +415,13 @@ if [ -s $MLadminEmailMessage ] # admin eMail message greater than 0 bytes?
 then # Yes, something is in the Message file
 	# So we move it to the Backup Directory and rename it accordingly
 	mv $MLadminEmailMessage $MLfinalTarget/AdminEMail.txt
+	
+	if [ $MLweAreRoot ]
+	then # we chwon the file to make sure the admin can read it!
+		chown root:admin $MLfinalTarget/AdminEMail.txt
+	fi
+	chmod 640 $MLfinalTarget/AdminEMail.txt
+	
 else # No, the message is empty, very unlikely
 	# nothing to shout about, so we silently remove the temporary file
 	# We can NEVER get here in debug mode thats why we use echo here!
