@@ -416,7 +416,7 @@ then # Yes, something is in the Message file
 	# So we move it to the Backup Directory and rename it accordingly
 	mv $MLadminEmailMessage $MLfinalTarget/AdminEMail.txt
 	
-	if [ $MLweAreRoot ]
+	if [ $MLweAreRoot -eq 1 ]
 	then # we chwon the file to make sure the admin can read it!
 		chown root:admin $MLfinalTarget/AdminEMail.txt
 	fi

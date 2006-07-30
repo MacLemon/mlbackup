@@ -12,6 +12,7 @@ Disclaimer:
 	This software is provided as-is. It is in early alpha status and should be treated as such. Please do not solely rely on the backups made with MacLemon Backup.
 
 
+
 Target Audience:
 --------------------------------------------------------------------------------
 Admins and Geek Users who like a nice intelligent and incremental backup through the shell. Can be run from cron (or launchd) if you like. This is NOT INTENDED for normal users (yet).
@@ -46,10 +47,8 @@ Known Issues:
 --------------------------------------------------------------------------------
 	no manpage for mlbackup yet
 
-	If you backup to an external drive and that drive is not available when mlbackup runs there is no exception handling yet which will result in VERY BAD THINGS! So make sure your external drives are available until I'm done coding the exception handling.
-
 	Spotlight comments are not backupped reliably if at all (rsync bug)
-
-	If a surplus backup cannot be successfully deleted during backup rotation, the script loops infinitely.
 	
-	Sending the eMail report in case of a broken backup will result in an emtpy message body. The message will still be correctly saved to the backup directory. (Yes this is dumb)
+	ACL (Access Control Lists) are not backupped correctly, if at all. (rsync problem)
+
+	If a surplus backup cannot be successfully deleted during backup rotation, the script loops infinitely. (dumb, fix in the works)
