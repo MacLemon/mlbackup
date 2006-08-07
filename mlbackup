@@ -347,7 +347,7 @@ case $MLbackupStatus in
 			do
 
 			debug "Removing the Set in: $MLdestPath/$MLoldBackupTobeRemoved"
-			rm -R "$MLdestPath/$MLoldBackupTobeRemoved"
+			rm -Rf "$MLdestPath/$MLoldBackupTobeRemoved"
 			MLrmReturnCode=$?
 			debug "rm returned $MLrmReturnCode"
 			
@@ -420,17 +420,18 @@ then
 		setfcomment -c "Unfinished backup! Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage Created by $MLbaseCommand $MLbacklemonVersion($MLbacklemonBuild). Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/"
 	fi # [ -e $MLsetfcommentPath ]
 
-	# renaming the unfinished backup, so it will notbe used for the next delta backup!	
-	mv "$MLfinalTarget" "$MLdestPath/ERROR-$MLbackupName-$MLbackupDate"
-	MLfinalTarget="$MLdestPath/ERROR-$MLbackupName-$MLbackupDate"
+	# renaming the unfinished backup, so it will not be used for the next delta backup!
+	MLfinalNewTarget="$MLdestPath/ERROR-$MLbackupName-$MLbackupDate"
+	mv "$MLfinalTarget" "$MLfinalNewTarget"
+	MLfinalTarget="$MLfinalNewTarget"
 	# notifying our user of the backup ERROR
 growlnotify -n BackLemon -m "$MLeRsyncErrorMessage" -s -t "$MLbackupName Error $MLbackupStatus"
 
 	else
 	# notifying the user of the completed and successful backup
-	mv "$MLfinalTarget" "$MLdestPath/$MLbackupName-$MLbackupDate"
-	MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate"
-	growlnotify -n BackLemon -m "$MLbackupName completed successfully." -s -t "Backup $MLbackupName finished"
+		mv "$MLfinalTarget" "$MLdestPath/$MLbackupName-$MLbackupDate"
+		MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate"
+		growlnotify -n BackLemon -m "$MLbackupName completed successfully." -s -t "Backup $MLbackupName finished"
 fi #[ $MLbackupStatus -ne 0 ]
 
 # Reporting of surplus OLD and ERROR backups that need to be taken care of
@@ -441,8 +442,8 @@ MLreallyOldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^OLD-$MLbackupName-" )
 if [ $MLreallyOldBackupCount -ne 0 ] # any ERROR backups left
 then # Yes, at least one OLD backup still left.
 	MLreallyOldBackupList=$(ls -1w "$MLdestPath/" | grep "^OLD-$MLbackupName-" )
-	appendToFile "$MLadminEmailMessage" "There are $MLreallyOldBackupCount old backup sets that could not be removed automatically. Please remove them manually.
-
+	appendToFile "$MLadminEmailMessage" "
+	There are $MLreallyOldBackupCount old backup sets that could not be removed automatically. Please remove them manually.
 ${MLreallyOldBackupList}
 "
 fi # [ $MLreallyOldBackupCount -ne 0 ]
@@ -453,12 +454,12 @@ MLreallyErrorBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^ERROR-$MLbackupName
 if [ $MLreallyErrorBackupCount -ne 0 ] # any ERROR backups left
 then # Yes, at least one ERROR backup still left.
 	MLreallyErrorBackupList=$(ls -1w "$MLdestPath/" | grep "^ERROR-$MLbackupName-" )
-	appendToFile "$MLadminEmailMessage" "There are $MLreallyErrorBackupCount failed backup sets left. Please remove them manually.
-
-${MLreallyOldBackupList}
+	appendToFile "$MLadminEmailMessage" "
+	There are $MLreallyErrorBackupCount failed backup sets left. Please remove them manually.
+${MLreallyErrorBackupList}
 "
 fi # [ $MLreallyErrorBackupCount -ne 0 ] 
----
+
 
 # At the moment we just move the MLadminEmailMessage into the Backup Dir
 # No emailing yet 
@@ -482,7 +483,6 @@ else # No, the message is empty, very unlikely
 	rm $MLadminEmailMessage
 fi
 
-# cleaning up, or so
 # FUTURE: Postflight script
 
 ###############################################################################
@@ -500,7 +500,7 @@ else # zero, two or more seconds
 fi
 
 # sending the admin eMail Notification
-cat $MLdestPath/$MLbackupName-$MLbackupDate/AdminEMail.txt | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
+cat $MLfinalTarget/AdminEMail.txt | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
 
 
 if [ "$MLweAreRoot" -eq "1" ]
