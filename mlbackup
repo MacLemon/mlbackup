@@ -10,12 +10,13 @@
 MLtimeScriptStart=$(date +%s)
 ###############################################################################
 # Debug Mode. Set to 1 to get some debug messages set to 0 to skip them.
-MLdebug=0
+MLdebug=1
 ###############################################################################
 # determining a few standard variables for comfortable use later
 MLfullCommand=$0
 MLbaseCommand=$(basename $0)
 MLhostname=$(hostname)
+$MLversion=0.4
 ###############################################################################
 # Error and exit codes used
 # Everything Ok returns 0
@@ -325,23 +326,37 @@ case $MLbackupStatus in
 		# notifying our user that the backup finished successfully
 		growlnotify -n BackLemon -m "The Backup $MLbackupName was successful." -t "BackLemon finished"
 		
+		#--------------------- Removing old surplus backups -----------------
 		# checking if we need to remove some old ones
-		MLoldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^$MLbackupName-")
-	
-		debug "Old Backup Count: $MLoldBackupCount"
+
+		MLoldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^$MLbackupName-" )
+		let "MLoldBackupCountDifference = $MLoldBackupCount - $MLbackupCount"	
+
+		MLoldBackupList=$(ls -1w "$MLdestPath/" | grep "^$MLbackupName-"| head -$MLoldBackupCountDifference)	
+		debug "Old Backup Count: $MLoldBackupCount, $MLoldBackupCountDifference to be removed."	
+		debug "Old Backup List: $MLoldBackupList"
+
 		if [ "$MLoldBackupCount" -gt "$MLbackupCount" ] # There are surplus Backups, so we remove them
 		then
-			debug "There are surplus old backups, starting to remove them."
-			for ((MLloopIndex="$MLoldBackupCount" ; MLloopIndex>"$MLbackupCount" ; MLloopIndex-- ))
+			if [ $MLoldBackupCountDifference -eq 1 ] # just one old backup
+			then # Yes, just a single old backup.
+				debug "There is $MLoldBackupCountDifference surplus old backup, starting to remove it."
+			else #  no more than one old backups to be removed
+				debug "There are $MLoldBackupCountDifference surplus old backups, starting to remove them."
+			fi
+			
+			for MLoldBackupTobeRemoved in $MLoldBackupList
 			do
 			# Counting down
-			MLoldestSetToBeRemoved=$(ls -1trw "$MLdestPath/" | grep "^$MLbackupName-" | head -1)
-			debug "Removing the Set named: $MLdestPath/$MLoldestSetToBeRemoved"
-			rm -r "$MLdestPath/$MLoldestSetToBeRemoved"
+			# MLoldestSetToBeRemoved=$(ls -1trw "$MLdestPath/" | grep "^$MLbackupName-" | head -1)
+			debug "Removing the Set in: $MLdestPath/$MLoldBackupTobeRemoved"
+			rm -r "$MLdestPath/$MLoldBackupTobeRemoved"
 			# We should check if removing an oldbackup worked correctly, if a user has set the
 			# locked bit, rm will fail on that file, which will take up space over time. and more important will have this part looooop and hang. Maybe better write them all to an array and try to delete in one rush.
 			done
 		fi
+		#--------------------------------------
+		
 	debug "BackLemon was successful!"
 	;;
 	# Error Codes we know from the rsync man page
