@@ -326,9 +326,7 @@ case $MLbackupStatus in
 		# notifying our user that the backup finished successfully
 		growlnotify -n BackLemon -m "The Backup $MLbackupName was successful." -t "BackLemon finished"
 		
-		#--------------------- Removing old surplus backups -----------------
 		# checking if we need to remove some old ones
-
 		MLoldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^$MLbackupName-" )
 		let "MLoldBackupCountDifference = $MLoldBackupCount - $MLbackupCount"	
 
@@ -347,16 +345,14 @@ case $MLbackupStatus in
 			
 			for MLoldBackupTobeRemoved in $MLoldBackupList
 			do
-			# Counting down
-			# MLoldestSetToBeRemoved=$(ls -1trw "$MLdestPath/" | grep "^$MLbackupName-" | head -1)
+
 			debug "Removing the Set in: $MLdestPath/$MLoldBackupTobeRemoved"
 			rm -r "$MLdestPath/$MLoldBackupTobeRemoved"
+			
 			# We should check if removing an oldbackup worked correctly, if a user has set the
-			# locked bit, rm will fail on that file, which will take up space over time. and more important will have this part looooop and hang. Maybe better write them all to an array and try to delete in one rush.
+			# locked bit, rm will fail on that set
 			done
 		fi
-		#--------------------------------------
-		
 	debug "BackLemon was successful!"
 	;;
 	# Error Codes we know from the rsync man page
