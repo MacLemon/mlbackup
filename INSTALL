@@ -10,4 +10,4 @@ The following files will be placed on your system:
 /usr/local/bin/growler.sh
 
 
-For the email notification to work make sure that /usr/bin/mail correctly works on your system. (maybe through sendmail or the postfix sendmail wrapper)
+For the email notification to work make sure that /usr/bin/mail correctly works on your system. (Maybe through sendmail or the postfix sendmail wrapper)
