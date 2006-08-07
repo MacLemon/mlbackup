@@ -348,7 +348,23 @@ case $MLbackupStatus in
 
 			debug "Removing the Set in: $MLdestPath/$MLoldBackupTobeRemoved"
 			rm -R "$MLdestPath/$MLoldBackupTobeRemoved"
+			MLrmReturnCode=$?
+			debug "rm returned $MLrmReturnCode"
 			
+			if [ $MLrmReturnCode -ne 0 ] # did rm NOT return 0?
+			then # no it did not return 0, meaning an error occured
+				# Could not delete the old backup
+				# try to label it gray
+				if [ -e $MLsetlabelPath ] # only makes it gray if setlabel command is installed
+				then
+					$MLsetlabelPath Gray "$MLdestPath/$MLoldBackupTobeRemoved"
+				fi # [ -e $MLsetlabelPath ]
+				# and rename it
+				mv "$MLdestPath/$MLoldBackupTobeRemoved" "$MLdestPath/OLD-$MLoldBackupTobeRemoved"
+				appendToFile "$MLadminEmailMessage" "The Backup $MLdestPath/$MLoldBackupTobeRemoved could not be deleted because rm(1) returned $MLrmReturnCode. It has been renamed to $MLdestPath/OLD-$MLoldBackupTobeRemoved. Please investigate why this backup could not be deleted automatically. Remove this old backup manually!"
+				
+			fi # [ $MLrmReturnCode -ne 0 ]
+
 			# We should check if removing an oldbackup worked correctly, if a user has set the
 			# locked bit, rm will fail on that set
 			done
@@ -417,6 +433,32 @@ growlnotify -n BackLemon -m "$MLeRsyncErrorMessage" -s -t "$MLbackupName Error $
 	growlnotify -n BackLemon -m "$MLbackupName completed successfully." -s -t "Backup $MLbackupName finished"
 fi #[ $MLbackupStatus -ne 0 ]
 
+# Reporting of surplus OLD and ERROR backups that need to be taken care of
+# OLD backups that should have been removed during rotation
+# but somehow could not be deleted (protected files, etc.)
+MLreallyOldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^OLD-$MLbackupName-" )
+
+if [ $MLreallyOldBackupCount -ne 0 ] # any ERROR backups left
+then # Yes, at least one OLD backup still left.
+	MLreallyOldBackupList=$(ls -1w "$MLdestPath/" | grep "^OLD-$MLbackupName-" )
+	appendToFile "$MLadminEmailMessage" "There are $MLreallyOldBackupCount old backup sets that could not be removed automatically. Please remove them manually.
+
+${MLreallyOldBackupList}
+"
+fi # [ $MLreallyOldBackupCount -ne 0 ]
+
+# ERROR backups that did not finish or had problems
+MLreallyErrorBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^ERROR-$MLbackupName-" )
+
+if [ $MLreallyErrorBackupCount -ne 0 ] # any ERROR backups left
+then # Yes, at least one ERROR backup still left.
+	MLreallyErrorBackupList=$(ls -1w "$MLdestPath/" | grep "^ERROR-$MLbackupName-" )
+	appendToFile "$MLadminEmailMessage" "There are $MLreallyErrorBackupCount failed backup sets left. Please remove them manually.
+
+${MLreallyOldBackupList}
+"
+fi # [ $MLreallyErrorBackupCount -ne 0 ] 
+---
 
 # At the moment we just move the MLadminEmailMessage into the Backup Dir
 # No emailing yet 
