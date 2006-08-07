@@ -10,7 +10,7 @@
 MLtimeScriptStart=$(date +%s)
 ###############################################################################
 # Debug Mode. Set to 1 to get some debug messages set to 0 to skip them.
-MLdebug=1
+MLdebug=0
 ###############################################################################
 # determining a few standard variables for comfortable use later
 MLfullCommand=$0
@@ -252,7 +252,8 @@ MLbackupDate=$(date "+%Y.%m.%d-%H.%M.%S")
 
 
 # Creating the Final Destination directory:
-# the .noindex trick keeps Spotlight from indexing while we backup
+# the .noindex trick surely keeps Spotlight from indexing while we backup
+# No matter if Spotlight indexin is enabled for the volume or not.
 MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate.noindex"
 debug "MLfinalTarget = $MLfinalTarget"
 mkdir $MLfinalTarget
@@ -262,6 +263,7 @@ mkdir $MLfinalTarget
 debug "Rsync starting now."
 MLtimeRsyncStart=$(date +%s)
 # backing up
+# we should BUILD the actual command into a variable to ensure this is in sync.
 debug The rsync command is: $MLsourceRsync $MLbeVerbose $MLdestRsync $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/"
 
 $MLsourceRsync $MLbeVerbose $MLdestRsync $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >$MLrsyncLogFile 2>$MLrsyncErrFile
@@ -281,7 +283,7 @@ fi
 # We move and compress the logfiles to the backup destination. (currently only on localhost)
 debug "Compressing the logfiles and moving them to the backup destination."
 
-# Postprocessing the error.log
+debug "--- Post processing the error.log"
 if [ -s $MLrsyncErrFile ] # Non zero byte error.log? Only in case of errors
 then # Yes, there were errors recorded.
 	$MLbeNiceCommand cat $MLrsyncErrFile | gzip -9 >$MLfinalTarget/error.log.gz
@@ -291,7 +293,7 @@ fi # [ -s $MLrsyncErrFile ]
 # removing the error.log tempfile
 rm $MLrsyncErrFile
 
-# post processing the rsync.log
+debug "--- Post processing the rsync.log"
 if [ -s $MLrsyncLogFile ] # Non zero bytes rsync.log? (Expected)
 then # Yes, of course, compress and move to the backup folder
 	$MLbeNiceCommand cat $MLrsyncLogFile | gzip -9 >$MLfinalTarget/rsync.log.gz
@@ -304,7 +306,7 @@ rm $MLrsyncLogFile
 
 ###############################################################################
 # Post processing of the backup:
-debug "Backup postprocessing"
+debug "--- Backup postprocessing"
 case $MLbackupStatus in
 	0)	# The last backup went ok
 		# If there is setlabel installed, we color it green (green is good)
@@ -396,10 +398,10 @@ case $MLbackupStatus in
 	;;
 esac
 
-
 debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"
 appendToFile "$MLadminEmailMessage" "Rsync returned $MLbackupStatus $MLeRsyncErrorMessage"
 
+debug "--- Post Processing backup errors"
 if [ $MLbackupStatus -ne 0 ] # Something went wrong during the backup
 then
 	# Telling that something went wrong
@@ -409,7 +411,8 @@ then
 	MLsetlabelPath=$(which setlabel)
 	if [ -e $MLsetlabelPath ] # only makes it red if setlabel command is installed
 	then
-		$MLsetlabelPath Red "$MLfinalTarget/"
+		debug "Setting a red label for ERROR $MLfinalTarget"
+		$MLsetlabelPath Red "$MLfinalTarget"
 	fi # [ -e $MLsetlabelPath ]
 
 	# If we have setfcomment installed, we add a nice comment to the folder
@@ -417,7 +420,8 @@ then
 	MLsetfcommentPath=$(which setfcomment)
 	if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
 	then
-		setfcomment -c "Unfinished backup! Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage Created by $MLbaseCommand $MLbacklemonVersion($MLbacklemonBuild). Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLdestPath/$MLbackupName-$MLbackupDate/"
+		debug "Setting Backup ERROR comment"
+		setfcomment -c "Unfinished backup! Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage Created by $MLbaseCommand $MLbacklemonVersion($MLbacklemonBuild). Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
 	fi # [ -e $MLsetfcommentPath ]
 
 	# renaming the unfinished backup, so it will not be used for the next delta backup!
@@ -434,6 +438,7 @@ growlnotify -n BackLemon -m "$MLeRsyncErrorMessage" -s -t "$MLbackupName Error $
 		growlnotify -n BackLemon -m "$MLbackupName completed successfully." -s -t "Backup $MLbackupName finished"
 fi #[ $MLbackupStatus -ne 0 ]
 
+debug "--- Handling OLD backups"
 # Reporting of surplus OLD and ERROR backups that need to be taken care of
 # OLD backups that should have been removed during rotation
 # but somehow could not be deleted (protected files, etc.)
@@ -448,6 +453,7 @@ ${MLreallyOldBackupList}
 "
 fi # [ $MLreallyOldBackupCount -ne 0 ]
 
+debug "--- Handling ERROR backups"
 # ERROR backups that did not finish or had problems
 MLreallyErrorBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^ERROR-$MLbackupName-" )
 
@@ -460,10 +466,7 @@ ${MLreallyErrorBackupList}
 "
 fi # [ $MLreallyErrorBackupCount -ne 0 ] 
 
-
-# At the moment we just move the MLadminEmailMessage into the Backup Dir
-# No emailing yet 
-# BUG: Breaks if Backup was renamed due to error...
+debug "--- Moving the Admin eMail Message to the Backup."
 # I should REALLY improve on Backup error postprocessing. *embarrassing*
 if [ -s $MLadminEmailMessage ] # admin eMail message greater than 0 bytes?
 then # Yes, something is in the Message file
@@ -499,15 +502,16 @@ else # zero, two or more seconds
 	debug "Backup took $MLtimeScriptDurationTotal seconds."
 fi
 
+debug "--- Sending the AdminEmail Message per mail."
 # sending the admin eMail Notification
 cat $MLfinalTarget/AdminEMail.txt | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
 
-
+debug "--- removing .pid file if any."
 if [ "$MLweAreRoot" -eq "1" ]
 then
 	# We are root, so we did create a .pid file, now let us remove it again.
 	rm $MLmyPidFile
 fi
-debug "BackLemon ended"
+debug "BackLemon END"
 ###############################################################################
 # EOF
