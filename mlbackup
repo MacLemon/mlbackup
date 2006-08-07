@@ -339,7 +339,7 @@ case $MLbackupStatus in
 			if [ $MLoldBackupCountDifference -eq 1 ] # just one old backup
 			then # Yes, just a single old backup.
 				debug "There is $MLoldBackupCountDifference surplus old backup, starting to remove it."
-			else #  no more than one old backups to be removed
+			else #  no, several old backups to be removed
 				debug "There are $MLoldBackupCountDifference surplus old backups, starting to remove them."
 			fi
 			
@@ -347,7 +347,7 @@ case $MLbackupStatus in
 			do
 
 			debug "Removing the Set in: $MLdestPath/$MLoldBackupTobeRemoved"
-			rm -r "$MLdestPath/$MLoldBackupTobeRemoved"
+			rm -R "$MLdestPath/$MLoldBackupTobeRemoved"
 			
 			# We should check if removing an oldbackup worked correctly, if a user has set the
 			# locked bit, rm will fail on that set
