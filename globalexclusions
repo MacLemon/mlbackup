@@ -24,6 +24,10 @@
 #		Globally SORT all this stuff. How? Suggestions are welcome.
 #
 ###############################################################################
+#
+#	2006.08.22: Added Cache files for Adobe Bridge (Creative Suite 2)
+#	2006.08.22: Added tmp/ and temp/ directory global exclusion
+#
 # Version 8 2006.06.16: Improved explanation for Apple Backup 3 excludes.
 #			File is now	under SubVersion Control.  
 #
@@ -305,6 +309,11 @@
 - /Library/Preferences/ACE2Cache
 
 
+# Adobe Creative Suite 2 - Adobe Bridge Cache files
+- Adobe Bridge Cache.bc
+- Adobe Bridge Cache.bct
+
+
 # AppleWorks Assitent and Filter Caches
 # These filenames are localized, what are they called in other languages
 # that are missing here? Please submit this info!
@@ -388,9 +397,10 @@
 - .jpi_cache/
 
 
-# Temporary Items folders created by Mac OS
+# Temporary Items folders created by Mac OS and other Apps
 - .TemporaryItems/
-
+- temp/
+- tmp/
 
 # User's Keychains
 ###############################################################################
