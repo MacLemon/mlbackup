@@ -90,7 +90,12 @@
 # We won't backup stuff, that is already in the Trash.
 - .Trash
 - .Trashes
-# What about NetworkTrash folders? Please send feedback!
+- Network Trash Folder
+- ._Network Trash Folder
+
+# The Volume Settings Folder by Mac OS
+- TheVolumeSettingsFolder
+- ._TheVolumeSettingsFolder
 
 
 # 10.3+ Adaptive hotfile Clustering Info will be useless in case of restore.
@@ -399,8 +404,8 @@
 
 # Temporary Items folders created by Mac OS and other Apps
 - .TemporaryItems/
-- temp/
-- tmp/
+- /temp
+- /tmp
 
 # User's Keychains
 ###############################################################################
