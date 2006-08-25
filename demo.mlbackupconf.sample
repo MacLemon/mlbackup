@@ -1,7 +1,7 @@
 # BackLemon Demo Configuration file
 
 # What is the name of this backup set?
-MLbackupName="Demo"
+MLbackupName="MacLemon-Sample"
 
 # NOTE on Naming Backups:
 # Spaces are allowed in Backup Set Names. (tested and verified)
@@ -12,27 +12,29 @@ MLbackupName="Demo"
 
 
 # How many Backup Sets to keep? (Integer > 0)
+# Default: 5
 MLbackupCount=5
 
 
 # Configuring the SOURCE that will be backed up:
 
 # What file or directory to Backup. (No trailing Slash for directories)
+# Default: $HOME
 MLsourcePath="$HOME"
 
 
 # Configuring the Destination we will save the Backup to.
 
 # Where shall the Backups be stored (local path on the destination machine)
+# Default: /Volumes/Backup
 MLdestPath="/Volumes/Backup"
 
-# FUTURE: Reserved for the Host the target resides on.
-# MLdestHost=localhost
 
-# ------
-# Future implementations:
-# MLlogfile
-# MLadminEmail
-# MLuserEmail
-# MLuseGlobalExclusions
-# MLcustomRsyncOptions
+
+# Where to send the eMail notification about the backup to?
+# If you need multiple recipients seperate them with commas.
+# Example: "admin@example.com,user@example.com"
+# Default: $USER
+MLadminEmail="$USER"
+
+#EOF
