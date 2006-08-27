@@ -16,7 +16,7 @@ MLdebug=0
 MLfullCommand=$0
 MLbaseCommand=$(basename $0)
 MLhostname=$(hostname)
-MLversion=0.4
+MLversion=0.5
 ###############################################################################
 # Error and exit codes used
 # Everything Ok returns 0
