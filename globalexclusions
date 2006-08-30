@@ -19,12 +19,15 @@
 # Things we consider for future exclusion are at the end of the file. Any info 
 # regarding these files is welcome.
 #
+# To learn more about rsync include/exclude patterns see the rsync manpage!
+#
 ###############################################################################
 # TODO:
 #		Globally SORT all this stuff. How? Suggestions are welcome.
 #
 ###############################################################################
 #
+#	2006.08.30: Corrected some directory exclusions
 #	2006.08.22: Added Cache files for Adobe Bridge (Creative Suite 2)
 #	2006.08.22: Added tmp/ and temp/ directory global exclusion
 #
@@ -84,17 +87,17 @@
 
 
 # Find By Content Lock Folder, used by Sherlock
-- .FBCLockFolder
+- .FBCLockFolder/
 
 
 # We won't backup stuff, that is already in the Trash.
-- .Trash
+- .Trash/
 - .Trashes
-- Network Trash Folder
+- Network Trash Folder/
 - ._Network Trash Folder
 
 # The Volume Settings Folder by Mac OS
-- TheVolumeSettingsFolder
+- TheVolumeSettingsFolder/
 - ._TheVolumeSettingsFolder
 
 
@@ -103,7 +106,7 @@
 
 
 # 10.4+ Spotlight indeces will be useless in case of restore. 
-- .Spotlight-V100
+- .Spotlight-V100/
 # Special note, I guess the V100 MAY change in future releases of Spotlight.
 # So we better be aware of this. May be changed to a wildcard in the future.
 
@@ -121,62 +124,62 @@
 
 # Apple Safari (and Webkit?) partial downloads
 # Info: http://www.apple.com/safari/
-- .download
+- *.download
 
 
 # Safari Favicons Cache (00-15/00-15/*.cache please help to improve this regexp)
-- /Library/Safari/Icons/
+- Library/Safari/Icons/
 
 
 # iChat Partial Transfers
-- .iChatTransfer
+- *.iChatTransfer
 
 
 # Common Cache Files for many apps
-- .cache
+- *.cache
 
 
 # Wired partially transferred files 
 # Info and Download: http://www.zankasoftware.com/wired/
-- .WiredTransfer
+- *.WiredTransfer
 
 
 # Heidrun Partial download files
 # Info: http://www.macupdate.com/info.php/id/11881
 # Info 2: http://www.versiontracker.com/dyn/moreinfo/macosx/16296
-- .HeidrunDownload
+- *.HeidrunDownload
 
 
-# Apple Addressbook Backup. Actually, these are packages simply containing the normal files used by Address Book in the Library
-- .abbu
+# Apple Addressbook Backup. Actually, these are packages (which are actually folders in the filesystem) simply containing the normal files used by Address Book in the Library
+- *.abbu/
 
 
 # Apple iCal Backup. Actually, these are packages simply containing the normal files used by iCal in the Library
-- .icbu
+- *.icbu/
 
 
 # Apple Backup 3.0 incompleted Backup Set (due to error during Backup or because the Backup is currently running)
 # Does it make sense to keep a FAILED backup of another Backup application?
-- .backXX
+- *.backXX/
 # other filetypes used by Apple Backup 3.0 are
 # FullBackups and Incremental Backups
-# - .FullBackup
-# - .IncrementalBackup
+# - *.FullBackup/
+# - *.IncrementalBackup/
 
 
-# User's Caches
-- /Library/Caches
+# User's Caches, global Library Caches and even System Caches
+- Library/Caches/
 
 
 # Aliases to the recently used apps/docs in the Apple Menu
-- /Library/Recent Applications
-- /Library/Recent Documents
+- Library/Recent Applications/
+- Library/Recent Documents/
 
 
 # Bookmarks to recently connected servers (AFP, SMB, FTP, etc.)
 # Accessible from the Finders "Go" Menu
 # We do not exclude these by default, as they're like bookmarks.
-# - /Library/Recent Servers/
+# - Library/Recent Servers/
 
 
 # iSync - SyncService "Revert to last Sync" files
@@ -184,59 +187,59 @@
 # and you end up with an empty Addressbook and empty cell phone/iPod/PDA/.Mac
 # Info: http://www.apple.com/isync/
 # NOT excluded by default.
-# - /Library/SyncService
+# - Library/SyncService/
 
 
 # Apple Calculator Currency Exchange Rates
 # When restoring a backup exchange rates will be outdated and should be
 # updated anyway, no need to backup them.
-- /Library/Application Support/Calculator/FinancialRates.plist
+- Library/Application Support/Calculator/FinancialRates.plist
 
 
 # OpenUp Archive decompressed files
 # Info about OpenUp: http://www.stepwise.com/Software/OpenUp/
 # Download: http://homepage.mac.com/sanguish/OpenUp/
-- /Library/OpenUp/
+- Library/OpenUp/
 
 
 # Recent Items used by Allume Stuffit Deluxe (former Aladdin Systems)
 # Info: http://www.allume.com/ or http://www.stuffit.com/
-- /Library/Preferences/Allume/StuffIt Deluxe Recent Items/
+- Library/Preferences/Allume/StuffIt Deluxe Recent Items/
 
 
 # Microsoft Internet Explorer Cache Files for Downloads
 # We don't link to Microsoft!
-- /Library/Preferences/Explorer/Download Cache/
+- Library/Preferences/Explorer/Download Cache/
 
 
 # Microsoft Internet Explorer temporary files
-- /Library/Preferences/Explorer/Temporary Files/
+- Library/Preferences/Explorer/Temporary Files/
 
 
 # Microsoft Office 2004 (11) Font Cache Files
-- /Library/Preferences/Microsoft/Office Font Cache (11)
+- Library/Preferences/Microsoft/Office Font Cache (11)
 
 
 # Connectix Virtual PC 6.x, Printer Spooler files
 # Info: http://www.connectix.com/
 # Virtual PC has since been bought by Microsoft :-(
-- /Library/Preferences/Virtaul PC 6.0 Preferences/Virtual PC Print Spool/
+- Library/Preferences/Virtaul PC 6.0 Preferences/Virtual PC Print Spool/
 
 
-# iCab WebBrowser temporary and cache files
+# iCab WebBrowser temporary and cache folder
 # http://www.icab.de/
-- /Library/Preferences/iCab Preferences/iCab Cache/
+- Library/Preferences/iCab Preferences/iCab Cache/
 
 
 # RagTime Cache Files
 # http://www.ragtime.de/
-- /Library/Preferences/RagTime/RagTime Privat Cache_de
-- /Library/Preferences/RagTime/RagTime Solo Cache_en
+- Library/Preferences/RagTime/RagTime Privat Cache_de
+- Library/Preferences/RagTime/RagTime Solo Cache_en
 
 
 # VLC (Video Lan Client) Cache
 # Info: http://www.videolan.org/
-- /Library/Preferences/VLC/cache/
+- Library/Preferences/VLC/cache/
 
 
 # mlMac partial and fully downloaded Files (This applies to the default
@@ -244,74 +247,76 @@
 # may want to change the path below as well!
 # Info: http://mlmac.org/
 # If YOU know what should be added here, contact me please! (see top of file!)
-- /Library/Application Support/mlMac/incoming
-- /Library/Application Support/mlMac/temp
-- /Library/Application Support/mlMac/torrents
+- Library/Application Support/mlMac/incoming/
+- Library/Application Support/mlMac/temp/
+- Library/Application Support/mlMac/torrents/
 
 
 # NetNewsWire and NetNewsWire Lite Caches:
 # Info & Download: http://ranchero.com/netnewswire/
 # Only applies to NNW before 2.1b16, the caches have been moved to
-# ~/Library/Caches/ since which we are excluding by default.
-- /Library/Application Support/NetNewsWire/Cache/
-- /Library/Application Support/NetNewsWire/Backups/
-- /Library/Application Support/NetNewsWire/Favicons/
+# Library/Caches/ since which we are excluding by default.
+- Library/Application Support/NetNewsWire/Cache/
+- Library/Application Support/NetNewsWire/Backups/
+- Library/Application Support/NetNewsWire/Favicons/
 
 
 # NewsFire RSS Reader Cache
 # Info & Download: http://www.newsfirerss.com/
-- /Library/Application Support/NewsFire/Cache
+- Library/Application Support/NewsFire/Cache/
 
 
 # DiscTop Artwork - will be refetched if missing, not vital to a backup
 # If you desperately want to keep the comment out the line accordingly.
 # Info: http://www.mekentosj.com/disctop/
-- /Library/Application Support/DiscTop/Artwork/
+- Library/Application Support/DiscTop/Artwork/
 
 
 # Mozilla FireFox WebCache (all Profiles)
-- /Library/Application Support/FireFox/Profiles/**Cache/
-- /Library/Application Support/FireFox/Profiles/**/Cache.Trash/
+# http://www.mozilla.com/
+# ------------------------------------------ These rules should be improved!
+- Library/Application Support/FireFox/Profiles/**Cache/
+- Library/Application Support/FireFox/Profiles/**/Cache.Trash/
 
 
 # LaunchBar 3 SetupCache (Does not apply to LaunchBar 4)
 # Info: http://obdev.at/products/launchbar/
-- /Library/Application Support/LaunchBar/SetupCache.plist
+- Library/Application Support/LaunchBar/SetupCache.plist
 
 
 # Synergy Temporary Album Cover
 # Info: http://wincent.com/a/products/synergy-classic/
-- /Library/Application Support/Synergy/Temporary Album Covers/
+- Library/Application Support/Synergy/Temporary Album Covers/
 
 
 # Pulp Fiction RSS Cache
 # Info: http://freshsqueeze.com/products/pulpfiction/
 # Thanks to Brad Miller from Freshly Squeezed Software for your support.
-- /Library/Application Support/PulpFiction/Cache/
-# ~/Library/Caches is generally excluded by default, no need to specify again.
-# - /Libraray/Caches/PulpFiction/
+- Library/Application Support/PulpFiction/Cache/
+# Library/Caches is generally excluded by default, no need to specify again.
+# - Libraray/Caches/PulpFiction/
 
 
 # Freespace 2 (Game) Cache files *.ibx
 # Info: http://freespace2.com/
-- /Library/FS2_Open/data/cache/
+- Library/FS2_Open/data/cache/
 
 
 # Webkit Favicon Cache files (Subfolder 00-15/00-15, should improve regexp here)
 # to exactly and only match these folders 00-15/00-15/*.cache
-- /Library/Icons/
+- Library/Icons/
 
 
-# Users Logs
+# Users Logs and global Library Logs (for all users)
 # You might be interested in keeping those logs, so the default is to backup them
-# - /Library/Logs/
+# - Library/Logs/
 # Or skip only the CrashReporter Logs and keep the rest?
-# - /Library/Logs/CrashReporter/*.log
+# - Library/Logs/CrashReporter/*.log
 
 
 # This Cache file belongs to Adobe Creative Suite
 # Info: http://www.adobe.com/support/techdocs/330060.html
-- /Library/Preferences/ACE2Cache
+- Library/Preferences/ACE2Cache
 
 
 # Adobe Creative Suite 2 - Adobe Bridge Cache files
@@ -324,13 +329,13 @@
 # that are missing here? Please submit this info!
 
 # german
-- /Library/Preferences/AppleWorks/AppleWorks 6 Assistenten Cache
-- /Library/Preferences/AppleWorks/AppleWorks 6 Filter Cache
+- Library/Preferences/AppleWorks/AppleWorks 6 Assistenten Cache
+- Library/Preferences/AppleWorks/AppleWorks 6 Filter Cache
 
 
 # BBedit Prefs Data Backup Files
 # Info: http://www.barebones.com/
-- /Library/Preferences/BBEdit Preferences/BBEdit Prefs Data (Backup)
+- Library/Preferences/BBEdit Preferences/BBEdit Prefs Data (Backup)
 
 # Containing your preferred and recent files
 # For BBEdit below 8.0
@@ -340,62 +345,62 @@
 
 # Containing your preferred and recent folders
 # For BBEdit below 8.0
-# - /Library/Preferences/BBEdit Preferences/Recent Folders & Favorites
+# - Library/Preferences/BBEdit Preferences/Recent Folders & Favorites
 # For BBEdit 8 (and possibly above)
-# - /Library/Preferences/com.barebones.bbedit.PreferenceData/Recent Folders & Favorites
+# - Library/Preferences/com.barebones.bbedit.PreferenceData/Recent Folders & Favorites
 
 # can we savely leave out this file?
-# - /Library/Preferences/BBEdit Preferences/Clipboards
+# - Library/Preferences/BBEdit Preferences/Clipboards
 
 
 # Shiira (Webkit Browser) Favicons Cache (00-15/00-15/*.cache improve regexp)
 # and Temporary Feed (RSS) Files
 # Info: http://hmdt-web.net/shiira/en
-- /Library/Shiira/IconDatabase/
-- /Library/Shiira/Feeds/tmp/*.xml
+- Library/Shiira/IconDatabase/
+- Library/Shiira/Feeds/tmp/*.xml
 
 
 # Apple iSync Backup Data
 # Currently we keep this, as I've seen to many people empty their phone and
 # AddressBook/Calendar by dumb use of iSync
 # If you don't want to keep this, uncomment the following line (remove # )
-# - /Library/SyncService/Backup Data/
+# - Library/SyncService/Backup Data/
 
 
 # Adobe Acrobat Distiller FontCache Files
 # Info: http://www.adobe.com/
 
 # For Adobe Acrobat Distiller 6
-- /Library/Application Support/Adobe/Acrobat/Distiller 6/FontCache/PSHFList
+- Library/Application Support/Adobe/Acrobat/Distiller 6/FontCache/PSHFList
 
 # For Adobe Acrobat Distiller 7
-- /Library/Application Support/Adobe/Acrobat/Distiller 6/FontCache/PSHFList
+- Library/Application Support/Adobe/Acrobat/Distiller 6/FontCache/PSHFList
 
 
 # BZflag (Game) Cache files
 # Info: http://sourceforge.net/projects/bzflag/
-- /Library/Application Support/BZFlag/cache/
+- Library/Application Support/BZFlag/cache/
 
 
 # Camino (Mozilla Engine based Cocoa webbrowser) Cache Files
 # Info: http://www.caminobrowser.org/
-- /Library/Application Support/Camino/Cache/
+- Library/Application Support/Camino/Cache/
 
 
 # TVtoday Fernsehen Widget (TV Program Guide) Cache Files
 # Info: http://www.sebastian-krauss.de/software/
-- /Library/Application Support/Fernsehen/Cache/
+- Library/Application Support/Fernsehen/Cache/
 
 
 # Flickr Export Resize Cache
 # Info: http://flickr.com/
-- /Library/Application Support/FlickrExport/ResizeCache/
+- Library/Application Support/FlickrExport/ResizeCache/
 
 
 # Google Earth - MyPlaces Application Backup File & temp file
 # Info: http://earth.google.com
-- /Library/Application Support/Google Earth/myplaces.backup.kml
-- /Library/Application Support/Google Earth/myplaces.kml.tmp
+- Library/Application Support/Google Earth/myplaces.backup.kml
+- Library/Application Support/Google Earth/myplaces.kml.tmp
 
 
 # Java Applet Cache
@@ -407,7 +412,7 @@
 - temp/
 - tmp/
 
-# User's Keychains
+# User's and System Keychains
 ###############################################################################
 ############################ SECURITY WARNING #################################
 ###############################################################################
@@ -426,7 +431,7 @@
 # If the line below this block begins with a comment "#" or ";" then your 
 # keychain files will be backuped!
 ###############################################################################
-# - /Library/Keychains/
+# - Library/Keychains/
 
 
 # Wired.app Preferences
@@ -442,15 +447,15 @@
 # If the line below this block begins with a comment "#" or ";" then your 
 # Wired Preferences will be backuped!
 ###############################################################################
-# - /Library/Preferences/com.zanka.WiredClient.plist
+# - Library/Preferences/com.zanka.WiredClient.plist
 
 
 # User's Fonts
 # CAUTION: If you're doing a lot of font management (activating/deactivatig)
 # fonts, you may want to SKIP this folder, as font's might be copied to and
 # deleted from this folder by your font management software.
-# eg: Extensis Suitcase, FontDoctor, etc.
-# - /Library/Fonts/
+# eg: Extensis Suitcase, FontDoctor, FontExplorer, etc.
+# - Library/Fonts/
 
 ###############################################################################
 # Things we are considering for exclusion, but are not yet sure if this is ok.
@@ -458,7 +463,7 @@
 ###############################################################################
 #
 # Distributed Compiler, /usr/bin/distcc
-# /Users/yourshortname/.distcc/
-# /Users/yourshortname/.distcc/state/
+# ~/.distcc/
+# ~/.distcc/state/
 
 #EOF
