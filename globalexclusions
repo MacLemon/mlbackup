@@ -404,8 +404,8 @@
 
 # Temporary Items folders created by Mac OS and other Apps
 - .TemporaryItems/
-- /temp
-- /tmp
+- temp/
+- tmp/
 
 # User's Keychains
 ###############################################################################
