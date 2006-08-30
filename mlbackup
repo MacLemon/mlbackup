@@ -476,18 +476,21 @@ if [ -s $MLadminEmailMessage ] # admin eMail message greater than 0 bytes?
 then # Yes, something is in the Message file
 	# So we move it to the Backup Directory and rename it accordingly
 	mv $MLadminEmailMessage $MLfinalTarget/AdminEMail.txt
+	# Updating the variable, so some very late messages are still appended
+	MLadminEmailMessage=$MLfinalTarget/AdminEMail.txt
 	
 	if [ $MLweAreRoot -eq 1 ]
 	then # we chwon the file to make sure the admin can read it!
-		chown root:admin $MLfinalTarget/AdminEMail.txt
+		chown root:admin $MLadminEmailMessage
 	fi
-	chmod 644 $MLfinalTarget/AdminEMail.txt
+	chmod 644 $MLadminEmailMessage
 	
 else # No, the message is empty, very unlikely
 	# nothing to shout about, so we silently remove the temporary file
 	# We can NEVER get here in debug mode thats why we use echo here!
 	echo "MLadminEmailMessage was empty, we just remove the temporary file."
 	rm $MLadminEmailMessage
+	unset $MLadminEmailMessage
 fi
 
 # FUTURE: Postflight script
@@ -511,10 +514,10 @@ debug "--- Sending the AdminEmail Message per mail."
 if [ $MLadminEmail ] # Is the AdminEMail Address set?
 then # Yes, there is an address!
 	debug "Sending the Admin eMail to $MLadminEmail"
-	cat $MLfinalTarget/AdminEMail.txt | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
+	cat $MLadminEmailMessage | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
 else # No address set
 	debug "No MLadminEmail Address set, cannot send eMail!"
-	appendToFile $MLfinalTarget/AdminEMail.txt "No MLadminEmail Address set. You will not receive backp notifications via eMail."
+	appendToFile $MLadminEmailMessage "No MLadminEmail Address set. You will not receive backp notifications via eMail."
 fi # [ $MLadminEmail -ne "" ]
 
 debug "--- removing .pid file if any."
