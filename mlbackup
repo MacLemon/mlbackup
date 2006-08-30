@@ -508,11 +508,13 @@ fi
 
 debug "--- Sending the AdminEmail Message per mail."
 # sending the admin eMail Notification, only if we have an address
-if [ ! $MLadminEmail ] # Is the AdminEMail Address empty?
-then # No, there is an address!
+if [ $MLadminEmail ] # Is the AdminEMail Address set?
+then # Yes, there is an address!
+	debug "Sending the Admin eMail to $MLadminEmail"
 	cat $MLfinalTarget/AdminEMail.txt | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
 else # No address set
-	appendToFile $MLadminEmail "No MLadminEmail Address set. You will not receive backp notifications via eMail."
+	debug "No MLadminEmail Address set, cannot send eMail!"
+	appendToFile $MLfinalTarget/AdminEMail.txt "No MLadminEmail Address set. You will not receive backp notifications via eMail."
 fi # [ $MLadminEmail -ne "" ]
 
 debug "--- removing .pid file if any."
