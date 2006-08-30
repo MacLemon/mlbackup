@@ -10,6 +10,7 @@
 MLtimeScriptStart=$(date +%s)
 ###############################################################################
 # Debug Mode. Set to 1 to get some debug messages set to 0 to skip them.
+# Can be set in the config file as well and will override this setting here!
 MLdebug=0
 ###############################################################################
 # determining a few standard variables for comfortable use later
@@ -108,7 +109,7 @@ MLrsyncCompress="--compress"
 
 # Rsync should be verbose
 # Rsync verbosity beyond -vv does NOT seem to work on Mac OS X, I am afraid this is an rsync bug
-MLbeVerbose="-v"
+MLbeVerbose="-vv"
 
 # Delete trashed files from the backup so our backups don't grow infinitely?
 MLdelete="--delete"
@@ -510,6 +511,8 @@ debug "--- Sending the AdminEmail Message per mail."
 if [ ! $MLadminEmail ] # Is the AdminEMail Address empty?
 then # No, there is an address!
 	cat $MLfinalTarget/AdminEMail.txt | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
+else # No address set
+	appendToFile $MLadminEmail "No MLadminEmail Address set. You will not receive backp notifications via eMail."
 fi # [ $MLadminEmail -ne "" ]
 
 debug "--- removing .pid file if any."

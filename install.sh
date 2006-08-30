@@ -10,7 +10,6 @@
 MLbackupInstallerVersion="0.0.1"
 MLbackupBuild=26
 
-# LastChange: 2006.07.26.
 ###############################################################################
 # Must be run as root
 
@@ -56,5 +55,4 @@ if [ "$UID" -ne "$MLrootUID" ]
 
 	echo Done installing the MacLemon backup scripts. See the README for more info
 fi
-return 0
 #EOF
