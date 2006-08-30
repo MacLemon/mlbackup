@@ -507,7 +507,7 @@ fi
 
 debug "--- Sending the AdminEmail Message per mail."
 # sending the admin eMail Notification, only if we have an address
-if [ $MLadminEmail -ne "" ] # Is the AdminEMail Address empty?
+if [ ! $MLadminEmail ] # Is the AdminEMail Address empty?
 then # No, there is an address!
 	cat $MLfinalTarget/AdminEMail.txt | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
 fi # [ $MLadminEmail -ne "" ]
