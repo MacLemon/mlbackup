@@ -480,8 +480,8 @@ then # Yes, something is in the Message file
 	MLadminEmailMessage=$MLfinalTarget/AdminEMail.txt
 	
 	if [ $MLweAreRoot -eq 1 ]
-	then # we chwon the file to make sure the admin can read it!
-		chown root:admin $MLadminEmailMessage
+	then # we chown the file to make sure the admin can read it!
+		chown $USER $MLadminEmailMessage
 	fi
 	chmod 644 $MLadminEmailMessage
 	
