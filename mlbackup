@@ -102,7 +102,7 @@ MLdestRsync="--rsync-path=$MLrsync"
 # MLdryRun=-n
 
 # The options to invoke rsync with.
-MLrsyncOptions="-apogt"
+MLrsyncOptions="-apogtxl"
 
 #Rsync should use compression for non-local-only backup transport (SSH)
 MLrsyncCompress="--compress"
