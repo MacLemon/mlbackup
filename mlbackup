@@ -203,6 +203,7 @@ fi # [ "$MLweAreRoot" -eq "1" ]
 # error handling of config file, setting defaults for missing parameters
 ###############################################################################
 # FUTURE: Preflight scripts will be called from here.
+# Possibly exchanged for a Plug-In like system. Not yet decided.
 ###############################################################################
 # asking rsync to tell us how to use extended Attributes (HFS, ResForks)
 # MLextendedAttributes=$($MLsourceRsync --help | grep -e "extended" -e "attributes" | sed -e 's/^.*--/--/' -e 's/\ .*//')
@@ -235,6 +236,8 @@ else # No, the target does not exist
 	exit $MLE_DestinationNotFound
 fi
 
+# We should also at least check the source folder for read privs, so we can give a very basic error message in case we cannot read it.
+
 # We need to find the most recent Backup as our Target for the link-dest
 # The grep shoud be a much better regexp, so we do not accidentally use a LIKE named other backup, but actually a correct old backup to refer to. Currently this will incorrectly find partial names as well as extended names!
 # FIX THIS!
@@ -255,7 +258,6 @@ debug "The most Recent Set to refer to is: $MLmostRecentSet"
 #Fetching the current date and time
 MLbackupDate=$(date "+%Y.%m.%d-%H.%M.%S")
 
-
 # Creating the Final Destination directory:
 # the .noindex trick surely keeps Spotlight from indexing while we backup
 # No matter if Spotlight indexin is enabled for the volume or not.
@@ -263,17 +265,12 @@ MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate.noindex"
 debug "MLfinalTarget = $MLfinalTarget"
 mkdir $MLfinalTarget
 
-
-
 debug "Rsync starting now."
 MLtimeRsyncStart=$(date +%s)
 # backing up
 
 #building the final command to run the backup
 $MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete "$MLexcludeFrom" --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >"$MLrsyncLogFile" 2>"$MLrsyncErrFile"
-
-# outputting for debug, so we know what has exactly been executed.
-debug "$MLfinalRsyncCommand"
 
 # And run the backup
 $MLfinalRsyncCommand
@@ -289,7 +286,7 @@ else # zero, two or more seconds
 fi
 
 ###############################################################################
-# Post processing the recorded logfiles:
+# Post processing the recorded rsync logfiles:
 # We move and compress the logfiles to the backup destination. (currently only on localhost)
 debug "Compressing the logfiles and moving them to the backup destination."
 
@@ -320,12 +317,84 @@ rm $MLrsyncLogFile
 ###############################################################################
 # Post processing of the backup:
 debug "--- Backup postprocessing"
+
+
+# Deciding what to do now
+
+# Beeing pessimistic we expect the backup to have failed, and change that if it hasn't.
+MLfatalError=1
+
 case $MLbackupStatus in
 	0)	# The last backup went ok
 		# If there is setlabel installed, we color it green (green is good)
 		MLeRsyncErrorMessage=""
-		MLfatalError=0
+		MLfatalError=0 ;;
+	# Error Codes we know from the rsync man page
+	1) MLeRsyncErrorMessage="Syntax or usage error";;
+	2) MLeRsyncErrorMessage="Protocol incompatibility";;
+	3) MLeRsyncErrorMessage="Errors selecting input/output files, dirs";;
+	4) MLeRsyncErrorMessage="Requested action not supported: an attempt was made to manipulate 64-bit files on a platform that cannot support them; or an option was specified that is supported by the client and not by the server.";;
+	5) MLeRsyncErrorMessage="Error starting client-server protocol";;
+	6) MLeRsyncErrorMessage="Daemon unable to append to log-file"
+		MLfatalError=2 ;;
+	10) MLeRsyncErrorMessage="Error in socket I/O";;
+	11) MLeRsyncErrorMessage="Error in file I/O";;
+	12) MLeRsyncErrorMessage="Error in rsync protocol data stream";;
+	13) MLeRsyncErrorMessage="Errors with program diagnostics";;
+	14) MLeRsyncErrorMessage="Error in IPC code";;
+	20) MLeRsyncErrorMessage="Received SIGUSR1 or SIGINT"
+		# The backup has been aborted by the user or some other interrupt.
+		# We should definitely clean up our mess before exiting.
+		# To be implemented
+		;;
+	21) MLeRsyncErrorMessage="Some error returned by waitpid()";;
+	22) MLeRsyncErrorMessage="Error allocating core memory buffers";;
+	23) MLeRsyncErrorMessage="Partial transfer due to error"
+		MLfatalError=2 ;;
+	24) MLeRsyncErrorMessage="Partial transfer due to vanished source files";;
+	25) MLeRsyncErrorMessage="The --max-delete limit stopped deletions";;
+	30) MLeRsyncErrorMessage="Timeout in data send/receive";;
+
+	# Any other error that might have occured that is unspecified
+	*) MLeRsyncErrorMessage="$0: Rsync returned Error Code $MLbackupStatus: Sorry, we do not know what this error code means. You may want to check your logfiles or the man page for rsync on your system."
+	;;
+esac
+
+case $MLfatalError in
+	1)	# Some fatal error occured during the backup
+		debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"
+		appendToFile "$MLadminEmailMessage" "Rsync returned $MLbackupStatus $MLeRsyncErrorMessage"
+	
+		debug "--- Post Processing backup errors"
+		if [ $MLbackupStatus -ne 0 ] # Something went wrong during the backup
+		then
+			# Telling that something went wrong
+			debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"
+			
+			# If there is setlabel installed, we color it red (red like a warning)
+			MLsetlabelPath=$(which setlabel)
+			if [ -e $MLsetlabelPath ] # only makes it red if setlabel command is installed
+			then
+				debug "Setting a red label for ERROR $MLfinalTarget"
+				$MLsetlabelPath Red "$MLfinalTarget"
+			fi # [ -e $MLsetlabelPath ]
 		
+			# If we have setfcomment installed, we add a nice comment to the folder
+			# TODO: Comment should be truncated to less than 200 characters.
+			MLsetfcommentPath=$(which setfcomment)
+			if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
+			then
+				debug "Setting Backup ERROR comment"
+				setfcomment -c "Unfinished backup! Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage Created by $MLbaseCommand $MLbacklemonVersion($MLbacklemonBuild). Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
+			fi # [ -e $MLsetfcommentPath ]
+		
+			# renaming the unfinished backup, so it will not be used for the next delta backup!
+			MLfinalNewTarget="$MLdestPath/ERROR-$MLbackupName-$MLbackupDate"
+			mv "$MLfinalTarget" "$MLfinalNewTarget"
+			MLfinalTarget="$MLfinalNewTarget"
+		fi #[ $MLbackupStatus -ne 0 ]
+		;;
+	*)	# The backup went OK, or had some other non fatal error (warning)
 		appendToFile "$MLadminEmailMessage" "The Backup $MLbackupName went OK!"
 		MLsetlabelPath=$(which setlabel)
 		if [ -e $MLsetlabelPath ] # only makes it green if setlabel command is installed
@@ -339,9 +408,6 @@ case $MLbackupStatus in
 		then
 			setfcomment -c "Created by $MLbaseCommand $MLversion. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
 		fi
-		
-		# notifying our user that the backup finished successfully
-#		growlnotify -n BackLemon -m "The Backup $MLbackupName was successful." -t "BackLemon finished"
 		
 		# checking if we need to remove some old ones
 		MLoldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^$MLbackupName-" )
@@ -386,90 +452,16 @@ case $MLbackupStatus in
 			# locked bit, rm will fail on that set
 			done
 		fi
+		
+		# Ranaming the Backup so it will be reused as link-target for the next run
+		mv "$MLfinalTarget" "$MLdestPath/$MLbackupName-$MLbackupDate"
+		MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate"
+		
 	debug "BackLemon was successful!"
-	;;
-	# Error Codes we know from the rsync man page
-	1) MLeRsyncErrorMessage="Syntax or usage error";
-		MLfatalError=1 ;;
-	2) MLeRsyncErrorMessage="Protocol incompatibility";
-		MLfatalError=1 ;;
-	3) MLeRsyncErrorMessage="Errors selecting input/output files, dirs";
-		MLfatalError=1 ;;
-	4) MLeRsyncErrorMessage="Requested action not supported: an attempt was made to manipulate 64-bit files on a platform that cannot support them; or an option was specified that is supported by the client and not by the server.";
-		MLfatalError=1 ;;
-	5) MLeRsyncErrorMessage="Error starting client-server protocol";
-		MLfatalError=1 ;;
-	6) MLeRsyncErrorMessage="Daemon unable to append to log-file";
-		MLfatalError=2 ;;
-	10) MLeRsyncErrorMessage="Error in socket I/O";
-		MLfatalError=1 ;;
-	11) MLeRsyncErrorMessage="Error in file I/O";
-		MLfatalError=1 ;;
-	12) MLeRsyncErrorMessage="Error in rsync protocol data stream";
-		MLfatalError=1 ;;
-	13) MLeRsyncErrorMessage="Errors with program diagnostics";
-		MLfatalError=1 ;;
-	14) MLeRsyncErrorMessage="Error in IPC code";
-		MLfatalError=1 ;;
-	20) MLeRsyncErrorMessage="Received SIGUSR1 or SIGINT";
-		MLfatalError=1 ;;
-	21) MLeRsyncErrorMessage="Some error returned by waitpid()";
-		MLfatalError=1 ;;
-	22) MLeRsyncErrorMessage="Error allocating core memory buffers";
-		MLfatalError=1 ;;
-	23) MLeRsyncErrorMessage="Partial transfer due to error"
-		MLfatalError=2 ;;
-	24) MLeRsyncErrorMessage="Partial transfer due to vanished source files" ;;
-	25) MLeRsyncErrorMessage="The --max-delete limit stopped deletions"
-		MLfatalError=1 ;;
-	30) MLeRsyncErrorMessage="Timeout in data send/receive";
-		MLfatalError=1 ;;
-
-	# Any other error that might have occured that is unspecified
-	*) MLeRsyncErrorMessage="$0: Rsync returned Error Code $MLbackupStatus: Sorry, we do not know what this error code means. You may want to check your logfiles or the man page for rsync on your system."
-	MLfatalError=1;
 	;;
 esac
 
-debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"
-appendToFile "$MLadminEmailMessage" "Rsync returned $MLbackupStatus $MLeRsyncErrorMessage"
 
-debug "--- Post Processing backup errors"
-if [ $MLbackupStatus -ne 0 ] # Something went wrong during the backup
-then
-	# Telling that something went wrong
-	debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"
-	
-	# If there is setlabel installed, we color it red (red like a warning)
-	MLsetlabelPath=$(which setlabel)
-	if [ -e $MLsetlabelPath ] # only makes it red if setlabel command is installed
-	then
-		debug "Setting a red label for ERROR $MLfinalTarget"
-		$MLsetlabelPath Red "$MLfinalTarget"
-	fi # [ -e $MLsetlabelPath ]
-
-	# If we have setfcomment installed, we add a nice comment to the folder
-	# TODO: Comment should be truncated to less than 200 characters.
-	MLsetfcommentPath=$(which setfcomment)
-	if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
-	then
-		debug "Setting Backup ERROR comment"
-		setfcomment -c "Unfinished backup! Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage Created by $MLbaseCommand $MLbacklemonVersion($MLbacklemonBuild). Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
-	fi # [ -e $MLsetfcommentPath ]
-
-	# renaming the unfinished backup, so it will not be used for the next delta backup!
-	MLfinalNewTarget="$MLdestPath/ERROR-$MLbackupName-$MLbackupDate"
-	mv "$MLfinalTarget" "$MLfinalNewTarget"
-	MLfinalTarget="$MLfinalNewTarget"
-	# notifying our user of the backup ERROR
-	#	growlnotify -n BackLemon -m "$MLeRsyncErrorMessage" -s -t "$MLbackupName Error $MLbackupStatus"
-
-	else
-	# notifying the user of the completed and successful backup
-		mv "$MLfinalTarget" "$MLdestPath/$MLbackupName-$MLbackupDate"
-		MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate"
-#		growlnotify -n BackLemon -m "$MLbackupName completed successfully." -s -t "Backup $MLbackupName finished"
-fi #[ $MLbackupStatus -ne 0 ]
 
 debug "--- Handling OLD backups"
 # Reporting of surplus OLD and ERROR backups that need to be taken care of
