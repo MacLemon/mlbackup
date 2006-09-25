@@ -270,7 +270,7 @@ MLtimeRsyncStart=$(date +%s)
 # backing up
 
 #building the final command to run the backup
-MLfinalRsycCommand = $MLsourceRsync $MLbeVerbose $MLdestRsync $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >$MLrsyncLogFile 2>$MLrsyncErrFile
+MLfinalRsyncCommand = $MLsourceRsync $MLbeVerbose $MLdestRsync $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >$MLrsyncLogFile 2>$MLrsyncErrFile
 
 # outputting for debug, so we know what has exactly been executed.
 debug $MLfinalRsyncCommand
@@ -341,7 +341,7 @@ case $MLbackupStatus in
 		fi
 		
 		# notifying our user that the backup finished successfully
-		growlnotify -n BackLemon -m "The Backup $MLbackupName was successful." -t "BackLemon finished"
+#		growlnotify -n BackLemon -m "The Backup $MLbackupName was successful." -t "BackLemon finished"
 		
 		# checking if we need to remove some old ones
 		MLoldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^$MLbackupName-" )
@@ -462,13 +462,13 @@ then
 	mv "$MLfinalTarget" "$MLfinalNewTarget"
 	MLfinalTarget="$MLfinalNewTarget"
 	# notifying our user of the backup ERROR
-growlnotify -n BackLemon -m "$MLeRsyncErrorMessage" -s -t "$MLbackupName Error $MLbackupStatus"
+	#	growlnotify -n BackLemon -m "$MLeRsyncErrorMessage" -s -t "$MLbackupName Error $MLbackupStatus"
 
 	else
 	# notifying the user of the completed and successful backup
 		mv "$MLfinalTarget" "$MLdestPath/$MLbackupName-$MLbackupDate"
 		MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate"
-		growlnotify -n BackLemon -m "$MLbackupName completed successfully." -s -t "Backup $MLbackupName finished"
+#		growlnotify -n BackLemon -m "$MLbackupName completed successfully." -s -t "Backup $MLbackupName finished"
 fi #[ $MLbackupStatus -ne 0 ]
 
 debug "--- Handling OLD backups"
