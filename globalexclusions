@@ -27,6 +27,7 @@
 #
 ###############################################################################
 #
+#   2006.10.11: Added Exclusion patterns to speed up testing. (will be removed)
 #	2006.08.30: Corrected some directory exclusions
 #	2006.08.22: Added Cache files for Adobe Bridge (Creative Suite 2)
 #	2006.08.22: Added tmp/ and temp/ directory global exclusion
@@ -77,6 +78,35 @@
 #
 ###############################################################################
 
+#for TESTING ONLY:
+# - *.mp3
+# - *.MP3
+# - *.MOV
+# - *.mov
+# - *.m4a
+# - *.m4b
+# - *.m4p
+# - *.mp4
+# - *.m4v
+# - *.tif
+# - *.TIF
+# - *.tiff
+# - *.TIFF
+# - *.png
+# - *.PNG
+# - *.jpeg
+# - *.JPEG
+# - *.jpg
+# - *.JPG
+# - *.dmg
+# - *.wav
+# - *.WAV
+# - *.aif
+# - *.AIF
+# - *.aifff
+# - *.AIFF
+# - *.zip
+# - *.ZIP
 
 # Ususal extensions to local backup and temporary files
 - *~
