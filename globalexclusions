@@ -27,6 +27,9 @@
 #
 ###############################################################################
 #
+#
+#   2007.05.27: Added .part Mozilla Firefox 2.0.0.3 Downlaod partial files
+#
 #   2006.10.11: Added Exclusion patterns to speed up testing. (will be removed)
 #	2006.08.30: Corrected some directory exclusions
 #	2006.08.22: Added Cache files for Adobe Bridge (Creative Suite 2)
@@ -156,6 +159,9 @@
 # Info: http://www.apple.com/safari/
 - *.download
 
+# Mozilla Firefox Partial downloads
+- *.part
+
 
 # Safari Favicons Cache (00-15/00-15/*.cache please help to improve this regexp)
 - Library/Safari/Icons/
@@ -178,6 +184,18 @@
 # Info: http://www.macupdate.com/info.php/id/11881
 # Info 2: http://www.versiontracker.com/dyn/moreinfo/macosx/16296
 - *.HeidrunDownload
+
+# Audiobook Builder Temporary Files
+# More Info: http://www.splasm.com/audiobookbuilder/
+- Library/Application Support/Audiobook Builder/Temp/*
+
+# BluePhoneElite 1.x
+# To be checked
+# - Library/Application Support/BluePhoneElite/Archive_Old
+# - Library/Application Support/BluePhonElite/SMS Archive_1.0.8.780
+# und andere Versions und builds Nummern RegExp?
+
+
 
 
 # Apple Addressbook Backup. Actually, these are packages (which are actually folders in the filesystem) simply containing the normal files used by Address Book in the Library
@@ -280,7 +298,7 @@
 - Library/Application Support/mlMac/incoming/
 - Library/Application Support/mlMac/temp/
 - Library/Application Support/mlMac/torrents/
-
+- Library/Application Support/mlMac/*.old
 
 # NetNewsWire and NetNewsWire Lite Caches:
 # Info & Download: http://ranchero.com/netnewswire/
@@ -294,6 +312,12 @@
 # NewsFire RSS Reader Cache
 # Info & Download: http://www.newsfirerss.com/
 - Library/Application Support/NewsFire/Cache/
+
+
+# PopCap Game: Zuma
+# - Library/Application Support/PopCap/Zuma/levels/cached_thumbnails/*
+
+
 
 
 # DiscTop Artwork - will be refetched if missing, not vital to a backup
@@ -431,6 +455,13 @@
 # Info: http://earth.google.com
 - Library/Application Support/Google Earth/myplaces.backup.kml
 - Library/Application Support/Google Earth/myplaces.kml.tmp
+
+# iSerial Reader
+# - Library/Application Support/iSerial Reader/Cache/
+
+# iSlayer iStatPro Widget
+# - Library/Application Support/iSlayer/ProcessesIconCache/
+
 
 
 # Java Applet Cache
