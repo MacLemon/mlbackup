@@ -29,6 +29,7 @@
 #
 #
 #   2007.05.27: Added .part Mozilla Firefox 2.0.0.3 Downlaod partial files
+#               Added Adobe PCD Cache Exclusion
 #
 #   2006.10.11: Added Exclusion patterns to speed up testing. (will be removed)
 #	2006.08.30: Corrected some directory exclusions
@@ -371,7 +372,7 @@
 # This Cache file belongs to Adobe Creative Suite
 # Info: http://www.adobe.com/support/techdocs/330060.html
 - Library/Preferences/ACE2Cache
-
+- Library/Application Support/Adobe/Adobe PCD/cache/
 
 # Adobe Creative Suite 2 - Adobe Bridge Cache files
 - Adobe Bridge Cache.bc
