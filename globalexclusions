@@ -27,6 +27,8 @@
 #
 ###############################################################################
 #
+#   2007.05.29: Added System Kernel Extensions Cache File
+#               Removed Testing Excludes in favor of per config exclusions
 #
 #   2007.05.27: Added .part Mozilla Firefox 2.0.0.3 Downlaod partial files
 #               Added Adobe PCD Cache Exclusion
@@ -82,36 +84,6 @@
 #
 ###############################################################################
 
-#for TESTING ONLY:
-# - *.mp3
-# - *.MP3
-# - *.MOV
-# - *.mov
-# - *.m4a
-# - *.m4b
-# - *.m4p
-# - *.mp4
-# - *.m4v
-# - *.tif
-# - *.TIF
-# - *.tiff
-# - *.TIFF
-# - *.png
-# - *.PNG
-# - *.jpeg
-# - *.JPEG
-# - *.jpg
-# - *.JPG
-# - *.dmg
-# - *.wav
-# - *.WAV
-# - *.aif
-# - *.AIF
-# - *.aifff
-# - *.AIFF
-# - *.zip
-# - *.ZIP
-
 # Ususal extensions to local backup and temporary files
 - *~
 - *.bak
@@ -138,6 +110,8 @@
 # 10.3+ Adaptive hotfile Clustering Info will be useless in case of restore.
 - .hotfiles.btree
 
+# Mac OS X System Kernel Extensions Cache File
+- Library/Extensions.kextcache
 
 # 10.4+ Spotlight indeces will be useless in case of restore. 
 - .Spotlight-V100/
@@ -147,7 +121,7 @@
 
 # Finder Desktop File information files
 - .DS_Store
-# There are a LOT of these files, so excluding is essential at the cost of loosing your view selection in the Finder. (Icon, list or column view setting)
+# There are a LOT of these files, so excluding is essential at the cost of loosing your view selection in the Finder. (Icon, list or column view setting, sort order etc.)
 
 
 # Classic Finder Desktop Database files, only used by Mac OS 9/Classic
@@ -429,7 +403,7 @@
 - Library/Application Support/Adobe/Acrobat/Distiller 6/FontCache/PSHFList
 
 # For Adobe Acrobat Distiller 7
-- Library/Application Support/Adobe/Acrobat/Distiller 6/FontCache/PSHFList
+- Library/Application Support/Adobe/Acrobat/Distiller 7/FontCache/PSHFList
 
 
 # BZflag (Game) Cache files

@@ -17,7 +17,7 @@ MLdebug=0
 MLfullCommand=$0
 MLbaseCommand=$(basename $0)
 MLhostname=$(hostname)
-MLversion=0.6
+MLversion=0.7
 ###############################################################################
 # Error and exit codes used
 # Everything Ok returns 0
@@ -109,14 +109,36 @@ MLrsyncCompress="" # --compress, -z
 
 # Rsync should be verbose
 # Rsync verbosity beyond -vv does NOT seem to work on Mac OS X, I am afraid this is an rsync bug
+# update 2007/05/28 16:49 -vvv seems to work on Mac OS X 10.4.9
 MLbeVerbose="-vv"
 
 # Delete trashed files from the backup so our backups don't grow infinitely?
 MLdelete="--delete"
 
 # Exclude Paths and Filenames mentioned in this file.
-MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
-# These are our global settings, user exclusion file will be available at a later date.
+
+
+### tag:exclusions
+# old single exclusions only, now supporting additional per config exclusions
+# MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
+
+
+# Per Default we respect the global Exclusions file to speed up backups
+MLuseGlobalExclusions=1
+MLglobalExcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
+
+# Per default we do NOT respect per config exclusions, they NEED to be
+# activated in the passed config file to become active.
+MLuseConfigExcludeFrom=0
+MLconfigExcludeFrom=""
+
+
+# FOR TESTING ONLY
+# To be backwards compatible during testing
+MLexcludeFrom=$MLglobalExcludeFrom
+
+
+
 
 # Be nice to other processes when compressing the logs
 # See man nice(1) for levels of niceness
@@ -243,6 +265,11 @@ fi
 # FIX THIS!
 MLmostRecentSet=$(ls -1tw "$MLdestPath/" | grep "^$MLbackupName-" | head -1)
 debug "The most Recent Set to refer to is: $MLmostRecentSet"
+
+
+### tag:exclusions
+# Here there should be creation of the final exclusions set
+# grep -h -v -e "^#" -v -e "^$" globalexclusions globalexclusions | sort | uniq
 
 
 # Commented out, so we can concentrate on core functionality at the moment, to stabilize.
