@@ -27,28 +27,34 @@ Installation:
 
 Usage:
 --------------------------------------------------------------------------------
-	Create a config file for your backup, for example by copying the included sampleconfig and edit the values accordingly.
-You can find the sample config in /etc/maclemon/backup/demo.mlbackupconf.sample  It hopefully is self-explanatory, if not, please tell us how to improve it!
-
+	Duplicate the provided sample configuration file found in /etc/maclemon/backup/demo.mlbackupconf.sample after installation. (Do NOT edit and use this file as your working configuration as it will be overwritten with a newer version if you update mlbackup.)
+The sample config is well documented and should be easy for an admin to fill out all the necessary variables to get a working configuration for your purpose. If you find any parameters complex or unintuitive to use send us feedback on how we can improve this!
 
 
 Additions:
 --------------------------------------------------------------------------------
-	None of these are mandatory, but they provide some comfort.
+	None of these are mandatory, but they provide some comfort and help to beautify your backups.
 
+Growl:
+NOTE: Growl notifications are currently NOT available until a later date in the development cycle.
 	If you have growl and growlnotify installed, mlbackup will try to make use of it. For more info on growl see http://growl.info/
 
-	If you have osxutils installed, mlbackup will try to make use of them. You can run `fink install osxutils` to install them if you have fink.
 
-	For more info on osxutils see http://sourceforge.net/projects/osxutils/
+OSXutils:
+	If you have osxutils installed, mlbackup will try to make use of them. 	For more info on osxutils see http://sourceforge.net/projects/osxutils/
+
+	
+fink project:
 	See http://fink.sf.net/ for info on fink.
-
+	You can use `fink install osxutils` to install them if you have fink.
 
 
 Known Issues:
 --------------------------------------------------------------------------------
 	no manpage for mlbackup yet
 
-	Spotlight comments are not backupped reliably if at all (rsync bug)
+	I am not sure if Spotlight comments (Finder comments) are backupped reliably at the moment. They should end up on your backup, but I am still investigating if this is working reliably.
 	
 	ACL (Access Control Lists) are not backupped correctly, if at all. (rsync problem)
+	
+	The Backup set may NOT include german umlaut characters. (I am still investigating why this is the case. If you have any information on how to make this work, please contact me!) This issue ONLY affects the naming of the backup sets. The files you intend to backup are not affected and will be backupped just fine!

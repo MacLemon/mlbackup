@@ -31,7 +31,7 @@ MLE_DestinationIsNoDirectory=252
 MLE_ConfigFileNotReadable=253
 MLE_ConfigFileNotFound=254
 ###############################################################################
-# Check if we run as root and set MLweAreRoot accordingly. Other parts of the script can rely on this variable to be set correctly.
+# Check if we run as root and set MLweAreRoot accordingly. Other parts of the script can rely on this variable to be set correctly. Like future preflight and postflight scripts.
 MLrootUID=0
 if [ "$UID" -ne "$MLrootUID" ]
 	then # I am not root
@@ -99,6 +99,7 @@ MLsourceRsync=$MLrsync
 MLdestRsync="--rsync-path=$MLrsync"
 
 # Dry run, for debugging Rsync, does NOT alter any files, only pretends to.
+# This option is ONLY to be used for debugging mlbackup.
 # MLdryRun=-n
 
 # The options to invoke rsync with.
@@ -565,12 +566,9 @@ else # No address set
 	appendToFile $MLadminEmailMessage "No MLadminEmail Address set. You will not receive backp notifications via eMail."
 fi # [ $MLadminEmail -ne "" ]
 
-debug "--- removing .pid file if any."
-if [ "$MLweAreRoot" -eq "1" ]
-then
-	# We are root, so we did create a .pid file, now let us remove it again.
-	rm $MLmyPidFile
-fi
+debug "--- Removing .pid file in $MLmyPidFile"
+rm $MLmyPidFile
+
 debug "BackLemon END"
 ###############################################################################
 # EOF
