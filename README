@@ -4,57 +4,77 @@ MacLemon Backup - README
 Do you like MacLemon Backup? Tell us why, we love to be praised and worshipped!
 Don't like MacLemon Backup? Tell us how we can improve it!
 
-Please send all feedback and suggestions to pepi@maclemon.at
+
+License:
+--------------------------------------------------------------------------------
+GNU general public license (GPL)
+You should have received a copy of the GPL with this software distribution. If not, you can find more information about the GPL at the official website of the free software foundation.
+http://www.gnu.org/licenses/gpl.html
 
 
 Disclaimer:
 --------------------------------------------------------------------------------
-	This software is provided as-is. It is in early alpha status and should be treated as such. MacLemon Backup has proven to work fine on my servers, but please do not solely rely on the backups made with MacLemon Backup.
-
+This software is provided as-is. It is in early alpha status and should be treated as such. MacLemon Backup has proven to work fine on _my_ servers, but please do not solely rely on the backups made with MacLemon Backup.
+No support can be given at the moment. I hope to have user self-support (forum ar similar way) available in the future. I will post relevant information on the mlbackup website.
 
 
 Target Audience:
 --------------------------------------------------------------------------------
-Admins and Geek Users who like a nice intelligent and incremental backup through the shell. Can be run from cron (or launchd) if you like. This is NOT INTENDED for normal users (yet).
+Mac OS X Admins and Geek Users who like a nice intelligent and incremental backup through the shell. Can be run from cron (or launchd) if you like. This is NOT INTENDED for normal users (yet). mlbackup is explicitly targeted at the Mac OS X (10.4 Tiger and above) platform. It has not been tested on other software platforms! Mac OS X 10.4.10 (Server as well) is recommended.
 
+
+Download:
+--------------------------------------------------------------------------------
+You can always get the latest version of mlbackup at http://maclemon.at/mlbackup
 
 
 Installation:
 --------------------------------------------------------------------------------
-	See INSTALL on how to install all the necessary files to use MacLemon backup.
-
+See INSTALL on how to install all the necessary files to use MacLemon backup.
 
 
 Usage:
 --------------------------------------------------------------------------------
-	Duplicate the provided sample configuration file found in /etc/maclemon/backup/demo.mlbackupconf.sample after installation. (Do NOT edit and use this file as your working configuration as it will be overwritten with a newer version if you update mlbackup.)
+Duplicate the provided sample configuration file found in /etc/maclemon/backup/demo.mlbackupconf.sample after installation. (Do NOT edit and use this file as your working configuration as it will be overwritten with a newer version if you update mlbackup.)
 The sample config is well documented and should be easy for an admin to fill out all the necessary variables to get a working configuration for your purpose. If you find any parameters complex or unintuitive to use send us feedback on how we can improve this!
 
 
 Additions:
 --------------------------------------------------------------------------------
-	None of these are mandatory, but they provide some comfort and help to beautify your backups.
+None of these are mandatory, but they provide some comfort and help to beautify your backups.
 
 Growl:
 NOTE: Growl notifications are currently NOT available until a later date in the development cycle.
-	If you have growl and growlnotify installed, mlbackup will try to make use of it. For more info on growl see http://growl.info/
+If you have growl and growlnotify installed, mlbackup will try to make use of it. For more info on growl see http://growl.info/
 
 
 OSXutils:
-	If you have osxutils installed, mlbackup will try to make use of them. 	For more info on osxutils see http://sourceforge.net/projects/osxutils/
+If you have osxutils installed, mlbackup will try to make use of them. 	For more info on osxutils see http://sourceforge.net/projects/osxutils/
 
 	
 fink project:
-	See http://fink.sf.net/ for info on fink.
-	You can use `fink install osxutils` to install them if you have fink.
+See http://fink.sf.net/ for info on fink.
+You can use `fink install osxutils` to install osxutils if you have fink.
 
 
 Known Issues:
 --------------------------------------------------------------------------------
-	no manpage for mlbackup yet
+No manpage for mlbackup yet
 
-	I am not sure if Spotlight comments (Finder comments) are backupped reliably at the moment. They should end up on your backup, but I am still investigating if this is working reliably.
+I am not sure if Spotlight comments (Finder comments) are backupped reliably at the moment. They should end up on your backup, but I am still investigating if this is working reliably.
 	
-	ACL (Access Control Lists) are not backupped correctly, if at all. (rsync problem)
+ACL (Access Control Lists) are not backupped correctly, if at all. (rsync problem)
 	
-	The Backup set may NOT include german umlaut characters. (I am still investigating why this is the case. If you have any information on how to make this work, please contact me!) This issue ONLY affects the naming of the backup sets. The files you intend to backup are not affected and will be backupped just fine!
+The Backup set may NOT include german umlaut characters. (I am still investigating why this is the case. If you have any information on how to make this work, please contact me!) This issue ONLY affects the naming of the backup sets. The files you intend to backup are not affected and will be backupped just fine!
+
+
+Feedback:
+--------------------------------------------------------------------------------
+Please direct all feedback, bug-reports, feature-requests and suggestions to pepi@maclemon.at . (In english or german language.)
+Support requests can not be handled on this email address and will be ignored.
+
+
+Enjoy using mlbackup!
+
+Best Regards
+Pepi Zawodsky

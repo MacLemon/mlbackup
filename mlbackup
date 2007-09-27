@@ -2,9 +2,9 @@
 ###############################################################################
 # Name: MacLemon Backup
 # Author: Pepi Zawodsky
-# eMail: pepi@maclemon.at
-# Copyright 2005, 2006: All Rights reserved
-# Future licensing not yet decided (GPL, LGPL or BSD are likely) Suggestions?
+# Authors eMail: pepi@maclemon.at
+# Website: http://maclemon.at/mlbackup
+# License: GNU general public license (GPL) http://www.gnu.org/licenses/gpl.html
 ###############################################################################
 # first thing we do is check the time to later see how long things took
 MLtimeScriptStart=$(date +%s)
@@ -57,7 +57,7 @@ function appendToFile (){
 # caveat: No error checking yet
 	
 # Pushed back a moment, current found solutions are not elegant and require at least 
-# one second temporary file.
+# one additional temporary file.
 
 # }
 
