@@ -200,7 +200,7 @@ else # We were passed a config file
 			debug "Loading the config file $MLconfigFile"
 			. $MLconfigFile
 		else # The user does not have read permission for the config file
-			echo $MLbaseCommand[$$]:FATAL The config file $MLconfigFile does exist but is not readable by $USER. Please change the mode or owner of the configuration file or use a different user to run $MLbaseCommand!
+			echo $MLbaseCommand[$$]:FATAL The config file $MLconfigFile seems to exist but is not readable by $USER. Please change the mode or owner of the configuration file or use a different user to run $MLbaseCommand!
 			exit $MLE_ConfigFileNotReadable # config file not readable
 			# We might do further testing of this file to give a better error
 		fi
@@ -210,15 +210,12 @@ else # We were passed a config file
 	fi # [ -e $MLconfigFile ]
 fi # [ -z "$1" ]
 ###############################################################################
-# If we're running as root we create a .pid file in /var/run
-# This should be substantially improved so we write different .pid files for different invocations of backlemon. (Depending on configuration)
-if [ "$MLweAreRoot" -eq "1" ]
-then # We are root, so let us create a .pid file
-	MLmyPidFile="/var/run/"$MLbaseCommand".pid"
-	echo $$ > $MLmyPidFile
-fi # [ "$MLweAreRoot" -eq "1" ]
+# Writing a .pid file to /tmp
+# Should check for simultanous invocations of mlbackup with the same config and refuse to run if another instance of mlbackup is running with the same configuration.
+MLmyPidFile="/tmp/"$MLbaseCommand-$MLbackupName".pid"
+echo $$ > $MLmyPidFile
+debug "PID File written to $MLmyPidFile"
 # This .pid file is removed at the end of the script
-# Would be nice to be able to write .pid files if not beeing root as well.
 ###############################################################################
 # Sanitizing of Input to variables.
 #

@@ -120,8 +120,8 @@
 
 
 # Finder Desktop File information files
-- .DS_Store
-# There are a LOT of these files, so excluding is essential at the cost of loosing your view selection in the Finder. (Icon, list or column view setting, sort order etc.)
+# - .DS_Store
+# Excluding these files will speed up the backup noticably, but also at the cost of loosing your view selections, possibly custom Icons and Spotlight/finder comments set on objects. Depending on your source files you may or may not want to skip these files.
 
 
 # Classic Finder Desktop Database files, only used by Mac OS 9/Classic
