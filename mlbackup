@@ -231,8 +231,10 @@ debug "PID File written to $MLmyPidFile"
 ###############################################################################
 # asking rsync to tell us how to use extended Attributes (HFS, ResForks)
 # MLextendedAttributes=$($MLsourceRsync --help | grep -e "extended" -e "attributes" | sed -e 's/^.*--/--/' -e 's/\ .*//')
-MLextendedAttributes="--extended-attributes"
+# MLextendedAttributes="--extended-attributes"
 
+# For rsync 3 the options are a LOT different:
+MLextendedAttributes="--hard-links --perms --executability --acls --xattrs --owner --group --times"
 
 # checking target
 
