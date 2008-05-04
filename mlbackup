@@ -98,7 +98,8 @@ debug "MLrsyncErrFile = $MLrsyncErrFile"
 
 # Path to rsync
 # MLrsync="/usr/bin/rsync" # For Mac OS X Tiger (10.4 and up) Apple rsync
-MLrsync="/usr/local/maclemon/bin/rsync" # Since r76, we use our own rsync 3
+# MLrsync="/usr/local/maclemon/bin/rsync" # Since r76, we use our own rsync 3
+MLrsync="/usr/local/maclemon-beta/bin/rsync" # For our trial and error experimentation
 MLsourceRsync=$MLrsync
 MLdestRsync="--rsync-path=$MLrsync"
 
