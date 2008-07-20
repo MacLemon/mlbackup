@@ -531,7 +531,7 @@ then # Yes, something is in the Message file
 	
 	if [ $MLweAreRoot -eq 1 ]
 	then # we chown the file to make sure the admin can read it!
-		chown $USER $MLadminEmailMessage
+		/usr/sbin/chown $USER $MLadminEmailMessage
 	fi
 	chmod 644 $MLadminEmailMessage
 	
