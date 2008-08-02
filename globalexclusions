@@ -401,7 +401,6 @@
 - Adobe Bridge Cache.bc
 - Adobe Bridge Cache.bct
 
-
 # AppleWorks Assitent and Filter Caches
 # These filenames are localized, what are they called in other languages
 # that are missing here? Please submit this info!
@@ -430,20 +429,17 @@
 # can we savely leave out this file?
 # - Library/Preferences/BBEdit Preferences/Clipboards
 
-
 # Shiira (Webkit Browser) Favicons Cache (00-15/00-15/*.cache improve regexp)
 # and Temporary Feed (RSS) Files
 # Info: http://hmdt-web.net/shiira/en
 - Library/Shiira/IconDatabase/
 - Library/Shiira/Feeds/tmp/*.xml
 
-
 # Apple iSync Backup Data
 # Currently we keep this, as I've seen to many people empty their phone and
 # AddressBook/Calendar by dumb use of iSync
 # If you don't want to keep this, uncomment the following line (remove # )
 # - Library/SyncService/Backup Data/
-
 
 # Adobe Acrobat Distiller FontCache Files
 # Info: http://www.adobe.com/
@@ -462,7 +458,6 @@
 - Library/Preferences/Adobe Illustrator 10/Zusatzmodul-Cache.psp
 
 
-
 # BZflag (Game) Cache files
 # Info: http://sourceforge.net/projects/bzflag/
 - Library/Application Support/BZFlag/cache/
@@ -477,11 +472,9 @@
 # Info: http://www.sebastian-krauss.de/software/
 - Library/Application Support/Fernsehen/Cache/
 
-
 # Flickr Export Resize Cache
 # Info: http://flickr.com/
 - Library/Application Support/FlickrExport/ResizeCache/
-
 
 # Google Earth - MyPlaces Application Backup File & temp file
 # Info: http://earth.google.com
@@ -493,8 +486,6 @@
 
 # iSlayer iStatPro Widget
 # - Library/Application Support/iSlayer/ProcessesIconCache/
-
-
 
 # Java Applet Cache
 - .jpi_cache/
@@ -527,8 +518,11 @@
 # - Library/Keychains/
 
 
-# Wired.app Preferences
+# Wired.app
 ###############################################################################
+# This ONLY applies to wired versions BELOW 1.3. Since 1.3 passwords are stored
+# in the keychain where they belong.
+#
 # SECURITY WARNING: This file contains login data to your wired bookmarks in
 # PLAIN TEXT! If you're not sure your backup location is safe from prying eyes
 # you may want to skip this file and backup to another location.
