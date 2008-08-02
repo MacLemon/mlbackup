@@ -108,10 +108,12 @@ MLdestRsync="--rsync-path=$MLrsync"
 # MLdryRun=-n
 
 # The options to invoke rsync with.
-MLrsyncOptions="-apogtxl --stats --hard-links"
+MLrsyncOptions="-apogtxl --stats --hard-links --fuzzy"
 
 #Rsync should use compression for non-local-only backup transport (SSH)
-MLrsyncCompress="" # --compress, -z
+# If you are using mlbackup over ssh, you should NOT compress the ssh connection, but 
+# use the rsync compression which gives better results as it knows more about the data.
+MLrsyncCompress="-z --compress-level=9" # --compress, -z
 
 # Rsync should be verbose
 # Rsync verbosity beyond -vv does NOT seem to work on Mac OS X, I am afraid this is an rsync bug
@@ -407,7 +409,6 @@ case $MLfatalError in
 			fi # [ -e $MLsetlabelPath ]
 		
 			# If we have setfcomment installed, we add a nice comment to the folder
-			# TODO: Comment should be truncated to less than 200 characters.
 			MLsetfcommentPath=$(which setfcomment)
 			if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
 			then
