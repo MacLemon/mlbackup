@@ -113,9 +113,12 @@
 - TheVolumeSettingsFolder/
 - ._TheVolumeSettingsFolder
 
-# The FindByContentFolder from Mac OS 9
+# The FindByContentFolder from Mac OS 9 (Sherlock)
 - /TheFindByContentFolder
-
+- .FBCindex
+- Library/Indexes/FindByContent/00001/
+- Library/Indexes/FindByContent/00002/
+- Library/Indexes/FindByContent/FBCPrivateIndexDB.plist
 
 # 10.3+ Adaptive hotfile Clustering Info will be useless in case of restore.
 - .hotfiles.btree
@@ -272,7 +275,13 @@
 
 
 # Microsoft Office 2004 (11) Font Cache Files
+- Documents/Microsoft-Benutzerdaten/Entourage Temp
+- Documents/Microsoft-Benutzerdaten/Office X-Identitäten/Hauptidentität/Datenbank Cache
+- Library/Preferences/Microsoft/Office Font Cache (10)
 - Library/Preferences/Microsoft/Office Font Cache (11)
+- Library/Preferences/Microsoft/Office Registration Cache X
+- Library/Preferences/Microsoft/Office Registration Cache 11
+- Library/Preferences/MS Internet Cache
 
 
 # Connectix Virtual PC 6.x, Printer Spooler files
@@ -285,6 +294,9 @@
 # http://www.icab.de/
 - Library/Preferences/iCab Preferences/iCab Cache/
 
+
+# iSerial Reader Cache Files
+- Library/Application Support/iSerial Reader/Cache
 
 # RagTime Cache Files
 # http://www.ragtime.de/
@@ -307,6 +319,9 @@
 - Library/Application Support/mlMac/torrents/
 - Library/Application Support/mlMac/*.old
 
+# Mac The Ripper Temp Files
+- .dvdcss
+
 # NetNewsWire and NetNewsWire Lite Caches:
 # Info & Download: http://ranchero.com/netnewswire/
 # Only applies to NNW before 2.1b16, the caches have been moved to
@@ -325,6 +340,8 @@
 # - Library/Application Support/PopCap/Zuma/levels/cached_thumbnails/*
 
 
+# Quark XPress 6 Aliases, for recently used files
+- Library/Preferences/Quark/QuarkXPress 6.0/MRU/*.qxp 
 
 
 # DiscTop Artwork - will be refetched if missing, not vital to a backup
@@ -392,7 +409,7 @@
 # german
 - Library/Preferences/AppleWorks/AppleWorks 6 Assistenten Cache
 - Library/Preferences/AppleWorks/AppleWorks 6 Filter Cache
-
+- Dokumente/AppleWorks Benutzerdaten/Ausgangspunkt/Cache
 
 # BBedit Prefs Data Backup Files
 # Info: http://www.barebones.com/
@@ -436,6 +453,14 @@
 
 # For Adobe Acrobat Distiller 7
 - Library/Application Support/Adobe/Acrobat/Distiller 7/FontCache/PSHFList
+
+# Module Caches for german Adobe Creative Suite
+- Library/Preferences/Adobe Photoshop 7.0 Settings/Zusatzmodul-Cache.psp
+- Library/Preferences/Adobe Photoshop CS Einstellungen/Zusatzmodul-Cache.psp
+- Library/Preferences/Adobe InDesign/Version 3.0/InDesign ClipboradScrap
+- Library/Preferences/Adobe InDesign/Version 3.0/InDesign OSXServicesScrap
+- Library/Preferences/Adobe Illustrator 10/Zusatzmodul-Cache.psp
+
 
 
 # BZflag (Game) Cache files
