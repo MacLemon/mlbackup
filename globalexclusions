@@ -1,7 +1,7 @@
 ###############################################################################
 # Excludes File for rsync Backups
-# by Pepi (c) 2005, 2006
-# eMail: pepi@maclemon.at
+# by Pepi 2005-2008
+# eMail: mlbackup@maclemon.at
 #
 # For mlbackup __VVAALLIIDD__RREEVVIISSIIOONNSS__
 #
@@ -28,6 +28,9 @@
 #		Globally SORT all this stuff. How? Suggestions are welcome.
 #
 ###############################################################################
+#
+#	2008/08/02:	Added several Leopard only Exclusions
+#				
 #
 #   2007.05.29: Added System Kernel Extensions Cache File
 #               Removed Testing Excludes in favor of per config exclusions
@@ -92,6 +95,8 @@
 - *.backup
 - *.tmp
 - *.temp
+- /private/tmp/*
+- /private/var/vm/*
 
 
 # Find By Content Lock Folder, used by Sherlock
@@ -108,6 +113,9 @@
 - TheVolumeSettingsFolder/
 - ._TheVolumeSettingsFolder
 
+# The FindByContentFolder from Mac OS 9
+- /TheFindByContentFolder
+
 
 # 10.3+ Adaptive hotfile Clustering Info will be useless in case of restore.
 - .hotfiles.btree
@@ -121,9 +129,31 @@
 # So we better be aware of this. May be changed to a wildcard in the future.
 
 
+# 10.5 additions
+- /.fseventsd
+
+# TimeMachine tagging of Volume
+- .com.apple.timemachine.supported
+
+# Leopard Special Folders
+- /net
+- /home
+- /Network
+- /automount
+- /dev/*
+- /Volumes/*
+- /.com.apple.NetBootX
+- /OpenFolderListDF
+- /VM Storage
+- /Shutdown Check
+- /Cleanup At Startup
+- /Auth.bak
+- /.vol/*
+
+
 # Finder Desktop File information files
 # - .DS_Store
-# Excluding these files will speed up the backup noticably, but also at the cost of loosing your view selections, possibly custom Icons and Spotlight/finder comments set on objects. Depending on your source files you may or may not want to skip these files.
+# Excluding these files will speed up the backup noticably, but also at the cost of loosing your view selections, custom Icons and Spotlight/finder comments set on objects. Depending on your source files you may or may not want to skip these files.
 
 
 # Classic Finder Desktop Database files, only used by Mac OS 9/Classic
