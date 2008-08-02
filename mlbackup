@@ -441,13 +441,15 @@ case $MLfatalError in
 		# checking if we need to remove some old ones
 		MLoldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^$MLbackupName-" )
 		let "MLoldBackupCountDifference = $MLoldBackupCount - $MLbackupCount"	
-
-		MLoldBackupList=$(ls -1w "$MLdestPath/" | grep "^$MLbackupName-"| head -$MLoldBackupCountDifference)	
-		debug "Old Backup Count: $MLoldBackupCount, $MLoldBackupCountDifference to be removed."	
-		debug "Old Backup List: $MLoldBackupList"
-
+		debug "MLoldBackupCountDifference = " $MLoldBackupCountDifference
+		
 		if [ "$MLoldBackupCount" -gt "$MLbackupCount" ] # There are surplus Backups, so we remove them
 		then
+
+			MLoldBackupList=$(ls -1w "$MLdestPath/" | grep "^$MLbackupName-"| head -$MLoldBackupCountDifference)	
+			debug "Old Backup Count: $MLoldBackupCount, $MLoldBackupCountDifference to be removed."	
+			debug "Old Backup List: $MLoldBackupList"
+		
 			if [ $MLoldBackupCountDifference -eq 1 ] # just one old backup
 			then # Yes, just a single old backup.
 				debug "There is $MLoldBackupCountDifference surplus old backup, starting to remove it."
