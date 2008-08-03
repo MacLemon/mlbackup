@@ -1,14 +1,31 @@
 #!/bin/bash
 ###############################################################################
-# Name: MacLemon Backup installer
+# Name: install.sh, an installer script for mlbackup
 # Author: Pepi Zawodsky
-# eMail: pepi@maclemon.at
-# Copyright 2005, 2006: All Rights reserved
+# Authors eMail: mlbackup@maclemon.at
+# Website: http://maclemon.at/mlbackup
+# License: GNU general public license (GPL) http://www.gnu.org/licenses/gpl.html
+###############################################################################
+# install.sh, an installer script for mlbackup
+# Copyright (C) 2005-2008 Pepi Zawodsky
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+###############################################################################
 
-# Status: ALPHA
-
-MLbackupInstallerVersion="0.0.1"
-MLbackupBuild=26
+MLbackupInstallerVersion="0.0.2"
+MLbackupBuild=__CCUURREENNTT__RREEVVIISSIIOONN__
 
 ###############################################################################
 # Must be run as root
@@ -38,14 +55,18 @@ if [ "$UID" -ne "$MLrootUID" ]
 	echo
 	echo copying files
 	# copying the files
-	cp $MLcpFlags growler.sh $MLbinDir/
+	# growler is deactivated at the moment and NOT distributed with mlbackup
+	#	cp $MLcpFlags growler.sh $MLbinDir/
 	cp $MLcpFlags mlbackup $MLbinDir/
 
 	cp $MLcpFlags globalexclusions $MLconfigDir/
 	cp $MLcpFlags demo.mlbackupconf.sample $MLconfigDir/
 
+
 	# Setting correct Ownership of files
-	chown root:wheel $MLbinDir/mlbackup $MLbinDir/growler.sh $MLconfigDir/globalexclusions $MLconfigDir
+
+	# growler is deactivated at the moment and NOT distributed with mlbackup
+	#	chown root:wheel $MLbinDir/mlbackup $MLbinDir/growler.sh $MLconfigDir/globalexclusions $MLconfigDir
 	
 	echo
 	echo Setting correct privileges and file modes
