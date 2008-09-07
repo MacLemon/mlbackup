@@ -62,10 +62,7 @@ You can use `fink install osxutils` to install osxutils if you have fink.
 Known Issues:
 --------------------------------------------------------------------------------
 No manpage for mlbackup yet
-
-Spotlight comments (Finder comments) are not backupped reliably at the moment. This will be improved soon!
 	
-ACL (Access Control Lists) are not backupped correctly, if at all. (rsync problem)
 	
 The Backup set may NOT include german umlaut characters. (I am still investigating why this is the case. If you have any information on how to make this work, please contact me!) This issue ONLY affects the naming of the backup sets. The files you intend to backup are not affected and will be backupped just fine!
 
