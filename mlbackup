@@ -87,6 +87,7 @@ function debug (){
 # usage: debug "Your debugging Message"
 	if [ $MLdebug -eq 1 ] # Is the debug flag set?
 	then # Output everything that is passed to stdout:
+	# Should Debugging Messages be output to stderr instead? Please give feedback!
 		MLtheDebugMessage="$(date) $MLbaseCommand[$$] DEBUG: $@"
 		echo $MLtheDebugMessage
 		
