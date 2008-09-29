@@ -15,7 +15,7 @@ http://www.gnu.org/licenses/gpl.html
 
 Disclaimer:
 --------------------------------------------------------------------------------
-This software is provided as-is. It is in beta status and should be treated as such. MacLemon Backup has proven to work fine on _my_ servers, but please do not solely rely on the backups made with MacLemon Backup. As usual, alwas have a second backup ffor vital data. No support can be given at the moment. I hope to have user self-support (forum or similar way) available in the future. I will post relevant information on the mlbackup website.
+This software is provided as-is. It is in beta status and should be treated as such. MacLemon Backup has proven to work fine on _my_ servers, but please do not solely rely on the backups made with MacLemon Backup. As usual, alwas have a second backup for vital data. No support can be given at the moment. I hope to have user self-support (forum or similar way) available in the future. I will post relevant information on the mlbackup website.
 
 
 Target Audience:
