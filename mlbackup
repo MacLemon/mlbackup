@@ -34,7 +34,7 @@ MLdebug=0
 MLfullCommand=$0
 MLbaseCommand=$(basename $0)
 MLhostname=$(hostname)
-MLversion=0.8
+MLversion=0.9
 MLrevision=__CCUURREENNTT__RREEVVIISSIIOONN__
 ###############################################################################
 # Error and exit codes used
@@ -238,7 +238,7 @@ fi # [ -z "$1" ]
 ###############################################################################
 # Writing a .pid file to /tmp
 # Should check for simultanous invocations of mlbackup with the same config and refuse to run if another instance of mlbackup is running with the same configuration.
-MLmyPidFile="/tmp/"$MLbaseCommand-$MLbackupName".pid"
+MLmyPidFile="/tmp/$MLbaseCommand-$MLbackupName.pid"
 echo $$ > $MLmyPidFile
 debug "PID File written to $MLmyPidFile"
 # This .pid file is removed at the end of the script
