@@ -419,7 +419,7 @@ case $MLfatalError in
 			debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"
 			
 			# If there is setlabel installed, we color it red (red like a warning)
-			MLsetlabelPath=$(which setlabel)
+			MLsetlabelPath=/sw/bin/setlabel
 			if [ -e $MLsetlabelPath ] # only makes it red if setlabel command is installed
 			then
 				debug "Setting a red label for ERROR $MLfinalTarget"
@@ -431,7 +431,7 @@ case $MLfatalError in
 			if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
 			then
 				debug "Setting Backup ERROR comment"
-				setfcomment -c "Unfinished backup! Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage Created by $MLbaseCommand $MLbacklemonVersion($MLbacklemonBuild). Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
+				/sw/bin/setfcomment -c "Unfinished backup! Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage Created by $MLbaseCommand $MLbacklemonVersion($MLbacklemonBuild). Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
 			fi # [ -e $MLsetfcommentPath ]
 		
 			# renaming the unfinished backup, so it will not be used for the next delta backup!
@@ -452,7 +452,7 @@ case $MLfatalError in
 		MLsetfcommentPath=/sw/bin/setfcomment
 		if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
 		then
-			setfcomment -c "Created by $MLbaseCommand $MLversion. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
+			/sw/bin/setfcomment -c "Created by $MLbaseCommand $MLversion. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
 		fi
 		
 		# checking if we need to remove some old ones
