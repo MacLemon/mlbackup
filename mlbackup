@@ -341,7 +341,7 @@ debug "--- Post processing the error.log"
 if [ -s $MLrsyncErrFile ] # Non zero byte error.log? Only in case of errors
 then # Yes, there were errors recorded.
 	$MLbeNiceCommand cat "$MLrsyncErrFile" | gzip -9 >"$MLfinalTarget/error.log.gz"
-	chmod 644 "$MLfinalTarget/error.log.gz"
+	/bin/chmod 644 "$MLfinalTarget/error.log.gz"
 else
 	debug "The error.log $MLrsyncErrFile was empty, looks good."
 fi # [ -s $MLrsyncErrFile ]
@@ -353,7 +353,7 @@ if [ -s "$MLrsyncLogFile" ] # Non zero bytes rsync.log? (Expected)
 then # Yes, of course, compress and move to the backup folder
 	$MLbeNiceCommand cat "$MLrsyncLogFile" | gzip -9 >"$MLfinalTarget/rsync.log.gz"
 	# make sure, the user can read that file!
-	chmod 644 "$MLfinalTarget/rsync.log.gz"
+	/bin/chmod 644 "$MLfinalTarget/rsync.log.gz"
 else
 	debug "The rsync.log $MLrsyncLogFile was empty, this is extremely unlikely!"
 fi #[ -s $MLrsyncLogFile ]
@@ -552,7 +552,7 @@ then # Yes, something is in the Message file
 	then # we chown the file to make sure the admin can read it!
 		/usr/sbin/chown $USER $MLadminEmailMessage
 	fi
-	chmod 644 "$MLadminEmailMessage"
+	/bin/chmod 644 "$MLadminEmailMessage"
 	
 else # No, the message is empty, very unlikely
 	# nothing to shout about, so we silently remove the temporary file
