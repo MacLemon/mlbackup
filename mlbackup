@@ -136,7 +136,7 @@ MLrsyncCompress="-z --compress-level=9" # --compress, -z
 # Rsync should be verbose
 # Rsync verbosity beyond -vv does NOT seem to work on Mac OS X, I am afraid this is an rsync bug
 # update 2007/05/28 16:49 -vvv seems to work on Mac OS X 10.4.9
-MLbeVerbose="-vv"
+MLbeVerbose="-v"
 
 # Delete trashed files from the backup so our backups don't grow infinitely?
 MLdelete="--delete"
@@ -235,6 +235,18 @@ else # We were passed a config file
 		exit $MLE_ConfigFileNotFound # Config file not found
 	fi # [ -e $MLconfigFile ]
 fi # [ -z "$1" ]
+###############################################################################
+# Post processing of new parameters loaded from the config file.
+
+# Increasing overall verbosity if we're in DEBUG mode.
+if [ $MLdebug -eq 1 ] # Is the debug flag set?
+then # Increase rsync verbosity
+		MLbeVerbose="-vvv"
+fi
+
+
+
+
 ###############################################################################
 # Writing a .pid file to /tmp
 # Should check for simultanous invocations of mlbackup with the same config and refuse to run if another instance of mlbackup is running with the same configuration.
