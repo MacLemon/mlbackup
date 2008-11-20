@@ -427,7 +427,7 @@ case $MLfatalError in
 			fi # [ -e $MLsetlabelPath ]
 		
 			# If we have setfcomment installed, we add a nice comment to the folder
-			MLsetfcommentPath=$(which setfcomment)
+			MLsetfcommentPath=/sw/bin/setfcomment
 			if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
 			then
 				debug "Setting Backup ERROR comment"
@@ -442,14 +442,14 @@ case $MLfatalError in
 		;;
 	*)	# The backup went OK, or had some other non fatal error (warning)
 		appendToFile "$MLadminEmailMessage" "The Backup $MLbackupName went OK!"
-		MLsetlabelPath=$(which setlabel)
+		MLsetlabelPath=/sw/bin/setlabel
 		if [ -e $MLsetlabelPath ] # only makes it green if setlabel command is installed
 		then
 			$MLsetlabelPath Green "$MLfinalTarget/"
 		fi
 		
 		# If we have setfcomment installed, we add a nice comment to the folder
-		MLsetfcommentPath=$(which setfcomment)
+		MLsetfcommentPath=/sw/bin/setfcomment
 		if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
 		then
 			setfcomment -c "Created by $MLbaseCommand $MLversion. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
