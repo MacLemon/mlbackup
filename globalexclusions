@@ -29,9 +29,14 @@
 #
 ###############################################################################
 #
+#	2008/11/20: Added:
+#				iSlayer iStat Menus Cache
+#				Acrobat 8 Cache
+#				Miro Icon Cache and Partial Files
+#				Leopard preloaded Updates
+#
 #	2008/08/02:	Added several Leopard only Exclusions
 #				
-#
 #   2007.05.29: Added System Kernel Extensions Cache File
 #               Removed Testing Excludes in favor of per config exclusions
 #
@@ -152,6 +157,7 @@
 - /Cleanup At Startup
 - /Auth.bak
 - /.vol/*
+- /Library/Updates/*
 
 
 # Finder Desktop File information files
@@ -450,6 +456,10 @@
 # For Adobe Acrobat Distiller 7
 - Library/Application Support/Adobe/Acrobat/Distiller 7/FontCache/PSHFList
 
+# For Adobe Acrobat 8
+- Library/Acrobat User Data/Preflight Acrobat 8/Preferences/Cache/*
+- Library/Application Support/Adobe/Acrobat/Distiller 8/FontCache/PSHFList
+
 # Module Caches for german Adobe Creative Suite
 - Library/Preferences/Adobe Photoshop 7.0 Settings/Zusatzmodul-Cache.psp
 - Library/Preferences/Adobe Photoshop CS Einstellungen/Zusatzmodul-Cache.psp
@@ -485,11 +495,15 @@
 # - Library/Application Support/iSerial Reader/Cache/
 
 # iSlayer iStatPro Widget
-# - Library/Application Support/iSlayer/ProcessesIconCache/
+- Library/Application Support/iSlayer/ProcessesIconCache/
+- Library/Application Support/iSlayer/Processes/IconsCache
 
 # Java Applet Cache
 - .jpi_cache/
 
+# Miro
+- Library/Application Support/Miro/icon-cache/
+- Movies/Miro/Incomplete Downloads
 
 # Temporary Items folders created by Mac OS and other Apps
 - .TemporaryItems/
