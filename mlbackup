@@ -260,7 +260,7 @@ debug "PID File written to $MLmyPidFile"
 ###############################################################################
 
 # For rsync 3 the options are a LOT different:
-MLextendedAttributes="--hard-links --perms --executability --acls --xattrs --owner --group --times"
+MLextendedAttributes="--hard-links --perms --executability --acls --xattrs --owner --group --times --iconv=UTF-8,UTF8-MAC"
 
 # checking target
 
