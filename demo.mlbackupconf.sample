@@ -1,5 +1,8 @@
 # BackLemon Demo Configuration file
 
+# To use this config file invoke mlbackup like this:
+# mlbackup path/to/your.mlbackupconf
+
 # What is the name of this backup set?
 MLbackupName="MacLemon-Sample"
 
@@ -32,10 +35,10 @@ MLdestPath="/Volumes/Backup"
 
 
 # Where to send the eMail notification about the backup to?
-# If you need multiple recipients seperate them with commas.
+# If you need multiple recipients separate them with commas.
 # Example: "admin@example.com,user@example.com"
 
-# If you don't have a working mailserver (postfix) setup on your Mac, like this might be on a Client Mac, you can just leave MLadminEmail="" and mlbackup will do it's backups as good as always, but without sending a mail. The message will still be saved with the backup so you can have a look at it.
+# If you don't have a working mailserver (postfix) setup on your Mac, like this might be on a Client Mac, you can just leave MLadminEmail="" and mlbackup will do it's backups as good as always, but without trying to send mail. The message will still be saved with the backup so you can have a look at it.
 
 # Default: $USER
 MLadminEmail="$USER"

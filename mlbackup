@@ -240,13 +240,9 @@ fi # [ -z "$1" ]
 
 # Increasing overall verbosity if we're in DEBUG mode.
 if [ $MLdebug -eq 1 ] # Is the debug flag set?
-then # Increase rsync verbosity
+then # Yes, Increase rsync verbosity
 		MLbeVerbose="-vvv"
 fi
-
-
-
-
 ###############################################################################
 # Writing a .pid file to /tmp
 # Should check for simultanous invocations of mlbackup with the same config and refuse to run if another instance of mlbackup is running with the same configuration.
