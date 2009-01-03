@@ -140,7 +140,7 @@ function seconds2dhms (){
 		*) seconds2dhms_secondtext="$seconds2dhms_seconds seconds";;
 	esac
 
-	return "$seconds2dhms_daytext $seconds2dhms_hourtext $seconds2dhms_minutetext $seconds2dhms_secondtext"
+	echo "$seconds2dhms_daytext $seconds2dhms_hourtext $seconds2dhms_minutetext $seconds2dhms_secondtext"
 }
 ###############################################################################
 # Creating a few temporary files we need
@@ -384,7 +384,11 @@ if [ $MLtimeRsyncDuration -eq 1 ] # Just to care for proper language
 then # It was only one second
 	debug "rsync took $MLtimeRsyncDuration second."
 else # zero, two or more seconds
-	debug "rsync took $MLtimeRsyncDuration seconds. $(seconds2dhms $MLtimeRsyncDuration)"
+	debug "rsync took $MLtimeRsyncDuration seconds. $(
+	if [ $MLtimeRsyncDuration -gt 60 ] # more than 60 seconds
+	then # makes sense to output in human readable format
+		seconds2dhms $MLtimeRsyncDuration
+	fi)"
 fi
 
 ###############################################################################
@@ -631,7 +635,11 @@ if [ $MLtimeScriptDurationTotal -eq 1 ] # Just to care for proper language
 then # It was only one second
 	debug "Backup took $MLtimeScriptDurationTotal second."
 else # zero, two or more seconds
-	debug "Backup took $MLtimeScriptDurationTotal seconds. $(seconds2dhms $MLtimeScriptDurationTotal)"
+	debug "Backup took $MLtimeScriptDurationTotal seconds. $(
+		if [ $MLtimeRsyncDuration -gt 60 ] # more than 60 seconds
+			then # makes sense to output in human readable format
+			seconds2dhms $MLtimeScriptDurationTotal
+		fi)"
 fi
 
 debug "--- Sending the AdminEmail Message per mail."
