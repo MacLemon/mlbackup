@@ -95,6 +95,53 @@ function debug (){
 		appendToFile "$MLadminEmailMessage" "$MLtheDebugMessage"
 	fi
 }
+#------------------------------------------------------------------------------
+function seconds2dhms (){
+	# Takes the number of seconds as integer and returns a string with human
+	# 	readable output in the form of 11d 22h 33m 44s to make durations
+	#	in the form of seconds easier to read for humans.
+	#	Usage: humanReadableDuration=seconds2dhms $NumberOfSeconds
+	seconds2dhms_seconds=$1
+
+	seconds2dhms_days=$(( seconds2dhms_seconds / 86400 )); # One day equals 86400 seconds
+	seconds2dhms_seconds=$(( seconds2dhms_seconds % 86400 ))
+
+	seconds2dhms_hours=$(( seconds2dhms_seconds / 3600 )); # One hour equals 3600 seconds
+	seconds2dhms_seconds=$(( seconds2dhms_seconds % 3600 ))
+
+	seconds2dhms_minutes=$(( seconds2dhms_seconds / 60 ))
+	seconds2dhms_seconds=$(( seconds2dhms_seconds % 60 ))
+
+	#days
+	case $seconds2dhms_days in
+		0) seconds2dhms_daytext="";;
+		1) seconds2dhms_daytext="$seconds2dhms_days day";;
+		*) seconds2dhms_daytext="$seconds2dhms_days days";;
+	esac
+
+	#hours
+	case $seconds2dhms_hours in
+		0) seconds2dhms_hourtext="";;
+		1) seconds2dhms_hourtext="$seconds2dhms_hours hour";;
+		*) seconds2dhms_hourtext="$seconds2dhms_hours hours";;
+	esac
+
+	#minutes
+	case $seconds2dhms_minutes in
+		0) seconds2dhms_minutetext="";;
+		1) seconds2dhms_minutetext="$seconds2dhms_minutes minute";;
+		*) seconds2dhms_minutetext="$seconds2dhms_minutes minutes";;
+	esac
+
+	#seconds
+	case $seconds2dhms_seconds in
+		0) seconds2dhms_secondtext="";;
+		1) seconds2dhms_secondtext="$seconds2dhms_seconds second";;
+		*) seconds2dhms_secondtext="$seconds2dhms_seconds seconds";;
+	esac
+
+	return "$seconds2dhms_daytext $seconds2dhms_hourtext $seconds2dhms_minutetext $seconds2dhms_secondtext"
+}
 ###############################################################################
 # Creating a few temporary files we need
 
@@ -337,7 +384,7 @@ if [ $MLtimeRsyncDuration -eq 1 ] # Just to care for proper language
 then # It was only one second
 	debug "rsync took $MLtimeRsyncDuration second."
 else # zero, two or more seconds
-	debug "rsync took $MLtimeRsyncDuration seconds."
+	debug "rsync took $MLtimeRsyncDuration seconds. $(seconds2dhms $MLtimeRsyncDuration)"
 fi
 
 ###############################################################################
@@ -460,7 +507,8 @@ case $MLfatalError in
 		MLsetfcommentPath=/sw/bin/setfcomment
 		if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
 		then
-			/sw/bin/setfcomment -c "Created by $MLbaseCommand $MLversion. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
+			/sw/bin/setfcomment -c "Created by $MLbaseCommand $MLversiy
+			on. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
 		fi
 		
 		# checking if we need to remove some old ones
@@ -583,7 +631,7 @@ if [ $MLtimeScriptDurationTotal -eq 1 ] # Just to care for proper language
 then # It was only one second
 	debug "Backup took $MLtimeScriptDurationTotal second."
 else # zero, two or more seconds
-	debug "Backup took $MLtimeScriptDurationTotal seconds."
+	debug "Backup took $MLtimeScriptDurationTotal seconds. $(seconds2dhms $MLtimeScriptDurationTotal)"
 fi
 
 debug "--- Sending the AdminEmail Message per mail."
