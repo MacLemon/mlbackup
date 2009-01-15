@@ -1,9 +1,11 @@
 mlbackup - README
 
-
+Contact and feedback:
+--------------------------------------------------------------------------------
 Do you like mlbackup? Tell us why, we love to be praised and worshipped!
 Don't like mlbackup? Tell us how we can improve it!
 Send an email to mlbackup@maclemon.at (english or german language please)
+mlbackup is on Twitter as well! http://twitter.com/mlbackup
 
 
 License:
