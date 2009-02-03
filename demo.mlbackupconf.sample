@@ -43,4 +43,9 @@ MLdestPath="/Volumes/Backup"
 # Default: $USER
 MLadminEmail="$USER"
 
+
+# If you don't want to exclude certain files that we deem unnecessary for a backup, set this parameter to 0.
+# To see what we exclude by default see /etc/maclemon/backup/globalexclusions
+# MLuseGlobalExclusions=1
+
 #EOF

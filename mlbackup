@@ -42,6 +42,8 @@ MLrevision=__CCUURREENNTT__RREEVVIISSIIOONN__
 # Any rsync error returns the return value of rsync
 # Known rsync error codes are 1-30
 # Any other error returns one of these (128-254):
+MLE_ConfigExclusionsFileNotReadable=247
+MLE_ConfigExclusionsFileDoesNotExist=248
 MLE_DestinationNotFound=249
 MLE_DestinationNotWriteable=250
 MLE_NoConfigFileParameter=251
@@ -198,19 +200,17 @@ MLdelete="--delete"
 
 # Per Default we respect the global Exclusions file to speed up backups
 MLuseGlobalExclusions=1
+MLglobalExclusionsFile=/etc/maclemon/backup/globalexclusions
 MLglobalExcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
 
-# Per default we do NOT respect per config exclusions, they NEED to be
-# activated in the passed config file to become active.
-MLuseConfigExcludeFrom=0
+# If there is a path in MLconfigExcludeFrom then we will import that one.
+# If it is empty, there is nothing to import.
 MLconfigExcludeFrom=""
 
 
 # FOR TESTING ONLY
 # To be backwards compatible during testing
-MLexcludeFrom=$MLglobalExcludeFrom
-
-
+# MLexcludeFrom=$MLglobalExcludeFrom
 
 
 # Be nice to other processes when compressing the logs
@@ -291,6 +291,52 @@ then # Yes, Increase rsync verbosity
 		MLbeVerbose="-vvv"
 fi
 ###############################################################################
+# Procesing global and per config exclusion files
+
+debug "MLconfigExcludeFrom: $MLconfigExcludeFrom"
+if [ -z "$MLconfigExcludeFrom" ]
+then # There has no per config exclusion file been set
+	debug "No per-config exclusions file has been set."
+	debug "MLuseGlobalExclusions: $MLuseGlobalExclusions"
+	if [ $MLuseGlobalExclusions -eq 1 ]
+	then # We shall only use the global exclusions
+		debug "We are using the globalexclusions."
+		MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
+	else # We shall NOT use the global exclusions, nothing left to consider for exclusion
+		debug "We shall not use globalexclusions. Nothing will be excluded from the backup."
+		MLexcludeFrom=""
+	fi
+	debug "MLexcludeFrom: $MLexcludeFrom"
+else # We shall respect a per config exclusions file.
+	debug "A per-config exclusions file has been set."
+	if [ -e $MLconfigExcludeFrom ]
+	then # The file does exist
+		debug "This exclusions file does exist."
+		if [ -r $MLconfigExcludeFrom ]
+		then # The per-config exclusions file can be read by the user invoking this script
+			debug "This exclusions file is readable by $USER."
+			if [ $MLuseGlobalExclusions -eq 1 ]
+			then # We shall also use the global exclusions, so we need to combine the files
+				debug "Globalexclusions shall also be respected."
+				MLcombinedExclusions=$(mktemp -t MLcombinedExclusions.XXXXXXXXXX) # Temporary File for exclusions
+				debug "MLcombinedExclusions = $MLcombinedExclusions"
+				debug "Combining globalexclusions and per-config exclusions."
+				grep -h -v -e "^#" -v -e "^$" -v -e "^;" "$MLglobalExclusionsFile" "$MLconfigExcludeFrom" | sort | uniq > $MLcombinedExclusions
+				MLexcludeFrom="--exclude-from=$MLcombinedExclusions"
+			else # We shall not use the globalexclusion, so we only use the per-config exclusions
+				debug "Globalexclusions shall not be used, only using per-config exclusions."
+				MLexcludeFrom="--exclude-from=$MLconfigExcludeFrom"
+			fi
+		else # The user does not have read permission for the per-config exclusions file
+			echo $MLbaseCommand[$$]:FATAL The config file $MLconfigExcludeFrom seems to exist but is not readable by $USER. Please change the mode or owner of the configuration file or use a different user to run $MLbaseCommand!
+			exit $MLE_ConfigExclusionsFileNotReadable # per-config exclusions file not readable. Exiting
+		fi
+	else # The per-config exclusions file does not exist, FATAL.	
+		echo $MLbaseCommand[$$]:FATAL The config file $MLconfigExcludeFrom could not be found. Please check the path!
+		exit $MLE_ConfigExclusionsFileDoesNotExist # Per Config Exclusions file does not exist. Exiting.
+	fi
+fi
+###############################################################################
 # Writing a .pid file to /tmp
 # Should check for simultanous invocations of mlbackup with the same config and refuse to run if another instance of mlbackup is running with the same configuration.
 MLmyPidFile="/tmp/$MLbaseCommand-$MLbackupName.pid"
@@ -341,12 +387,6 @@ fi
 MLmostRecentSet=$(ls -1tw "$MLdestPath/" | grep -E "^$MLbackupName-(19|20)[0-9][0-9]\.(0[1-9]|1[012])\.(0[1-9]|[12][0-9]|3[01])-([01][0-9]|2[0-3])\.[0-5][0-9]\.[0-5][0-9]" | head -1)
 debug "The most Recent Set to refer to is: $MLmostRecentSet"
 
-
-### tag:exclusions
-# Here there should be creation of the final exclusions set
-# grep -h -v -e "^#" -v -e "^$" globalexclusions globalexclusions | sort | uniq
-
-
 # Commented out, so we can concentrate on core functionality at the moment, to stabilize.
 # MLgrowlNotifyDelay=10
 # # notifying our user of the pending backup
@@ -372,7 +412,7 @@ MLtimeRsyncStart=$(date +%s)
 # backing up
 
 #building the final command to run the backup
-$MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete "$MLexcludeFrom" --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >"$MLrsyncLogFile" 2>"$MLrsyncErrFile"
+$MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >"$MLrsyncLogFile" 2>"$MLrsyncErrFile"
 
 # And run the backup
 $MLfinalRsyncCommand
@@ -392,7 +432,7 @@ else # zero, two or more seconds
 fi
 
 ###############################################################################
-# Post processing the recorded rsync logfiles:
+# Post processing the recorded rsync logfiles and temporary files:
 # We move and compress the logfiles to the backup destination. (currently only on localhost)
 debug "Compressing the logfiles and moving them to the backup destination."
 
@@ -415,10 +455,17 @@ then # Yes, of course, compress and move to the backup folder
 	/bin/chmod 644 "$MLfinalTarget/rsync.log.gz"
 else
 	debug "The rsync.log $MLrsyncLogFile was empty, this is extremely unlikely!"
-fi #[ -s $MLrsyncLogFile ]
+fi # [ -s $MLrsyncLogFile ]
 # Removing the rsync.log tempfile
 rm "$MLrsyncLogFile"
 
+# Cleaning up MLcombinedExclusions
+
+if [ $MLcombinedExclusions ]
+then Yes, we have a temporary MLcombinedExclusions file, let us remove it.
+	debug "Removing MLcombinedExclusions: $MLcombinedExclusions"
+	rm -f "$MLcombinedExclusions"
+fi
 
 ###############################################################################
 # Post processing of the backup:
@@ -565,7 +612,7 @@ case $MLfatalError in
 		mv "$MLfinalTarget" "$MLdestPath/$MLbackupName-$MLbackupDate"
 		MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate"
 		
-	debug "BackLemon was successful!"
+	debug "mlbackup was successful!"
 	;;
 esac
 
