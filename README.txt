@@ -4,8 +4,11 @@ Contact and feedback:
 --------------------------------------------------------------------------------
 Do you like mlbackup? Tell us why, we love to be praised and worshipped!
 Don't like mlbackup? Tell us how we can improve it!
+Found a bug? Eeek! See "Bug Reports" at the end of this document!
+
 Send an email to mlbackup@maclemon.at (english or german language please)
 mlbackup is on Twitter as well! http://twitter.com/mlbackup
+mlbackup usergroup at Facebook: http://www.facebook.com/group.php?gid=38141392466
 
 
 License:
@@ -75,6 +78,11 @@ If you are using Kerio mailserver be sure to check with the Kerio documentation 
 Feedback:
 --------------------------------------------------------------------------------
 Please direct all feedback, bug-reports, feature-requests and suggestions to mlbackup@maclemon.at . (In english or german language.) Support requests can handled in a limited way, depending on how much spare time I can afford.
+
+
+Bug Reports:
+--------------------------------------------------------------------------------
+When reporting a bug, please tell us how we can reproduce the bug. Please also include the configuration file you use when the bug occurs. Also include rsync.log and error.log of the backup where the bug showed up. To provide Debug output, please add MLdebug=1 to your config. This will spit out vast amounts of debugging information that will help track down the problem. Don't forget to remove that line again or set MLdebug=0 if you don't need it anymore. It will speed up your backups considerably.
 
 
 Enjoy using mlbackup!
