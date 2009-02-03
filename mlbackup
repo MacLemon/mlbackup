@@ -191,13 +191,6 @@ MLbeVerbose="-v"
 MLdelete="--delete"
 
 # Exclude Paths and Filenames mentioned in this file.
-
-
-### tag:exclusions
-# old single exclusions only, now supporting additional per config exclusions
-# MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
-
-
 # Per Default we respect the global Exclusions file to speed up backups
 MLuseGlobalExclusions=1
 MLglobalExclusionsFile=/etc/maclemon/backup/globalexclusions
@@ -207,11 +200,8 @@ MLglobalExcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
 # If it is empty, there is nothing to import.
 MLconfigExcludeFrom=""
 
-
-# FOR TESTING ONLY
-# To be backwards compatible during testing
-# MLexcludeFrom=$MLglobalExcludeFrom
-
+# For deleting stuff we use
+MLrm="/bin/rm"
 
 # Be nice to other processes when compressing the logs
 # See man nice(1) for levels of niceness
@@ -287,8 +277,9 @@ fi # [ -z "$1" ]
 
 # Increasing overall verbosity if we're in DEBUG mode.
 if [ $MLdebug -eq 1 ] # Is the debug flag set?
-then # Yes, Increase rsync verbosity
-		MLbeVerbose="-vvv"
+then # Yes, Increase verbosity
+		MLbeVerbose="-vvv" # For rsync
+		MLrm="/bin/rm -v" # for rm, actually -v is a NON POSIX standard option in rm on Mac OS X.
 fi
 ###############################################################################
 # Procesing global and per config exclusion files
@@ -445,7 +436,7 @@ else
 	debug "The error.log $MLrsyncErrFile was empty, looks good."
 fi # [ -s $MLrsyncErrFile ]
 # removing the error.log tempfile
-rm "$MLrsyncErrFile"
+$MLrm "$MLrsyncErrFile"
 
 debug "--- Post processing the rsync.log"
 if [ -s "$MLrsyncLogFile" ] # Non zero bytes rsync.log? (Expected)
@@ -457,14 +448,14 @@ else
 	debug "The rsync.log $MLrsyncLogFile was empty, this is extremely unlikely!"
 fi # [ -s $MLrsyncLogFile ]
 # Removing the rsync.log tempfile
-rm "$MLrsyncLogFile"
+$MLrm "$MLrsyncLogFile"
 
 # Cleaning up MLcombinedExclusions
 
 if [ $MLcombinedExclusions ]
 then Yes, we have a temporary MLcombinedExclusions file, let us remove it.
 	debug "Removing MLcombinedExclusions: $MLcombinedExclusions"
-	rm -f "$MLcombinedExclusions"
+	$MLrm "$MLcombinedExclusions"
 fi
 
 ###############################################################################
@@ -585,11 +576,22 @@ case $MLfatalError in
 			do
 
 			debug "Removing the Set in: $MLdestPath/$MLoldBackupTobeRemoved"
-			rm -Rf "$MLdestPath/$MLoldBackupTobeRemoved"
+			$MLrm -Rf "$MLdestPath/$MLoldBackupTobeRemoved"
 			MLrmReturnCode=$?
 			debug "rm returned $MLrmReturnCode"
 			
 			if [ $MLrmReturnCode -ne 0 ] # did rm NOT return 0?
+			then # no it did not return 0, meaning an error occured
+				# So we try to unlock files and delete the remaining ones again
+				debug "Trying to unlock files that could not be deleted"
+				/usr/bin/chflags -R nouchg "$MLdestPath/$MLoldBackupTobeRemoved" # unlocking files
+				debug "Deleting the remaining files again."
+				$MLrm -Rf "$MLdestPath/$MLoldBackupTobeRemoved" # And delete the rest again
+				MLrmReturnCode=$?
+				debug "rm returned $MLrmReturnCode"
+			fi
+			
+			if [ $MLrmReturnCode -ne 0 ] # did rm still NOT return 0?
 			then # no it did not return 0, meaning an error occured
 				# Could not delete the old backup
 				# try to label it gray
@@ -602,9 +604,6 @@ case $MLfatalError in
 				appendToFile "$MLadminEmailMessage" "The Backup $MLdestPath/$MLoldBackupTobeRemoved could not be deleted because rm(1) returned $MLrmReturnCode. It has been renamed to $MLdestPath/OLD-$MLoldBackupTobeRemoved. Please investigate why this backup could not be deleted automatically. Remove this old backup manually!"
 				
 			fi # [ $MLrmReturnCode -ne 0 ]
-
-			# We should check if removing an oldbackup worked correctly, if a user has set the
-			# locked bit, rm will fail on that set
 			done
 		fi
 		
@@ -654,18 +653,14 @@ then # Yes, something is in the Message file
 	mv "$MLadminEmailMessage" "$MLfinalTarget/AdminEMail.txt"
 	# Updating the variable, so some very late messages are still appended
 	MLadminEmailMessage=$MLfinalTarget/AdminEMail.txt
-	
-#	if [ $MLweAreRoot -eq 1 ]
-#	then # we chown the file to make sure the admin can read it!
-#		/usr/sbin/chown $USER $MLadminEmailMessage
-#	fi
+
 	/bin/chmod 644 "$MLadminEmailMessage"
-	
+
 else # No, the message is empty, very unlikely
 	# nothing to shout about, so we silently remove the temporary file
 	# We can NEVER get here in debug mode thats why we use echo here!
 	echo "MLadminEmailMessage was empty, we just remove the temporary file."
-	rm $MLadminEmailMessage
+	$MLrm $MLadminEmailMessage
 	unset $MLadminEmailMessage
 fi
 
@@ -697,7 +692,7 @@ else # No address set
 fi # [ $MLadminEmail -ne "" ]
 
 debug "--- Removing .pid file in $MLmyPidFile"
-rm "$MLmyPidFile"
+$MLrm "$MLmyPidFile"
 
 debug "BackLemon END"
 ###############################################################################
