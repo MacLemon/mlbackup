@@ -1,6 +1,6 @@
 ###############################################################################
 # Excludes File for rsync Backups
-# by Pepi 2005-2008
+# by Pepi 2005-2009
 # eMail: mlbackup@maclemon.at
 #
 # For mlbackup __VVAALLIIDD__RREEVVIISSIIOONNSS__
@@ -29,6 +29,8 @@
 #
 ###############################################################################
 #
+#	2009/02/04: Added:	Different stuff related to temp directories
+#				fifos and sockets
 #	2008/11/20: Added:
 #				iSlayer iStat Menus Cache
 #				Acrobat 8 Cache
@@ -101,8 +103,11 @@
 - *.tmp
 - *.temp
 - /private/tmp/*
+- /tmp/*
 - /private/var/vm/*
-
+- /var/vm/*
+- *.sock
+- *.fifo
 
 # Find By Content Lock Folder, used by Sherlock
 - .FBCLockFolder/
