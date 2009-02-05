@@ -28,7 +28,7 @@ MLtimeScriptStart=$(date +%s)
 ###############################################################################
 # Debug Mode. Set to 1 to get some debug messages set to 0 to skip them.
 # Can be set in the config file as well and will override this setting here!
-MLdebug=0
+MLdebug=1
 ###############################################################################
 # determining a few standard variables for comfortable use later
 MLfullCommand=$0
@@ -36,12 +36,18 @@ MLbaseCommand=$(basename $0)
 MLhostname=$(hostname)
 MLversion=0.9
 MLrevision=__CCUURREENNTT__RREEVVIISSIIOONN__
+
+# For development and testing only:
+# MLrevision=$(svn info svn+maclemon:///Backup/trunk | grep "Revision:" | awk {'print $2'})
+# echo "MLrevision: $MLrevision"
 ###############################################################################
 # Error and exit codes used
 # Everything Ok returns 0
 # Any rsync error returns the return value of rsync
 # Known rsync error codes are 1-30
 # Any other error returns one of these (128-254):
+MLE_NoConfigFileParameterAndStableUpdateAvailable=245
+MLE_NoConfigFileParameterAndCouldNotVersioncheck=246
 MLE_ConfigExclusionsFileNotReadable=247
 MLE_ConfigExclusionsFileDoesNotExist=248
 MLE_DestinationNotFound=249
@@ -145,6 +151,13 @@ function seconds2dhms (){
 	echo "$seconds2dhms_daytext $seconds2dhms_hourtext $seconds2dhms_minutetext $seconds2dhms_secondtext"
 }
 ###############################################################################
+# Version Checking info
+MLversioncheckBaseURL="http://versioncheck.maclemon.at/"
+MLversioncheckURL="$MLversioncheckBaseURL$MLbaseCommand.txt"
+MLinfoURL="http://maclemon.at/mlbackup"
+debug "MLversioncheckURL: $MLversioncheckURL"
+
+###############################################################################
 # Creating a few temporary files we need
 
 MLadminEmailMessage=$(mktemp -t MLadminEmailMessage.XXXXXXXXXX) # Email composition for Backup Admin
@@ -239,12 +252,36 @@ debug "MLbeNice = $MLbeNice ; MLbeNiceCommand = $MLbeNiceCommand"
 ###############################################################################
 # Getting the configuration file
 # Handling of the config file should be a little more elegant.
+# Known Issue: Versioncheck does not yet respect Mac OS X Proxy settings.
 
 # Did we get a parameter to use as a config file?
 if [ -z "$1" ]
 then # There was no config filename passed
-  echo "Usage: $MLbaseCommand path/to/configfile"
-  exit $MLE_NoConfigFileParameter # Error invoking backlemon. Cannot continue without a config.
+	# Outputting Usage information as needed for POSIX
+	echo "Usage: $MLbaseCommand path/to/configfile"
+
+	# Checking for current stable version
+	MLcheckedVersion=$(curl -sL --connect-timeout 30 $MLversioncheckURL | grep -w "^mlbackup.stable" | awk '{printf $3}')
+	MLcurlReturned=$?
+	if [ $MLcurlReturned -eq 0 ] # Could we successfully check our version?
+	then # Yes we could successfully versioncheck
+		if [ $MLcheckedVersion -gt $MLrevision ] # Is there a newer version available?
+		then # Yes, there is a newer version available
+			echo The current revision of $MLbaseCommand is $MLcheckedVersion, you are running $MLrevision.
+			echo Visit $MLinfoURL to get an update.
+			exit $MLE_NoConfigFileParameterAndStableUpdateAvailable
+
+		else # No Update available, running current
+			exit $MLE_NoConfigFileParameter
+
+		fi
+	else # No, we could not successfully versioncheck.
+		# Known Issue: curl(1) error codes are not yet displayed as human readable text.
+		echo Could not check for update. curl\(1\) Exit Code $MLcurlReturned.
+		exit $MLE_NoConfigFileParameterAndCouldNotVersioncheck
+
+	fi
+
 else # We were passed a config file
 	MLconfigFile="$1"
 	debug "Config file to use is: $MLconfigFile"
