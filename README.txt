@@ -28,9 +28,10 @@ Target Audience:
 Mac OS X Admins and Geek Users who like a nice intelligent and incremental backup through the shell. Can be run from launchd (or cron) if you like. This is NOT INTENDED for normal users (yet). mlbackup is explicitly targeted at the Mac OS X (10.4 Tiger and 10.5 Leopard) platform. It has not been tested on other software platforms! Mac OS X 10.4.11 or Leopard (Server as well) is recommended.
 
 
-Download:
+Download & Versioncheck:
 --------------------------------------------------------------------------------
 You can always get the latest version of mlbackup at http://maclemon.at/mlbackup
+If you invoke mlbackup without a config file parameter it will check online for a n updated version. It tries to connect to http://versioncheck.maclemon.at/mlbackup.txt to find out if there is a newer version available. At no point is ANY information sent to our servers to respect your privacy.
 
 
 Installation:
@@ -73,6 +74,12 @@ The backup set name may NOT include german umlaut characters. (I am still invest
 
 
 If you are using Kerio mailserver be sure to check with the Kerio documentation on how to use the sendmail replacement wrapper for Kerio on your system. Otherwise mlbackup may not be able to send email. If you're using the Mac OS X postfix mailserver everything should just work. If you don't want to or cannot send email, just leave the $MLadminEmail=""
+
+
+Versioncheck will not work if you need to connect to the web using a proxy server. This will hopefully be improved in a future version.
+
+
+If mlbackup cannot check for updates it will present you an Exit Code that it got from curl(1) but will not give you a helpful human readable error message. At the moment you need to look up the error in man curl.
 
 
 Feedback:

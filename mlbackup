@@ -28,7 +28,7 @@ MLtimeScriptStart=$(date +%s)
 ###############################################################################
 # Debug Mode. Set to 1 to get some debug messages set to 0 to skip them.
 # Can be set in the config file as well and will override this setting here!
-MLdebug=1
+MLdebug=0
 ###############################################################################
 # determining a few standard variables for comfortable use later
 MLfullCommand=$0
