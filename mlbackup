@@ -64,7 +64,6 @@ MLrootUID=0
 if [ "$UID" -ne "$MLrootUID" ]
 	then # I am not root
 		MLweAreRoot=0
-		
 	else # Bow before me, for I am root!
 		MLweAreRoot=1
 fi
@@ -75,7 +74,12 @@ function appendToFile (){
 # Appends a given text at the end of a given file
 # usage: appendToFile "path/to/filename" "Message to append"
 # caveat: No error checking yet (should check for existence of file and writeability, should output to console in case of problems)
-	echo "$2" >> "$1"
+if [ $MLdebug -eq 1 ] # Is the debug flag set?
+	then # We output to console and log to the file
+		echo "$2" | tee -a "$1"
+	else # No Debugging turned on, we only log to a file.
+		echo "$2" >> "$1"
+fi
 }
 
 #------------------------------------------------------------------------------
