@@ -28,7 +28,7 @@ MLtimeScriptStart=$(date +%s)
 ###############################################################################
 # Debug Mode. Set to 1 to get some debug messages set to 0 to skip them.
 # Can be set in the config file as well and will override this setting here!
-MLdebug=1
+MLdebug=0
 ###############################################################################
 # determining a few standard variables for comfortable use later
 MLfullCommand=$0
@@ -151,13 +151,6 @@ function seconds2dhms (){
 	echo "$seconds2dhms_daytext $seconds2dhms_hourtext $seconds2dhms_minutetext $seconds2dhms_secondtext"
 }
 ###############################################################################
-# Version Checking info
-MLversioncheckBaseURL="http://versioncheck.maclemon.at/"
-MLversioncheckURL="$MLversioncheckBaseURL$MLbaseCommand.txt"
-MLinfoURL="http://maclemon.at/mlbackup"
-debug "MLversioncheckURL: $MLversioncheckURL"
-
-###############################################################################
 # Creating a few temporary files we need
 
 MLadminEmailMessage=$(mktemp -t MLadminEmailMessage.XXXXXXXXXX) # Email composition for Backup Admin
@@ -171,7 +164,12 @@ debug "MLrsyncLogFile = $MLrsyncLogFile"
 
 MLrsyncErrFile=$(mktemp -t MLrsyncErrFile.XXXXXXXXXX) # Logfile for rsync ERR
 debug "MLrsyncErrFile = $MLrsyncErrFile"
-
+###############################################################################
+# Version Checking info
+MLversioncheckBaseURL="http://versioncheck.maclemon.at/"
+MLversioncheckURL="$MLversioncheckBaseURL$MLbaseCommand.txt"
+MLinfoURL="http://maclemon.at/mlbackup"
+debug "MLversioncheckURL: $MLversioncheckURL"
 ###############################################################################
 # Setting our own internal variables.
 # To be improved. Some of these may be moved to the config file later.
