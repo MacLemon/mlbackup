@@ -28,13 +28,13 @@ MLtimeScriptStart=$(date +%s)
 ###############################################################################
 # Debug Mode. Set to 1 to get some debug messages set to 0 to skip them.
 # Can be set in the config file as well and will override this setting here!
-MLdebug=0
+MLdebug=1
 ###############################################################################
 # determining a few standard variables for comfortable use later
 MLfullCommand=$0
 MLbaseCommand=$(basename $0)
 MLhostname=$(hostname)
-MLversion=0.9.1
+MLversion=0.9
 MLrevision=__CCUURREENNTT__RREEVVIISSIIOONN__
 
 # For development and testing only:
@@ -64,6 +64,7 @@ MLrootUID=0
 if [ "$UID" -ne "$MLrootUID" ]
 	then # I am not root
 		MLweAreRoot=0
+		
 	else # Bow before me, for I am root!
 		MLweAreRoot=1
 fi
@@ -74,10 +75,7 @@ function appendToFile (){
 # Appends a given text at the end of a given file
 # usage: appendToFile "path/to/filename" "Message to append"
 # caveat: No error checking yet (should check for existence of file and writeability, should output to console in case of problems)
-if [ $MLdebug -eq 1 ] # Is the debug flag set?
-	then # We output to console and log to the file
-		echo "$2" >> "$1"
-fi
+	echo "$2" >> "$1"
 }
 
 #------------------------------------------------------------------------------
@@ -93,14 +91,13 @@ fi
 
 #------------------------------------------------------------------------------
 function debug (){
-	# outputs a debugging message to console if the MLdebug Flag is set to 1
-	# usage: debug "Your debugging Message"
-
-	# Is the debug flag set?
-	if [ $MLdebug -eq 1 ]; then # Output everything that is passed to stdout:
+# outputs a debugging message to console if the MLdebug Flag is set to 1
+# usage: debug "Your debugging Message"
+	if [ $MLdebug -eq 1 ] # Is the debug flag set?
+	then # Output everything that is passed to stdout:
 	# Should Debugging Messages be output to stderr instead? Please give feedback!
 		MLtheDebugMessage="$(date) $MLbaseCommand[$$] DEBUG: $@"
-		echo "$MLtheDebugMessage"
+		echo $MLtheDebugMessage
 		
 		# same message passed to the admin eMail Message
 		appendToFile "$MLadminEmailMessage" "$MLtheDebugMessage"
@@ -154,10 +151,17 @@ function seconds2dhms (){
 	echo "$seconds2dhms_daytext $seconds2dhms_hourtext $seconds2dhms_minutetext $seconds2dhms_secondtext"
 }
 ###############################################################################
+# Version Checking info
+MLversioncheckBaseURL="http://versioncheck.maclemon.at/"
+MLversioncheckURL="$MLversioncheckBaseURL$MLbaseCommand.txt"
+MLinfoURL="http://maclemon.at/mlbackup"
+debug "MLversioncheckURL: $MLversioncheckURL"
+
+###############################################################################
 # Creating a few temporary files we need
 
 MLadminEmailMessage=$(mktemp -t MLadminEmailMessage.XXXXXXXXXX) # Email composition for Backup Admin
-debug "MLadminEmailMessage: $MLadminEmailMessage"
+debug "MLadminEmailMessage = $MLadminEmailMessage"
 
 # If the backup only takes place on localhost we should probably directly
 # create the logfiles in the backup destination (which we would need to create
@@ -167,31 +171,7 @@ debug "MLrsyncLogFile = $MLrsyncLogFile"
 
 MLrsyncErrFile=$(mktemp -t MLrsyncErrFile.XXXXXXXXXX) # Logfile for rsync ERR
 debug "MLrsyncErrFile = $MLrsyncErrFile"
-###############################################################################
-# Version Checking info
-MLversioncheckBaseURL="http://versioncheck.maclemon.at/"
-MLversioncheckURL="$MLversioncheckBaseURL$MLbaseCommand.txt"
-MLinfoURL="http://maclemon.at/mlbackup"
-debug "MLversioncheckURL: $MLversioncheckURL" 
-###############################################################################
-# Check if we'are running in an interactive shell, and control output accordingly.
-# Would print out "not a tty" if non-interactive and a tty device if interactive
-# I know that tty -s is deprecated according to man tty, but test -s 0
-# seems to be broken and does not give reliable results. test -t 0 is unusable.
 
-debug "Checking for interactive TTY"
-/usr/bin/tty -s
-MLttyReturned=$?
-
-# echo MLttyReturned = $MLttyReturned
-
-if [ $MLttyReturned -eq 1 ]; then # tty returns 1 on nonInteractive
-	MLisInteractive=0
-	debug "Running in a non-interactive environment. tty returned $MLttyReturned, MLisInteractive set to $MLisInteractive."
-else # tty returns 0 on interactive (tty present)
-	MLisInteractive=1
-	debug "Running in an interactive environment. tty returned $MLttyReturned, MLisInteractive set to $MLisInteractive."
-fi
 ###############################################################################
 # Setting our own internal variables.
 # To be improved. Some of these may be moved to the config file later.
@@ -213,7 +193,6 @@ MLrsyncOptions="-apogtxl --stats --hard-links --fuzzy"
 #Rsync should use compression for non-local-only backup transport (SSH)
 # If you are using mlbackup over ssh, you should NOT compress the ssh connection, but 
 # use the rsync compression which gives better results as it knows more about the data.
-# Should probably not use compression on LAN, only on WAN remote copies oar only compress-lever=1?
 MLrsyncCompress="-z --compress-level=9" # --compress, -z
 
 # Rsync should be verbose
@@ -461,10 +440,7 @@ MLtimeRsyncStart=$(date +%s)
 # backing up
 
 #building the final command to run the backup
-$MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --log-file="$MLrsyncLogFile" --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" 2>"$MLrsyncErrFile"
-
-# $MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >"$MLrsyncLogFile" 2>"$MLrsyncErrFile"
-
+$MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >"$MLrsyncLogFile" 2>"$MLrsyncErrFile"
 
 # And run the backup
 $MLfinalRsyncCommand
@@ -668,7 +644,7 @@ case $MLfatalError in
 			done
 		fi
 		
-		# Renaming the Backup so it will be reused as link-target for the next run
+		# Ranaming the Backup so it will be reused as link-target for the next run
 		mv "$MLfinalTarget" "$MLdestPath/$MLbackupName-$MLbackupDate"
 		MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate"
 		
@@ -722,7 +698,7 @@ else # No, the message is empty, very unlikely
 	# We can NEVER get here in debug mode thats why we use echo here!
 	echo "MLadminEmailMessage was empty, we just remove the temporary file."
 	$MLrm $MLadminEmailMessage
-#	unset $MLadminEmailMessage
+	unset $MLadminEmailMessage
 fi
 
 # FUTURE: Postflight script
@@ -736,9 +712,9 @@ let "MLtimeScriptDurationTotal = $MLtimeScriptEnd - $MLtimeScriptStart"
 
 if [ $MLtimeScriptDurationTotal -eq 1 ] # Just to care for proper language
 then # It was only one second
-	appendToFile "$MLadminEmailMessage" "Backup took $MLtimeScriptDurationTotal second."
+	debug "Backup took $MLtimeScriptDurationTotal second."
 else # zero, two or more seconds
-	appendToFile "$MLadminEmailMessage" "Backup took $MLtimeScriptDurationTotal seconds. $(seconds2dhms $MLtimeScriptDurationTotal)"
+	debug "Backup took $MLtimeScriptDurationTotal seconds. $(seconds2dhms $MLtimeScriptDurationTotal)"
 fi
 
 debug "--- Sending the AdminEmail Message per mail."
