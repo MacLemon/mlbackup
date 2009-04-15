@@ -461,7 +461,10 @@ MLtimeRsyncStart=$(date +%s)
 # backing up
 
 #building the final command to run the backup
-$MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >"$MLrsyncLogFile" 2>"$MLrsyncErrFile"
+$MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --log-file="$MLrsyncLogFile" --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" 2>"$MLrsyncErrFile"
+
+# $MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >"$MLrsyncLogFile" 2>"$MLrsyncErrFile"
+
 
 # And run the backup
 $MLfinalRsyncCommand
@@ -665,7 +668,7 @@ case $MLfatalError in
 			done
 		fi
 		
-		# Ranaming the Backup so it will be reused as link-target for the next run
+		# Renaming the Backup so it will be reused as link-target for the next run
 		mv "$MLfinalTarget" "$MLdestPath/$MLbackupName-$MLbackupDate"
 		MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate"
 		
@@ -719,7 +722,7 @@ else # No, the message is empty, very unlikely
 	# We can NEVER get here in debug mode thats why we use echo here!
 	echo "MLadminEmailMessage was empty, we just remove the temporary file."
 	$MLrm $MLadminEmailMessage
-	unset $MLadminEmailMessage
+#	unset $MLadminEmailMessage
 fi
 
 # FUTURE: Postflight script
@@ -733,9 +736,9 @@ let "MLtimeScriptDurationTotal = $MLtimeScriptEnd - $MLtimeScriptStart"
 
 if [ $MLtimeScriptDurationTotal -eq 1 ] # Just to care for proper language
 then # It was only one second
-	debug "Backup took $MLtimeScriptDurationTotal second."
+	appendToFile "$MLadminEmailMessage" "Backup took $MLtimeScriptDurationTotal second."
 else # zero, two or more seconds
-	debug "Backup took $MLtimeScriptDurationTotal seconds. $(seconds2dhms $MLtimeScriptDurationTotal)"
+	appendToFile "$MLadminEmailMessage" "Backup took $MLtimeScriptDurationTotal seconds. $(seconds2dhms $MLtimeScriptDurationTotal)"
 fi
 
 debug "--- Sending the AdminEmail Message per mail."
