@@ -191,6 +191,7 @@ MLrsyncOptions="-apogtxl --stats --hard-links --fuzzy"
 #Rsync should use compression for non-local-only backup transport (SSH)
 # If you are using mlbackup over ssh, you should NOT compress the ssh connection, but 
 # use the rsync compression which gives better results as it knows more about the data.
+# Should probably not use compression on LAN, only on WAN remote copies oar only compress-lever=1?
 MLrsyncCompress="-z --compress-level=9" # --compress, -z
 
 # Rsync should be verbose
@@ -438,7 +439,9 @@ MLtimeRsyncStart=$(date +%s)
 # backing up
 
 #building the final command to run the backup
-$MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >"$MLrsyncLogFile" 2>"$MLrsyncErrFile"
+# $MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >"$MLrsyncLogFile" 2>"$MLrsyncErrFile"
+$MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --log-file="$MLrsyncLogFile" --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" 2>"$MLrsyncErrFile"
+
 
 # And run the backup
 $MLfinalRsyncCommand
