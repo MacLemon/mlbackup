@@ -34,7 +34,7 @@ MLdebug=0
 MLfullCommand=$0
 MLbaseCommand=$(basename $0)
 MLhostname=$(hostname)
-MLversion=0.9
+MLversion=0.9.1
 MLrevision=__CCUURREENNTT__RREEVVIISSIIOONN__
 
 # For development and testing only:
@@ -170,6 +170,28 @@ MLversioncheckBaseURL="http://versioncheck.maclemon.at/"
 MLversioncheckURL="$MLversioncheckBaseURL$MLbaseCommand.txt"
 MLinfoURL="http://maclemon.at/mlbackup"
 debug "MLversioncheckURL: $MLversioncheckURL"
+###############################################################################
+# Check if we'are running in an interactive shell, and control output accordingly.
+# Would print out "not a tty" if non-interactive and a tty device if interactive
+# I know that tty -s is deprecated according to man tty, but test -s 0
+# seems to be broken and does not give reliable results. test -t 0 is unusable.
+ 
+# Would return "not a tty" if non-interactive and a tty device if interactive
+
+debug "Checking for interactive TTY"
+/usr/bin/tty -s
+MLttyReturned=$?
+ 
+# echo MLttyReturned = $MLttyReturned
+ 
+if [ $MLttyReturned -eq 1 ]
+then # tty returns 1 on nonInteractive
+	MLisInteractive=0
+	debug "Running in a non-interactive environment. tty returned $MLttyReturned, MLisInteractive set to $MLisInteractive."
+else # tty returns 0 on interactive (tty present)
+	MLisInteractive=1
+	debug "Running in an interactive environment. tty returned $MLttyReturned, MLisInteractive set to $MLisInteractive."
+fi
 ###############################################################################
 # Setting our own internal variables.
 # To be improved. Some of these may be moved to the config file later.
