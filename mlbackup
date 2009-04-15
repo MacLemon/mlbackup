@@ -34,7 +34,7 @@ MLdebug=0
 MLfullCommand=$0
 MLbaseCommand=$(basename $0)
 MLhostname=$(hostname)
-MLversion=0.9
+MLversion=0.9.1
 MLrevision=__CCUURREENNTT__RREEVVIISSIIOONN__
 
 # For development and testing only:
@@ -76,8 +76,14 @@ function appendToFile (){
 # caveat: No error checking yet (should check for existence of file and writeability, should output to console in case of problems)
 if [ $MLdebug -eq 1 ] # Is the debug flag set?
 	then # We output to console and log to the file
+
+# TEST: Trying to get rid of double output on the console when debugging.
+# Seems to work.
+
 		echo "$2" | tee -a "$1"
 	else # No Debugging turned on, we only log to a file.
+# /TEST
+
 		echo "$2" >> "$1"
 fi
 }
@@ -177,6 +183,25 @@ MLrsyncErrFile=$(mktemp -t MLrsyncErrFile.XXXXXXXXXX) # Logfile for rsync ERR
 debug "MLrsyncErrFile = $MLrsyncErrFile"
 
 ###############################################################################
+# Check if we'are running in an interactive shell, and control output accordingly.
+
+# Would return "not a tty" if non-interactive and a tty device if interactive
+
+debug "Checking for interactive TTY"
+/usr/bin/tty -s
+MLttyReturned=$?
+
+# echo MLttyReturned = $MLttyReturned
+
+if [ $MLttyReturned -eq 1 ]
+then # tty returns 1 on nonInteractive
+		MLisInteractive=0
+		debug "Running in a non-interactive environment. tty returned $MLttyReturned, MLisInteractive set to $MLisInteractive."
+else # tty returns 0 on interactive (tty present)
+		MLisInteractive=1
+		debug "Running in an interactive environment. tty returned $MLttyReturned, MLisInteractive set to $MLisInteractive."
+fi
+###############################################################################
 # Setting our own internal variables.
 # To be improved. Some of these may be moved to the config file later.
 
@@ -197,6 +222,7 @@ MLrsyncOptions="-apogtxl --stats --hard-links --fuzzy"
 #Rsync should use compression for non-local-only backup transport (SSH)
 # If you are using mlbackup over ssh, you should NOT compress the ssh connection, but 
 # use the rsync compression which gives better results as it knows more about the data.
+# Should probably not use compression on LAN, only on WAN remote copies oar only compress-lever=1?
 MLrsyncCompress="-z --compress-level=9" # --compress, -z
 
 # Rsync should be verbose
