@@ -712,7 +712,12 @@ if [ $MLtimeScriptDurationTotal -eq 1 ] # Just to care for proper language
 then # It was only one second
 	debug "Backup took $MLtimeScriptDurationTotal second."
 else # zero, two or more seconds
-	debug "Backup took $MLtimeScriptDurationTotal seconds. $(seconds2dhms $MLtimeScriptDurationTotal)"
+	if [ $MLtimeScriptDurationTotal -gt 60 ] # Backup tool longer than 60 seconds, which equals 1 minute?
+	then # Yes, took longer than 60 seconds.
+		appendToFile "$MLadminEmailMessage" "Backup took $(seconds2dhms $MLtimeScriptDurationTotal). ($MLtimeScriptDurationTotal seconds)"
+	else
+		appendToFile "$MLadminEmailMessage" "Backup took $MLtimeScriptDurationTotal seconds."
+	fi
 fi
 
 debug "--- Sending the AdminEmail Message per mail."
