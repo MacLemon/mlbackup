@@ -1,7 +1,7 @@
 mlbackup - README
 
 Contact and feedback:
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 Do you like mlbackup? Tell us why, we love to be praised and worshipped!
 Don't like mlbackup? Tell us how we can improve it!
 Found a bug? Eeek! See "Bug Reports" at the end of this document!
@@ -12,35 +12,35 @@ mlbackup usergroup at Facebook: http://www.facebook.com/group.php?gid=3814139246
 
 
 License:
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 GNU general public license (GPL)
 You should have received a copy of the GPL with this software distribution. If not, you can find more information about the GPL at the official website of the free software foundation.
 http://www.gnu.org/licenses/gpl.html
 
 
 Disclaimer:
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 This software is provided as-is. It is in beta status and should be treated as such. mlbackup has proven to work fine on _my_ servers and other's, but please do not solely rely on the backups made with mlbackup. As usual, always have at least a second backup for vital data. Some support via email or the web site can be given at the moment. I hope to have user self-support (wiki/trac or similar) available in the future. I will post relevant information on the mlbackup website.
 
 
 Target Audience:
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 Mac OS X Admins and Geek Users who like a nice intelligent and incremental backup through the shell. Can be run from launchd (or cron) if you like. This is NOT INTENDED for normal users (yet). mlbackup is explicitly targeted at the Mac OS X (10.4 Tiger and 10.5 Leopard) platform. It has not been tested on other software platforms! Mac OS X 10.4.11 or Leopard (Server as well) is recommended.
 
 
 Download & Versioncheck:
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 You can always get the latest version of mlbackup at http://maclemon.at/mlbackup
 If you invoke mlbackup without a config file parameter it will check online for a n updated version. It tries to connect to http://versioncheck.maclemon.at/mlbackup.txt to find out if there is a newer version available. At no point is ANY information sent to our servers to respect your privacy.
 
 
 Installation:
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 See INSTALL on how to install all the necessary files to use mlbackup.
 
 
 Usage:
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 Duplicate the provided sample configuration file found in /etc/maclemon/backup/demo.mlbackupconf.sample after installation. (Do NOT edit and use this file as your working configuration as it will be overwritten with a newer version if you update mlbackup.)
 The sample config is well documented and should be easy for an admin to fill out all the necessary variables to get a working configuration for your purpose. If you find any parameters complex or unintuitive to use send us feedback on how we can improve this!
 
@@ -49,7 +49,7 @@ mlbackup path/to/your/configuration-file.mlbackupconf
 
 
 Additions:
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 None of these are mandatory, but they provide some comfort and help to beautify your backups.
 
 Growl:
@@ -67,7 +67,7 @@ You can use `fink install osxutils` to install osxutils if you have fink.
 
 
 Known Issues:
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 Still no manpage for mlbackup yet. (There still is hope and you should be able to get mlbackup up and running easily anyway.)
 
 The backup set name may NOT include german umlaut characters. (I am still investigating why this is the case. If you have any information on how to make this work, please contact me!) This issue ONLY affects the naming of the backup sets. The files you intend to backup are not affected and will be backupped just fine!
@@ -83,12 +83,12 @@ If mlbackup cannot check for updates it will present you an Exit Code that it go
 
 
 Feedback:
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 Please direct all feedback, bug-reports, feature-requests and suggestions to mlbackup@maclemon.at . (In english or german language.) Support requests can handled in a limited way, depending on how much spare time I can afford.
 
 
 Bug Reports:
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 When reporting a bug, please tell us how we can reproduce the bug. Please also include the configuration file you use when the bug occurs. Also include rsync.log and error.log of the backup where the bug showed up. To provide Debug output, please add MLdebug=1 to your config. This will spit out vast amounts of debugging information that will help track down the problem. Don't forget to remove that line again or set MLdebug=0 if you don't need it anymore. It will speed up your backups considerably.
 
 

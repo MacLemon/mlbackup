@@ -434,7 +434,7 @@ then # Yes, it does exist,
 else # No, the target does not exist
 	debug "FATAL: The target $MLdestPath could not be found."
 	debug "If your target is on an external volume, make sure it is mounted!"
-	echo "The target $MLdestPath could not be found! If your target is on an external volume, make sure it is mounted!" | mail -s "$MLhostname $MLbackupName: Target missing" $MLadminEmail
+	echo "The target $MLdestPath could not be found! If your target is on an external volume, make sure it is mounted!" | /usr/bin/mail -s "$MLhostname $MLbackupName: Target missing" $MLadminEmail
 	exit $MLE_DestinationNotFound
 fi
 
