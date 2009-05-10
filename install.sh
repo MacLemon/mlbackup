@@ -73,11 +73,8 @@ if [ "$UID" -ne "$MLrootUID" ]
 	# Setting correct file modes
 	chmod 755 $MLbinDir/mlbackup $MLbinDir/growler.sh $MLconfigDir
 	chmod 644 $MLconfigDir/globalexclusions $MLconfigDir/demo.mlbackupconf.sample
-
-	echo Done installing the MacLemon backup scripts. See the README for more info
 	
-	
-	if [ $(sw_vers | grep "Server") -eq 1 ]
+	if [ ! $(sw_vers | grep "Server") ]
 	then
 		echo
 		echo Fixing the postifx queue system on Mac OS X client
@@ -86,5 +83,6 @@ if [ "$UID" -ne "$MLrootUID" ]
 		echo
 		echo This is Mac OS X Server, not touching the postfix system.
 	fi
+echo Done installing the MacLemon backup scripts. See the README for more info
 fi
 #EOF
