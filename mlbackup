@@ -760,7 +760,7 @@ then # Yes, there is an address!
 	cat "$MLadminEmailMessage" | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
 else # No address set
 	debug "No MLadminEmail Address set, cannot send eMail!"
-	appendToFile $MLadminEmailMessage "No MLadminEmail Address set. You will not receive backp notifications via eMail."
+	appendToFile $MLadminEmailMessage "No MLadminEmail Address set. You will not receive backup notifications via eMail."
 fi # [ $MLadminEmail -ne "" ]
 
 debug "--- Removing .pid file in $MLmyPidFile"
