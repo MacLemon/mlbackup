@@ -46,6 +46,7 @@ MLrevision=__CCUURREENNTT__RREEVVIISSIIOONN__
 # Any rsync error returns the return value of rsync
 # Known rsync error codes are 1-30
 # Any other error returns one of these (128-254):
+# MLE_SourceNotFound=244 # Not yet in use
 MLE_NoConfigFileParameterAndStableUpdateAvailable=245
 MLE_NoConfigFileParameterAndCouldNotVersioncheck=246
 MLE_ConfigExclusionsFileNotReadable=247
@@ -229,7 +230,7 @@ MLrsyncCompress="--compress --compress-level=9" # --compress, -z
 # update 2007/05/28 16:49 -vvv seems to work on Mac OS X 10.4.9
 MLbeVerbose="-v"
 
-# Delete trashed files from the backup so our backups don't grow infinitely?
+# Delete trashed files from the backup so our backups don't grow infinitely
 MLdelete="--delete"
 
 # Exclude Paths and Filenames mentioned in this file.
@@ -245,7 +246,14 @@ MLconfigExcludeFrom=""
 # For deleting stuff we use
 MLrm="/bin/rm"
 
-# Be nice to other processes when compressing the logs
+
+
+# 2009/05/13 14:35 Questioning the purpose of MLbeNice and if it makes sense to do this.
+#	Would probably be more intelligent to check how many cores the system has and run 
+# 	compression tasks in parallel if more than one core is available. Or just skip at all and
+#	let Mac OS X do the scheduling by itself.
+#	Be nice to other processes when compressing the logs
+
 # See man nice(1) for levels of niceness
 MLbeNice=20
 # should check if MLbeNice is an integer in the range of -20 < MLbeNice < +20.
@@ -412,6 +420,19 @@ debug "PID File written to $MLmyPidFile"
 # For rsync 3 the options are a LOT different:
 MLextendedAttributes="--hard-links --perms --executability --acls --xattrs --owner --group --times"
 
+
+
+# We should also at least check the source folder for read privs, so we can give a very basic error message in case we cannot read it.
+# Checking for the source
+#if [ -e "$MLsourcePath" ] #
+#then	
+	
+	
+	
+#fi
+
+
+
 # checking target
 
 if [ -e "$MLdestPath" ] # Does our target exist?
@@ -437,8 +458,6 @@ else # No, the target does not exist
 	echo "The target $MLdestPath could not be found! If your target is on an external volume, make sure it is mounted!" | /usr/bin/mail -s "$MLhostname $MLbackupName: Target missing" $MLadminEmail
 	exit $MLE_DestinationNotFound
 fi
-
-# We should also at least check the source folder for read privs, so we can give a very basic error message in case we cannot read it.
 
 # We need to find the most recent Backup as our Target for the link-dest
 MLmostRecentSet=$(ls -1tw "$MLdestPath/" | grep -E "^$MLbackupName-(19|20)[0-9][0-9]\.(0[1-9]|1[012])\.(0[1-9]|[12][0-9]|3[01])-([01][0-9]|2[0-3])\.[0-5][0-9]\.[0-5][0-9]" | head -1)
@@ -497,28 +516,44 @@ debug "Compressing the logfiles and moving them to the backup destination."
 debug "--- Post processing the error.log"
 if [ -s $MLrsyncErrFile ] # Non zero byte error.log? Only in case of errors
 then # Yes, there were errors recorded.
-	$MLbeNiceCommand cat "$MLrsyncErrFile" | gzip -9 >"$MLfinalTarget/error.log.gz"
+	debug "Compressing $MLrsyncErrFile to $MLfinalTarget/error.log.gz."
+	gzip -9 --no-name --to-stdout "$MLrsyncErrFile" > "$MLfinalTarget/error.log.gz"
 	/bin/chmod 644 "$MLfinalTarget/error.log.gz"
 else
 	debug "The error.log $MLrsyncErrFile was empty, looks good."
 fi # [ -s $MLrsyncErrFile ]
-# removing the error.log tempfile
-$MLrm "$MLrsyncErrFile"
+
+# removing the error.log tempfile, should it not have been done by gzip already
+if [ -e "$MLrsyncErrFile" ] # Does our "$MLrsyncErrFile" still exist?
+then # Yes, it does exist, let us remove it.
+	debug "The temp MLrsyncErrFile $MLrsyncErrFile still exists, removing it."
+	$MLrm "$MLrsyncErrFile"
+else
+	debug "The temp MLrsyncErrFile $MLrsyncErrFile did not exist aynmore, no need to delete it."
+fi
 
 debug "--- Post processing the rsync.log"
 if [ -s "$MLrsyncLogFile" ] # Non zero bytes rsync.log? (Expected)
 then # Yes, of course, compress and move to the backup folder
-	$MLbeNiceCommand cat "$MLrsyncLogFile" | gzip -9 >"$MLfinalTarget/rsync.log.gz"
+	debug "Compressing $MLrsyncLogFile to $MLfinalTarget/rsync.log.gz."
+	gzip -9 --no-name --to-stdout "$MLrsyncLogFile" > "$MLfinalTarget/rsync.log.gz"
+
 	# make sure, the user can read that file!
 	/bin/chmod 644 "$MLfinalTarget/rsync.log.gz"
 else
 	debug "The rsync.log $MLrsyncLogFile was empty, this is extremely unlikely!"
 fi # [ -s $MLrsyncLogFile ]
-# Removing the rsync.log tempfile
-$MLrm "$MLrsyncLogFile"
+
+# Removing the rsync.log tempfile, should it not have been done by gzip already
+if [ -e "$MLrsyncLogFile" ] # Does our "$MLrsyncLogFile" still exist? Either was zero bytes, ot somethow not removed by gzip.
+then # Yes, it does exist, let us remove it.
+	debug "The temp MLrsyncLogFile $MLrsyncLogFile still exists, removing it."
+	$MLrm "$MLrsyncLogFile"
+else
+	debug "The temp MLrsyncLogFile $MLrsyncLogFile did not exist aynmore, no need to delete it."
+fi
 
 # Cleaning up MLcombinedExclusions
-
 if [ $MLcombinedExclusions ]
 then Yes, we have a temporary MLcombinedExclusions file, let us remove it.
 	debug "Removing MLcombinedExclusions: $MLcombinedExclusions"
