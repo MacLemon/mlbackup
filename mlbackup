@@ -46,7 +46,8 @@ MLrevision=__CCUURREENNTT__RREEVVIISSIIOONN__
 # Any rsync error returns the return value of rsync
 # Known rsync error codes are 1-30
 # Any other error returns one of these (128-254):
-MLE_SourceNotFound=244 # Not yet in use
+MLE_ConcurrentInstanceRunningWithSameConfig=243
+MLE_SourceNotFound=244
 MLE_NoConfigFileParameterAndStableUpdateAvailable=245
 MLE_NoConfigFileParameterAndCouldNotVersioncheck=246
 MLE_ConfigExclusionsFileNotReadable=247
@@ -464,7 +465,7 @@ else # No, the target does not exist
 fi
 
 
-# Checking for the source
+# Checking the source
 if [ -r "$MLsourcePath" -o -d "$MLsourcePath" ] # If the source exists (be it a file or folder)
 then	
 		debug "The Source $MLsourcePath does exist."
@@ -479,6 +480,38 @@ else
 	exit $MLE_SourceNotFound
 fi
 
+
+# Checking for concurrent mlbackup running with the same configuration
+if [ -r "$MLdestPath/$MLbackupName.pid" ] # Is there already a tag .pid in the destination?
+	then # Yes, there is a tag
+	MLprobablyConcurrentPid=$(cat "$MLdestPath/$MLbackupName.pid")
+
+	# Checking if this tag is old or if it really is a running mlbackup instance
+	# The pid from the tag does have "mlbackup" and the same config file in use
+	
+	MLprobablyConcurrentProcess=$(/bin/ps -ax | grep ^$MLprobablyConcurrentPid | grep "$MLbaseCommand" | grep -e "$(basename $MLconfigFile)")
+	MLprobablyConcurrentProcessReturned=$?
+	debug "Checking for concurrent proess returned $MLprobablyConcurrentProcessReturned"
+	debug "MLprobablyConcurrentProcess = $MLprobablyConcurrentProcess"
+	
+	if [ "$MLprobablyConcurrentProcessReturned" ]
+	then
+		# we found another instance of mlbackup running with the same config.
+		# Refusing to run two instances simultanously to preserve backup integrity
+		debug "Found another instance of mlbackup with PID $MLprobablyConcurrentPid. Refusing simultanous invocations. Exiting."
+
+		cleanup
+		exit $MLE_ConcurrentInstanceRunningWithSameConfig
+	else
+		# The Tag seems to be leftover or the concurrent instance has finished by now.
+		debug "Found tag $MLdestPath/$MLbackupName.pid with PID $MLprobablyConcurrentPid which does not seem to be a running instance of $MLbaseCommand with config $MLconfigFile. Continuing."
+	fi
+else
+	debug "Could not detect another concurrent running instance of mlbackup with config $MLconfigFile"
+fi
+
+debug "Writing my own tag to $MLdestPath/$MLbackupName.pid"
+echo $$ > "$MLdestPath/$MLbackupName.pid"
 
 
 # We need to find the most recent Backup as our Target for the link-dest
@@ -739,7 +772,10 @@ case $MLfatalError in
 	;;
 esac
 
-
+# Backup is completed by now. We can savely remove our tag.pid
+# Antother instance launched now can not affect backup integrity anymore.
+debug "Removing tag.pid in $MLdestPath/$MLbackupName.pid"
+$MLrm "$MLdestPath/$MLbackupName.pid"
 
 debug "--- Handling OLD backups"
 # Reporting of surplus OLD and ERROR backups that need to be taken care of
