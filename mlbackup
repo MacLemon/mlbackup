@@ -76,8 +76,35 @@ fi
 function appendToFile (){
 # Appends a given text at the end of a given file
 # usage: appendToFile "path/to/filename" "Message to append"
-# caveat: No error checking yet (should check for existence of file and writeability, should output to console in case of problems)
+
+# Checking if the target file exists and is writable
+if [ -w "$1" ] # Is the file to append to existent AND writable
+then # Yes, file does exist AND is writable
 	echo "$2" >> "$1"
+else # The file is not writable, need to further investigate
+	
+	if [ -e "$1" ] # Does the file at least exist?
+	then # Yes, it does exist
+	# but it is not writable
+		echo "The file $1 is not writable for $USER. Logging message to console."
+		echo "$2"
+	else # File does not exist
+		if [ -w "$(dirname $1)" ] # Is the directory where the file should result in writable?
+		then # Yes, the directory does exist AND is writable
+			# Then we can just create the file and be happy.
+			echo "$2" >> "$1"
+		else # No, the directory is NOT writable OR may not even exist
+			if [ -d  "$(dirname $1)" ] # Does the directory exist at all?
+			then # Yes, it does exist, but is not writable.
+				echo "The File $1 does not exist and the directory $(dirname $1) is not writable so we cannot create the file either. Please fix the permissions for $USER. Logging message to console."
+				echo "$2"
+			else # No, the directory does not even exist. User needs to create it.
+				echo "Cannot create file $1 as user $USER because $(dirname $1) does not exist. You need to create it manually and make it writable for $USER. Logging message to console."
+				echo "$2"
+			fi
+		fi
+	fi
+fi
 }
 
 #------------------------------------------------------------------------------
