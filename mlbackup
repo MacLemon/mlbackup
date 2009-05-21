@@ -252,13 +252,16 @@ MLdestRsync="--rsync-path=$MLrsync"
 # MLdryRun=-n
 
 # The options to invoke rsync with.
-MLrsyncOptions="-apogtxl --stats --hard-links --fuzzy"
+MLrsyncOptions="-apogtxl --hard-links --fuzzy"
 
-# When running interactively we're showing some progress for the user
+# When running interactively we're showing some progress and stats for the user
 if [ $MLisInteractive ]
 then # we show a progress for the user, else we do not, since in a non-interactive session there is noone to watch this.
-	MLshowRsyncProgress="--progress"
+	MLshowRsyncProgress="--progress --stats"
 fi
+
+
+
 
 
 
@@ -486,7 +489,6 @@ else # We shall respect a per config exclusions file.
 fi
 ###############################################################################
 # Writing a .pid file to /tmp
-# Should check for simultanous invocations of mlbackup with the same config and refuse to run if another instance of mlbackup is running with the same configuration.
 MLmyPidFile="/tmp/$MLbaseCommand-$MLbackupName.pid"
 echo $$ > "$MLmyPidFile"
 debug "PID File written to $MLmyPidFile"
