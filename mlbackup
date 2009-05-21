@@ -7,7 +7,7 @@
 # License: GNU general public license (GPL) http://www.gnu.org/licenses/gpl.html
 ###############################################################################
 # mlbackup, a backup system with autorotation for Mac OS X (Server)
-# Copyright (C) 2005-2008 Pepi Zawodsky
+# Copyright (C) 2005-2009 Pepi Zawodsky
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ MLdebug=0
 MLfullCommand=$0
 MLbaseCommand=$(basename $0)
 MLhostname=$(hostname)
-MLversion=0.9.1
+MLversion=0.9.5
 MLrevision=__CCUURREENNTT__RREEVVIISSIIOONN__
 
 # For development and testing only:
@@ -359,7 +359,6 @@ then # There was no config filename passed
 		# Known Issue: curl(1) error codes are not yet displayed as human readable text.
 		echo Could not check for update. curl\(1\) Exit Code $MLcurlReturned.
 		exit $MLE_NoConfigFileParameterAndCouldNotVersioncheck
-
 	fi
 
 else # We were passed a config file
@@ -389,6 +388,47 @@ else # We were passed a config file
 		exit $MLE_ConfigFileNotFound # Config file not found
 	fi # [ -e $MLconfigFile ]
 fi # [ -z "$1" ]
+###############################################################################
+#------------------------------------------------------------------------------
+# Cannot define function earlier since we need parameters from the config file.
+# Depending if Growl is installed
+# We define the notifyGrowl function differently to preserve performance
+
+MLgrowlnotify=/usr/local/bin/growlnotify
+
+if [ -e "$MLgrowlnotify" ]
+then
+	MLgrowlStandardPriority="Normal"
+
+	# creating a pseudorandom ID for growl coalescing. Should be sufficently unique for our purpose.
+	let "MLgrowlID = $MLtimeScriptStart + $RANDOM"
+	debug "MLgrowlID = $MLgrowlID"
+
+	function notifyGrowl () {
+		# Usage: notifyGrowl "text of message" ["text of title" "other growlnotify options"]
+		# We use the icon of the source as notification Icon
+		# Automatically handles registration with growl as mlbackup, ID, coalescing
+		# other growlnotify options could be "--sticky" for example
+		# Could we really use SIPS to badge this mit an mlbackup icon? Esoteric?
+		MLgrowlIconpath="$MLsourcePath" # For use with --iconpath/-I (capital i)
+		
+		if [ ! -z "$2" ]
+		then
+			MLgrowlTitle="$2"
+		else
+			MLgrowlTitle="$MLbackupName"
+		fi
+		
+		MLgrowlTitle="$MLbackupName"
+		$MLgrowlnotify --priority "$MLgrowlStandardPriority" --identifier "$MLgrowlID" --iconpath "$MLgrowlIconpath" --name "$MLbaseCommand" $3 -m "$1" -t "$MLgrowlTitle"
+	}
+else
+	debug "Could not find /usr/local/bin/growlnotify, Growl notifications are disabled."
+	function notifyGrowl () {
+		debug "$MLgrowlnotify is not installed. Cannot growl message parameters $@."
+		# Doing nothing, since growl is not installed.
+	}
+fi
 ###############################################################################
 # Post processing of new parameters loaded from the config file.
 
@@ -487,6 +527,7 @@ else # No, the target does not exist
 	debug "If your target is on an external volume, make sure it is mounted!"
 	echo "The target $MLdestPath could not be found! If your target is on an external volume, make sure it is mounted!" | /usr/bin/mail -s "$MLhostname $MLbackupName: Target missing" $MLadminEmail
 
+	notifyGrowl "ERROR: Destination could not be found." "" "--sticky"
 	cleanup
 	exit $MLE_DestinationNotFound
 fi
@@ -525,7 +566,9 @@ if [ -r "$MLdestPath/$MLbackupName.pid" ] # Is there already a tag .pid in the d
 	then
 		# we found another instance of mlbackup running with the same config.
 		# Refusing to run two instances simultanously to preserve backup integrity
-		debug "Found another instance of mlbackup with PID $MLprobablyConcurrentPid. Refusing simultanous invocations. Exiting."
+		debug "Found another instance of mlbackup with PID $MLprobablyConcurrentPid. Refusing simultaneous invocations. Exiting."
+
+		notifyGrowl "Simultaneous invocation detected. Aborting."
 
 		cleanup
 		exit $MLE_ConcurrentInstanceRunningWithSameConfig
@@ -545,16 +588,6 @@ echo $$ > "$MLdestPath/$MLbackupName.pid"
 MLmostRecentSet=$(ls -1tw "$MLdestPath/" | grep -E "^$MLbackupName-(19|20)[0-9][0-9]\.(0[1-9]|1[012])\.(0[1-9]|[12][0-9]|3[01])-([01][0-9]|2[0-3])\.[0-5][0-9]\.[0-5][0-9]" | head -1)
 debug "The most Recent Set to refer to is: $MLmostRecentSet"
 
-# Commented out, so we can concentrate on core functionality at the moment, to stabilize.
-# MLgrowlNotifyDelay=10
-# # notifying our user of the pending backup
-# if [ $MLdebug -eq 0 ] # Are we in debug mode?
-# then	# We are NOT in debug mode, so we display a growl and wait a moment
-# 	growlnotify -n BackLemon -m "Your Backup will start in $MLgrowlNotifyDelay Seconds" -t "BackLemon starting"
-# 	sleep $MLgrowlNotifyDelay
-# fi
-
-
 #Fetching the current date and time
 MLbackupDate=$(date "+%Y.%m.%d-%H.%M.%S")
 
@@ -564,6 +597,8 @@ MLbackupDate=$(date "+%Y.%m.%d-%H.%M.%S")
 MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate.noindex"
 debug "MLfinalTarget = $MLfinalTarget"
 mkdir "$MLfinalTarget"
+
+notifyGrowl "Backup running"
 
 debug "Rsync starting now."
 MLtimeRsyncStart=$(date +%s)
@@ -882,6 +917,8 @@ else # No address set
 	debug "No MLadminEmail Address set, cannot send eMail!"
 	appendToFile $MLadminEmailMessage "No MLadminEmail Address set. You will not receive backup notifications via eMail."
 fi # [ $MLadminEmail -ne "" ]
+
+notifyGrowl "Finished backup"
 
 debug "--- Removing .pid file in $MLmyPidFile"
 $MLrm "$MLmyPidFile"
