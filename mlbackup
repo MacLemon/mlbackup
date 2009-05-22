@@ -46,6 +46,7 @@ MLrevision=__CCUURREENNTT__RREEVVIISSIIOONN__
 # Any rsync error returns the return value of rsync
 # Known rsync error codes are 1-30
 # Any other error returns one of these (128-254):
+MLE_RemoteSourceNotFound=242
 MLE_ConcurrentInstanceRunningWithSameConfig=243
 MLE_SourceNotFound=244
 MLE_NoConfigFileParameterAndStableUpdateAvailable=245
@@ -260,20 +261,11 @@ then # we show a progress for the user, else we do not, since in a non-interacti
 	MLshowRsyncProgress="--progress --stats"
 fi
 
-
-
-
-
-
 #Rsync should use compression for non-local-only backup transport (SSH)
-# If you are using mlbackup over ssh, you should NOT compress the ssh connection, but 
-# use the rsync compression which gives better results as it knows more about the data.
-# Should probably not use compression on LAN, only on WAN remote copies oar only compress-lever=1?
-MLrsyncCompress="--compress --compress-level=9" # --compress, -z
+MLrsyncNetworkOptions="--compress --compress-level=9 -e 'ssh -o \\"Compression no\\"' " # --compress, -z
 
 # Rsync should be verbose
 # Rsync verbosity beyond -vv does NOT seem to work on Mac OS X, I am afraid this is an rsync bug
-# update 2007/05/28 16:49 -vvv seems to work on Mac OS X 10.4.9
 MLbeVerbose="-v"
 
 # Delete trashed files from the backup so our backups don't grow infinitely
@@ -291,8 +283,6 @@ MLconfigExcludeFrom=""
 
 # For deleting stuff we use
 MLrm="/bin/rm"
-
-
 
 # 2009/05/13 14:35 Questioning the purpose of MLbeNice and if it makes sense to do this.
 #	Would probably be more intelligent to check how many cores the system has and run 
@@ -506,6 +496,7 @@ debug "PID File written to $MLmyPidFile"
 MLextendedAttributes="--hard-links --perms --executability --acls --xattrs --owner --group --times"
 
 # checking target
+# target is always local at the moment
 
 if [ -e "$MLdestPath" ] # Does our target exist?
 then # Yes, it does exist,
@@ -536,18 +527,76 @@ fi
 
 
 # Checking the source
-if [ -r "$MLsourcePath" -o -d "$MLsourcePath" ] # If the source exists (be it a file or folder)
-then	
-		debug "The Source $MLsourcePath does exist."
-else
-	# The Source does not exist, bailing out.
-	debug "The Source $MLsourcePath does NOT exist. Cleaning up, then bailing out."	
+# Source could be local, could be remote via SSH as well, we need to accomodate that, but expect a local source in favor of a remote source.
+	MLfatalError=1
+	
+debug "Testing for local source in: $MLsourcePath"
+if [ -r "$MLsourcePath" -o -d "$MLsourcePath" ] # If the source exists (be it a local file or folder)
+then # Yes, the source folder can be found locally, using that one.
+		MLrsyncNetworkOptions=""
+		debug "The Source $MLsourcePath does exist locally."
+		MLfatalError=0
+		MLsourceIsRemote=0
+else # No, the source could not be found locally, could still be remotely located.
+	debug "Local source could not be found."
+	debug "Testing for a remote source with $MLsourcePath"
+	# testing if a remote source does exist.
+	
+	echo The TEST command is:
+	echo 	$MLsourceRsync $MLdestRsync $MLrsyncNetworkOptions -n $MLsourcePath
+	$MLsourceRsync $MLdestRsync $MLrsyncNetworkOptions -n "$MLsourcePath" > /dev/null  2>&1
+	MLrsyncRemoteTest=$?
+	
+	# not working yet
+	# xxxxxx marker zp work on
+	# need to consolidate the error codes for sourceNotFound into a single one.
+	# Cannot decide if if should have been local or remote. fact is, not found. that is all.
+	# use new error code? MLE_CouldNotConnectWithSSH=255
+	
+	case $MLrsyncRemoteTest in
+		0)	# The last backup went ok
+			MLeRsyncErrorMessage=""
+			MLfatalError=0
+			MLsourceIsRemote=1 ;;
+		# Error Codes we know from the rsync man page
+		1) MLeRsyncErrorMessage="Syntax or usage error";;
+		2) MLeRsyncErrorMessage="Protocol incompatibility";;
+		3) MLeRsyncErrorMessage="Errors selecting input/output files, dirs";;
+		4) MLeRsyncErrorMessage="Requested action not supported: an attempt was made to manipulate 64-bit files on a platform that cannot support them; or an option was specified that is supported by the client and not by the server.";;
+		5) MLeRsyncErrorMessage="Error starting client-server protocol";;
+		6) MLeRsyncErrorMessage="Daemon unable to append to log-file";;
+		10) MLeRsyncErrorMessage="Error in socket I/O";;
+		11) MLeRsyncErrorMessage="Error in file I/O";;
+		12) MLeRsyncErrorMessage="Error in rsync protocol data stream";;
+		13) MLeRsyncErrorMessage="Errors with program diagnostics";;
+		14) MLeRsyncErrorMessage="Error in IPC code";;
+		20) MLeRsyncErrorMessage="Received SIGUSR1 or SIGINT";;
+		21) MLeRsyncErrorMessage="Some error returned by waitpid()";;
+		22) MLeRsyncErrorMessage="Error allocating core memory buffers";;
+		23) MLeRsyncErrorMessage="Partial transfer due to error";;
+		24) MLeRsyncErrorMessage="Partial transfer due to vanished source files";;
+		25) MLeRsyncErrorMessage="The --max-delete limit stopped deletions";;
+		30) MLeRsyncErrorMessage="Timeout in data send/receive";;
+		255) MLeRsyncErrorMessage="ssh could not connect, probably unknown hostname.";;
+		# Any other error that might have occured that is unspecified
+		*) MLeRsyncErrorMessage="$0: Rsync returned Error Code $MLbackupStatus: Sorry, we do not know what this error code means. You may want to check your logfiles or the man page for rsync on your system."
+		;;
+	esac
+	debug "Remote Source test returned Code $MLrsyncRemoteTest"
+	debug "$MLeRsyncErrorMessage"
 
-	# Should write diagnostic info to a file at the destination. Just for the record.
-	appendToFile "$MLdestPath/$MLbackupName.log" "$(date) [$$] Source $MLsourcePath does not exist."
 
-	cleanup
-	exit $MLE_SourceNotFound
+	if [ $MLfatalError -eq 1 ]
+	then
+		# The Source does not exist, bailing out.
+		debug "The Source $MLsourcePath could not be found. Cleaning up, exiting."
+
+		appendToFile "$MLdestPath/$MLbackupName.log" "Testing for remote Source returned: $MLeRsyncErrorMessage"
+		appendToFile "$MLdestPath/$MLbackupName.log" "$(date) [$$] Source $MLsourcePath does not exist."
+
+		cleanup
+		exit $MLE_SourceNotFound
+	fi
 fi
 
 
@@ -606,27 +655,17 @@ debug "Rsync starting now."
 MLtimeRsyncStart=$(date +%s)
 # backing up
 
-#building the final command to run the backup
-# $MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" >"$MLrsyncLogFile" 2>"$MLrsyncErrFile"
-$MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLshowRsyncProgress $MLrsyncCompress $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --log-file="$MLrsyncLogFile" --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" 2>"$MLrsyncErrFile"
+# building the final command to run the backup
+echo $MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLshowRsyncProgress $MLrsyncNetworkOptions $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --log-file="$MLrsyncLogFile" --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" 2>"$MLrsyncErrFile"
+$MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLshowRsyncProgress $MLrsyncNetworkOptions $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --log-file="$MLrsyncLogFile" --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" 2>"$MLrsyncErrFile"
 
 # And run the backup
-$MLfinalRsyncCommand
+# $MLfinalRsyncCommand
 MLbackupStatus=$? # Fetching the return code from our rsync command
 MLtimeRsyncEnd=$(date +%s) # Fetching a timestamp after rsync for timing stats
 
 let "MLtimeRsyncDuration = $MLtimeRsyncEnd - $MLtimeRsyncStart"
 if [ $MLtimeRsyncDuration -eq 1 ] # Just to care for proper language
-then # It was only one second
-	debug "rsync took $MLtimeRsyncDuration second."
-else # zero, two or more seconds
-	debug "rsync took $MLtimeRsyncDuration seconds. $(
-	if [ $MLtimeRsyncDuration -gt 60 ] # more than 60 seconds
-	then # makes sense to output in human readable format
-		seconds2dhms $MLtimeRsyncDuration
-	fi)"
-fi
-
 ###############################################################################
 # Post processing the recorded rsync logfiles and temporary files:
 # We move and compress the logfiles to the backup destination. (currently only on localhost)
@@ -678,13 +717,9 @@ then Yes, we have a temporary MLcombinedExclusions file, let us remove it.
 	debug "Removing MLcombinedExclusions: $MLcombinedExclusions"
 	$MLrm "$MLcombinedExclusions"
 fi
-
 ###############################################################################
 # Post processing of the backup:
 debug "--- Backup postprocessing"
-
-
-# Deciding what to do now
 
 # Beeing pessimistic we expect the backup to have failed, and change that if it hasn't.
 MLfatalError=1
@@ -889,7 +924,6 @@ else # No, the message is empty, very unlikely
 fi
 
 # FUTURE: Postflight script
-
 ###############################################################################
 # Almost last thing is to determine how long the backup took.
 MLtimeScriptEnd=$(date +%s)
