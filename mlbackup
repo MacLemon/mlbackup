@@ -284,40 +284,6 @@ MLconfigExcludeFrom=""
 
 # For deleting stuff we use
 MLrm="/bin/rm"
-
-# 2009/05/13 14:35 Questioning the purpose of MLbeNice and if it makes sense to do this.
-#	Would probably be more intelligent to check how many cores the system has and run 
-# 	compression tasks in parallel if more than one core is available. Or just skip at all and
-#	let Mac OS X do the scheduling by itself.
-#	Be nice to other processes when compressing the logs
-
-# See man nice(1) for levels of niceness
-MLbeNice=20
-# should check if MLbeNice is an integer in the range of -20 < MLbeNice < +20.
-
-if [ "$MLbeNice" -eq 0 ]
-then # nice is zero, so we do not alter the task priority
-	MLbeNiceCommand=""
-else # nice is non zero
-	if [ "$MLbeNice" -gt 0 ]
-	then # We can always lower the priority of the tasks
-		MLbeNiceCommand="/usr/bin/nice -n $MLbeNice "
-	else 
-		if [ $MLweAreRoot -eq 1 ]
-		then # We can only increase the priority if we are running as root
-			MLbeNiceCommand="/usr/bin/nice -n $MLbeNice "			
-		else # We are not root, so we will not change the priority, but tell the admin
-			MLbeNiceCommand=""
-			# Adding a message to the admin notification eMail
-			appendToFile "$MLadminEmailMessage"  "
-INFO: The requested increased priority of $MLbeNice for $MLbaseCommand could not be set since we are not running as root. Either set the variable MLbeNice to a non negative integer value or run $MLbaseCommand as root.
-See man nice(1) for more info.
-"
-# End of message. Take care of the quotes!
-		fi # [ $MLweAreRoot -eq 1 ]
-	fi # [ $MLbeNice > 0 ]
-fi # [ $MLbeNice -eq 0 ]
-debug "MLbeNice = $MLbeNice ; MLbeNiceCommand = $MLbeNiceCommand"
 ###############################################################################
 # Including other external scripts, this will be improved in the future
 
@@ -544,8 +510,6 @@ else # No, the source could not be found locally, could still be remotely locate
 	debug "Testing for a remote source with $MLsourcePath"
 	# testing if a remote source does exist.
 	
-	echo The TEST command is:
-	echo 	$MLsourceRsync $MLdestRsync $MLrsyncNetworkOptions -n "$MLsourcePath"
 	$MLsourceRsync $MLdestRsync $MLrsyncNetworkOptions -n "$MLsourcePath" > /dev/null  2>&1
 	MLrsyncRemoteTest=$?
 	
@@ -629,7 +593,6 @@ fi
 
 debug "Writing my own tag to $MLdestPath/$MLbackupName.pid"
 echo $$ > "$MLdestPath/$MLbackupName.pid"
-
 
 # We need to find the most recent Backup as our Target for the link-dest
 MLmostRecentSet=$(ls -1tw "$MLdestPath/" | grep -E "^$MLbackupName-(19|20)[0-9][0-9]\.(0[1-9]|1[012])\.(0[1-9]|[12][0-9]|3[01])-([01][0-9]|2[0-3])\.[0-5][0-9]\.[0-5][0-9]" | head -1)
