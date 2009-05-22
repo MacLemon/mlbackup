@@ -262,7 +262,8 @@ then # we show a progress for the user, else we do not, since in a non-interacti
 fi
 
 #Rsync should use compression for non-local-only backup transport (SSH)
-MLrsyncNetworkOptions="--compress --compress-level=9 -e 'ssh -o \\"Compression no\\"' " # --compress, -z
+MLrsyncNetworkOptions="--compress --compress-level=9"
+
 
 # Rsync should be verbose
 # Rsync verbosity beyond -vv does NOT seem to work on Mac OS X, I am afraid this is an rsync bug
@@ -534,6 +535,7 @@ debug "Testing for local source in: $MLsourcePath"
 if [ -r "$MLsourcePath" -o -d "$MLsourcePath" ] # If the source exists (be it a local file or folder)
 then # Yes, the source folder can be found locally, using that one.
 		MLrsyncNetworkOptions=""
+
 		debug "The Source $MLsourcePath does exist locally."
 		MLfatalError=0
 		MLsourceIsRemote=0
@@ -546,12 +548,6 @@ else # No, the source could not be found locally, could still be remotely locate
 	echo 	$MLsourceRsync $MLdestRsync $MLrsyncNetworkOptions -n $MLsourcePath
 	$MLsourceRsync $MLdestRsync $MLrsyncNetworkOptions -n "$MLsourcePath" > /dev/null  2>&1
 	MLrsyncRemoteTest=$?
-	
-	# not working yet
-	# xxxxxx marker zp work on
-	# need to consolidate the error codes for sourceNotFound into a single one.
-	# Cannot decide if if should have been local or remote. fact is, not found. that is all.
-	# use new error code? MLE_CouldNotConnectWithSSH=255
 	
 	case $MLrsyncRemoteTest in
 		0)	# The last backup went ok
@@ -577,8 +573,9 @@ else # No, the source could not be found locally, could still be remotely locate
 		24) MLeRsyncErrorMessage="Partial transfer due to vanished source files";;
 		25) MLeRsyncErrorMessage="The --max-delete limit stopped deletions";;
 		30) MLeRsyncErrorMessage="Timeout in data send/receive";;
-		255) MLeRsyncErrorMessage="ssh could not connect, probably unknown hostname.";;
+		255) MLeRsyncErrorMessage="ssh could not connect, probably unknown hostname."
 		# Any other error that might have occured that is unspecified
+		;;
 		*) MLeRsyncErrorMessage="$0: Rsync returned Error Code $MLbackupStatus: Sorry, we do not know what this error code means. You may want to check your logfiles or the man page for rsync on your system."
 		;;
 	esac
@@ -598,7 +595,6 @@ else # No, the source could not be found locally, could still be remotely locate
 		exit $MLE_SourceNotFound
 	fi
 fi
-
 
 # Checking for concurrent mlbackup running with the same configuration
 if [ -r "$MLdestPath/$MLbackupName.pid" ] # Is there already a tag .pid in the destination?
@@ -650,36 +646,41 @@ debug "MLfinalTarget = $MLfinalTarget"
 mkdir "$MLfinalTarget"
 
 notifyGrowl "Backup running"
-
 debug "Rsync starting now."
 MLtimeRsyncStart=$(date +%s)
 # backing up
 
 # building the final command to run the backup
-echo $MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLshowRsyncProgress $MLrsyncNetworkOptions $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --log-file="$MLrsyncLogFile" --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" 2>"$MLrsyncErrFile"
 $MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLshowRsyncProgress $MLrsyncNetworkOptions $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --log-file="$MLrsyncLogFile" --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" 2>"$MLrsyncErrFile"
-
-# And run the backup
-# $MLfinalRsyncCommand
 MLbackupStatus=$? # Fetching the return code from our rsync command
 MLtimeRsyncEnd=$(date +%s) # Fetching a timestamp after rsync for timing stats
 
+
 let "MLtimeRsyncDuration = $MLtimeRsyncEnd - $MLtimeRsyncStart"
 if [ $MLtimeRsyncDuration -eq 1 ] # Just to care for proper language
+then # It was only one second
+	debug "rsync took $MLtimeRsyncDuration second."
+else # zero, two or more seconds
+	debug "rsync took $MLtimeRsyncDuration seconds. $(
+	if [ $MLtimeRsyncDuration -gt 60 ] # more than 60 seconds
+	then # makes sense to output in human readable format
+		seconds2dhms $MLtimeRsyncDuration
+	fi)"
+fi	
 ###############################################################################
 # Post processing the recorded rsync logfiles and temporary files:
 # We move and compress the logfiles to the backup destination. (currently only on localhost)
 debug "Compressing the logfiles and moving them to the backup destination."
 
 debug "--- Post processing the error.log"
-if [ -s $MLrsyncErrFile ] # Non zero byte error.log? Only in case of errors
-then # Yes, there were errors recorded.
-	debug "Compressing $MLrsyncErrFile to $MLfinalTarget/error.log.gz."
-	gzip -9 --no-name --to-stdout "$MLrsyncErrFile" > "$MLfinalTarget/error.log.gz"
-	/bin/chmod 644 "$MLfinalTarget/error.log.gz"
-else
-	debug "The error.log $MLrsyncErrFile was empty, looks good."
-fi # [ -s $MLrsyncErrFile ]
+	if [ -s $MLrsyncErrFile ] # Non zero byte error.log? Only in case of errors
+	then # Yes, there were errors recorded.
+		debug "Compressing $MLrsyncErrFile to $MLfinalTarget/error.log.gz."
+		gzip -9 --no-name --to-stdout "$MLrsyncErrFile" > "$MLfinalTarget/error.log.gz"
+		/bin/chmod 644 "$MLfinalTarget/error.log.gz"
+	else
+		debug "The error.log $MLrsyncErrFile was empty, looks good."
+	fi # [ -s $MLrsyncErrFile ]
 
 # removing the error.log tempfile, should it not have been done by gzip already
 if [ -e "$MLrsyncErrFile" ] # Does our "$MLrsyncErrFile" still exist?
