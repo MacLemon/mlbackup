@@ -677,7 +677,7 @@ fi
 
 # Cleaning up MLcombinedExclusions
 if [ $MLcombinedExclusions ]
-then Yes, we have a temporary MLcombinedExclusions file, let us remove it.
+then # Yes, we have a temporary MLcombinedExclusions file, let us remove it.
 	debug "Removing MLcombinedExclusions: $MLcombinedExclusions"
 	$MLrm "$MLcombinedExclusions"
 fi
