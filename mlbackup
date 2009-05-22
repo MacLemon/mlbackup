@@ -545,7 +545,7 @@ else # No, the source could not be found locally, could still be remotely locate
 	# testing if a remote source does exist.
 	
 	echo The TEST command is:
-	echo 	$MLsourceRsync $MLdestRsync $MLrsyncNetworkOptions -n $MLsourcePath
+	echo 	$MLsourceRsync $MLdestRsync $MLrsyncNetworkOptions -n "$MLsourcePath"
 	$MLsourceRsync $MLdestRsync $MLrsyncNetworkOptions -n "$MLsourcePath" > /dev/null  2>&1
 	MLrsyncRemoteTest=$?
 	
