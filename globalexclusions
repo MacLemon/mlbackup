@@ -8,7 +8,7 @@
 # This is the global exclusions file for backlemon. Files and folders mentioned 
 # in this file will be EXCLUDED from your backup!
 #
-# To have one of these still backed up, useyour personal inclusions an
+# To have one of these still backed up, use your personal inclusions an
 # exclusions file for a backup. See man rsync for more info on how to write
 # these or learn from the comments in this file.
 #
