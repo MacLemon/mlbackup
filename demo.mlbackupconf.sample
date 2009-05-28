@@ -45,7 +45,7 @@ MLadminEmail="$USER"
 
 # If you don't want to exclude certain files that we deem unnecessary for a backup, set this parameter to 0.
 # To see what we exclude by default see /etc/maclemon/backup/globalexclusions
-# The default ist to respect globalexclusions and not backup what is mentioned there.
+# The default is to respect globalexclusions and not backup what is mentioned there.
 MLuseGlobalExclusions=1
 
 # You can specify an additional file with objects that you want to exclude from your backups.
