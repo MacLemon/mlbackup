@@ -55,8 +55,6 @@ if [ "$UID" -ne "$MLrootUID" ]
 	echo
 	echo copying files
 	# copying the files
-	# growler is deactivated at the moment and NOT distributed with mlbackup
-	#	cp $MLcpFlags growler.sh $MLbinDir/
 	cp $MLcpFlags mlbackup $MLbinDir/
 
 	cp $MLcpFlags globalexclusions $MLconfigDir/
@@ -65,13 +63,12 @@ if [ "$UID" -ne "$MLrootUID" ]
 
 	# Setting correct Ownership of files
 
-	# growler is deactivated at the moment and NOT distributed with mlbackup
-	#	chown root:wheel $MLbinDir/mlbackup $MLbinDir/growler.sh $MLconfigDir/globalexclusions $MLconfigDir
+	chown root:wheel $MLbinDir/mlbackup $MLconfigDir/globalexclusions $MLconfigDir
 	
 	echo
 	echo Setting correct privileges and file modes
 	# Setting correct file modes
-	chmod 755 $MLbinDir/mlbackup $MLbinDir/growler.sh $MLconfigDir
+	chmod 755 $MLbinDir/mlbackup $MLconfigDir
 	chmod 644 $MLconfigDir/globalexclusions $MLconfigDir/demo.mlbackupconf.sample
 	
 	if [ ! $(sw_vers | grep "Server") ]
