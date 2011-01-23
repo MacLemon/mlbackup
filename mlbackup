@@ -285,11 +285,6 @@ MLconfigExcludeFrom=""
 # For deleting stuff we use
 MLrm="/bin/rm"
 ###############################################################################
-# Including other external scripts, this will be improved in the future
-
-# Commented out, so we can concentrate on core functionality at the moment, to stabilize.
-# . /usr/local/bin/growler.sh # Provides a handy growlnotify function, see script for info!
-###############################################################################
 # Getting the configuration file
 # Handling of the config file should be a little more elegant.
 # Known Issue: Versioncheck does not yet respect Mac OS X Proxy settings.
