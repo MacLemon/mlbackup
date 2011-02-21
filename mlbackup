@@ -7,7 +7,7 @@
 # License: GNU general public license (GPL) http://www.gnu.org/licenses/gpl.html
 ###############################################################################
 # mlbackup, a backup system with autorotation for Mac OS X (Server)
-# Copyright (C) 2005-2009 Pepi Zawodsky
+# Copyright (C) 2005-2011 Pepi Zawodsky
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ MLdebug=0
 MLfullCommand=$0
 MLbaseCommand=$(basename $0)
 MLhostname=$(hostname)
-MLversion=0.9.5
+MLversion=1.5.0
 MLrevision=__CCUURREENNTT__RREEVVIISSIIOONN__
 
 # For development and testing only:
