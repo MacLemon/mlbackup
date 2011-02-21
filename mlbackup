@@ -300,7 +300,7 @@ then # There was no config filename passed
 	MLcurlReturned=$?
 	if [ $MLcurlReturned -eq 0 ] # Could we successfully check our version?
 	then # Yes we could successfully versioncheck
-		if [ $MLcheckedVersion -gt $MLrevision ] # Is there a newer version available?
+		if [[ $MLcheckedVersion -gt $MLrevision ]] # Is there a newer version available?
 		then # Yes, there is a newer version available
 			echo The current revision of $MLbaseCommand is $MLcheckedVersion, you are running $MLrevision.
 			echo Visit $MLinfoURL to get an update.
