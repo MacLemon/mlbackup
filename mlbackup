@@ -65,11 +65,11 @@ MLE_ConfigFileNotFound=254
 # Like future preflight and postflight scripts.
 MLrootUID=0
 if [ "$UID" -ne "$MLrootUID" ]
-	then # I am not root
-		MLweAreRoot=0
-		
-	else # Bow before me, for I am root!
-		MLweAreRoot=1
+    then # I am not root
+        MLweAreRoot=0
+        
+    else # Bow before me, for I am root!
+        MLweAreRoot=1
 fi
 ###############################################################################
 # defining our own functions:
@@ -81,30 +81,30 @@ function appendToFile (){
 # Checking if the target file exists and is writable
 if [ -w "$1" ] # Is the file to append to existent AND writable
 then # Yes, file does exist AND is writable
-	echo "$2" >> "$1"
+    echo "$2" >> "$1"
 else # The file is not writable, need to further investigate
-	
-	if [ -e "$1" ] # Does the file at least exist?
-	then # Yes, it does exist
-	# but it is not writable
-		echo "The file $1 is not writable for $USER. Logging message to console."
-		echo "$2"
-	else # File does not exist
-		if [ -w "$(dirname $1)" ] # Is the directory where the file should result in writable?
-		then # Yes, the directory does exist AND is writable
-			# Then we can just create the file and be happy.
-			echo "$2" >> "$1"
-		else # No, the directory is NOT writable OR may not even exist
-			if [ -d  "$(dirname $1)" ] # Does the directory exist at all?
-			then # Yes, it does exist, but is not writable.
-				echo "The File $1 does not exist and the directory $(dirname $1) is not writable so we cannot create the file either. Please fix the permissions for $USER. Logging message to console."
-				echo "$2"
-			else # No, the directory does not even exist. User needs to create it.
-				echo "Cannot create file $1 as user $USER because $(dirname $1) does not exist. You need to create it manually and make it writable for $USER. Logging message to console."
-				echo "$2"
-			fi
-		fi
-	fi
+    
+    if [ -e "$1" ] # Does the file at least exist?
+    then # Yes, it does exist
+    # but it is not writable
+        echo "The file $1 is not writable for $USER. Logging message to console."
+        echo "$2"
+    else # File does not exist
+        if [ -w "$(dirname $1)" ] # Is the directory where the file should result in writable?
+        then # Yes, the directory does exist AND is writable
+            # Then we can just create the file and be happy.
+            echo "$2" >> "$1"
+        else # No, the directory is NOT writable OR may not even exist
+            if [ -d  "$(dirname $1)" ] # Does the directory exist at all?
+            then # Yes, it does exist, but is not writable.
+                echo "The File $1 does not exist and the directory $(dirname $1) is not writable so we cannot create the file either. Please fix the permissions for $USER. Logging message to console."
+                echo "$2"
+            else # No, the directory does not even exist. User needs to create it.
+                echo "Cannot create file $1 as user $USER because $(dirname $1) does not exist. You need to create it manually and make it writable for $USER. Logging message to console."
+                echo "$2"
+            fi
+        fi
+    fi
 fi
 }
 
@@ -113,7 +113,7 @@ fi
 # Prepends a given Text at the beginning of a given file
 # usage: prependToFile "path/to/filename" "Message to prepend"
 # caveat: No error checking yet
-	
+    
 # Pushed back a moment, current found solutions are not elegant and require at least 
 # one additional temporary file.
 
@@ -123,15 +123,15 @@ fi
 function debug (){
 # outputs a debugging message to console if the MLdebug Flag is set to 1
 # usage: debug "Your debugging Message"
-	if [ $MLdebug -eq 1 ] # Is the debug flag set?
-	then # Output everything that is passed to stdout:
-	# Should Debugging Messages be output to stderr instead? Please give feedback!
-		MLtheDebugMessage="$(date) $MLbaseCommand[$$] DEBUG: $@"
-		echo $MLtheDebugMessage
-		
-		# same message passed to the admin eMail Message
-		appendToFile "$MLadminEmailMessage" "$MLtheDebugMessage"
-	fi
+    if [ $MLdebug -eq 1 ] # Is the debug flag set?
+    then # Output everything that is passed to stdout:
+    # Should Debugging Messages be output to stderr instead? Please give feedback!
+        MLtheDebugMessage="$(date) $MLbaseCommand[$$] DEBUG: $@"
+        echo $MLtheDebugMessage
+        
+        # same message passed to the admin eMail Message
+        appendToFile "$MLadminEmailMessage" "$MLtheDebugMessage"
+    fi
 }
 #------------------------------------------------------------------------------
 function cleanup (){
@@ -139,10 +139,10 @@ function cleanup (){
 
 # Removing already created temp files.
 debug "Removing temp MLrsyncLogFile in $MLrsyncLogFile"
-$MLrm	"$MLrsyncLogFile"
+$MLrm   "$MLrsyncLogFile"
 
 debug "Removing temp MLrsyncErrFile in $MLrsyncErrFile"
-$MLrm	"$MLrsyncErrFile"
+$MLrm   "$MLrsyncErrFile"
 
 debug "Removing my .pid file in $MLmyPidFile."
 $MLrm "$MLmyPidFile"
@@ -150,50 +150,50 @@ $MLrm "$MLmyPidFile"
 
 #------------------------------------------------------------------------------
 function seconds2dhms (){
-	# Takes the number of seconds as integer and returns a string with human
-	# 	readable output in the form of 11d 22h 33m 44s to make durations
-	#	in the form of seconds easier to read for humans.
-	#	Usage: humanReadableDuration=seconds2dhms $NumberOfSeconds
-	seconds2dhms_seconds=$1
+    # Takes the number of seconds as integer and returns a string with human
+    #   readable output in the form of 11d 22h 33m 44s to make durations
+    #   in the form of seconds easier to read for humans.
+    #   Usage: humanReadableDuration=seconds2dhms $NumberOfSeconds
+    seconds2dhms_seconds=$1
 
-	seconds2dhms_days=$(( seconds2dhms_seconds / 86400 )); # One day equals 86400 seconds
-	seconds2dhms_seconds=$(( seconds2dhms_seconds % 86400 ))
+    seconds2dhms_days=$(( seconds2dhms_seconds / 86400 )); # One day equals 86400 seconds
+    seconds2dhms_seconds=$(( seconds2dhms_seconds % 86400 ))
 
-	seconds2dhms_hours=$(( seconds2dhms_seconds / 3600 )); # One hour equals 3600 seconds
-	seconds2dhms_seconds=$(( seconds2dhms_seconds % 3600 ))
+    seconds2dhms_hours=$(( seconds2dhms_seconds / 3600 )); # One hour equals 3600 seconds
+    seconds2dhms_seconds=$(( seconds2dhms_seconds % 3600 ))
 
-	seconds2dhms_minutes=$(( seconds2dhms_seconds / 60 ))
-	seconds2dhms_seconds=$(( seconds2dhms_seconds % 60 ))
+    seconds2dhms_minutes=$(( seconds2dhms_seconds / 60 ))
+    seconds2dhms_seconds=$(( seconds2dhms_seconds % 60 ))
 
-	#days
-	case $seconds2dhms_days in
-		0) seconds2dhms_daytext="";;
-		1) seconds2dhms_daytext="$seconds2dhms_days day";;
-		*) seconds2dhms_daytext="$seconds2dhms_days days";;
-	esac
+    #days
+    case $seconds2dhms_days in
+        0) seconds2dhms_daytext="";;
+        1) seconds2dhms_daytext="$seconds2dhms_days day";;
+        *) seconds2dhms_daytext="$seconds2dhms_days days";;
+    esac
 
-	#hours
-	case $seconds2dhms_hours in
-		0) seconds2dhms_hourtext="";;
-		1) seconds2dhms_hourtext="$seconds2dhms_hours hour";;
-		*) seconds2dhms_hourtext="$seconds2dhms_hours hours";;
-	esac
+    #hours
+    case $seconds2dhms_hours in
+        0) seconds2dhms_hourtext="";;
+        1) seconds2dhms_hourtext="$seconds2dhms_hours hour";;
+        *) seconds2dhms_hourtext="$seconds2dhms_hours hours";;
+    esac
 
-	#minutes
-	case $seconds2dhms_minutes in
-		0) seconds2dhms_minutetext="";;
-		1) seconds2dhms_minutetext="$seconds2dhms_minutes minute";;
-		*) seconds2dhms_minutetext="$seconds2dhms_minutes minutes";;
-	esac
+    #minutes
+    case $seconds2dhms_minutes in
+        0) seconds2dhms_minutetext="";;
+        1) seconds2dhms_minutetext="$seconds2dhms_minutes minute";;
+        *) seconds2dhms_minutetext="$seconds2dhms_minutes minutes";;
+    esac
 
-	#seconds
-	case $seconds2dhms_seconds in
-		0) seconds2dhms_secondtext="";;
-		1) seconds2dhms_secondtext="$seconds2dhms_seconds second";;
-		*) seconds2dhms_secondtext="$seconds2dhms_seconds seconds";;
-	esac
+    #seconds
+    case $seconds2dhms_seconds in
+        0) seconds2dhms_secondtext="";;
+        1) seconds2dhms_secondtext="$seconds2dhms_seconds second";;
+        *) seconds2dhms_secondtext="$seconds2dhms_seconds seconds";;
+    esac
 
-	echo "$seconds2dhms_daytext $seconds2dhms_hourtext $seconds2dhms_minutetext $seconds2dhms_secondtext"
+    echo "$seconds2dhms_daytext $seconds2dhms_hourtext $seconds2dhms_minutetext $seconds2dhms_secondtext"
 }
 ###############################################################################
 # Creating a few temporary files we need
@@ -231,11 +231,11 @@ MLttyReturned=$?
  
 if [ $MLttyReturned -eq 1 ]
 then # tty returns 1 on nonInteractive
-	MLisInteractive=0
-	debug "Running in a non-interactive environment. tty returned $MLttyReturned, MLisInteractive set to $MLisInteractive."
+    MLisInteractive=0
+    debug "Running in a non-interactive environment. tty returned $MLttyReturned, MLisInteractive set to $MLisInteractive."
 else # tty returns 0 on interactive (tty present)
-	MLisInteractive=1
-	debug "Running in an interactive environment. tty returned $MLttyReturned, MLisInteractive set to $MLisInteractive."
+    MLisInteractive=1
+    debug "Running in an interactive environment. tty returned $MLttyReturned, MLisInteractive set to $MLisInteractive."
 fi
 ###############################################################################
 # Setting our own internal variables.
@@ -258,7 +258,7 @@ MLrsyncOptions="-apogtxl --hard-links --fuzzy --fileflags --protect-args --prote
 # When running interactively we're showing some progress and stats for the user
 if [ $MLisInteractive ]
 then # we show a progress for the user, else we do not, since in a non-interactive session there is noone to watch this.
-	MLshowRsyncProgress="--progress --stats"
+    MLshowRsyncProgress="--progress --stats"
 fi
 
 #Rsync should use compression for non-local-only backup transport (SSH)
@@ -292,56 +292,56 @@ MLrm="/bin/rm"
 # Did we get a parameter to use as a config file?
 if [ -z "$1" ]
 then # There was no config filename passed
-	# Outputting Usage information as needed for POSIX
-	echo "Usage: $MLbaseCommand path/to/configfile"
+    # Outputting Usage information as needed for POSIX
+    echo "Usage: $MLbaseCommand path/to/configfile"
 
-	# Checking for current stable version
-	MLcheckedVersion=$(curl -sL --connect-timeout 30 $MLversioncheckURL | grep -w "^mlbackup.stable" | awk '{printf $3}')
-	MLcurlReturned=$?
-	if [ $MLcurlReturned -eq 0 ] # Could we successfully check our version?
-	then # Yes we could successfully versioncheck
-		if [[ $MLcheckedVersion -gt $MLrevision ]] # Is there a newer version available?
-		then # Yes, there is a newer version available
-			echo The current revision of $MLbaseCommand is $MLcheckedVersion, you are running $MLrevision.
-			echo Visit $MLinfoURL to get an update.
-			exit $MLE_NoConfigFileParameterAndStableUpdateAvailable
+    # Checking for current stable version
+    MLcheckedVersion=$(curl -sL --connect-timeout 30 $MLversioncheckURL | grep -w "^mlbackup.stable" | awk '{printf $3}')
+    MLcurlReturned=$?
+    if [ $MLcurlReturned -eq 0 ] # Could we successfully check our version?
+    then # Yes we could successfully versioncheck
+        if [[ $MLcheckedVersion -gt $MLrevision ]] # Is there a newer version available?
+        then # Yes, there is a newer version available
+            echo The current revision of $MLbaseCommand is $MLcheckedVersion, you are running $MLrevision.
+            echo Visit $MLinfoURL to get an update.
+            exit $MLE_NoConfigFileParameterAndStableUpdateAvailable
 
-		else # No Update available, running current
-			exit $MLE_NoConfigFileParameter
+        else # No Update available, running current
+            exit $MLE_NoConfigFileParameter
 
-		fi
-	else # No, we could not successfully versioncheck.
-		# Known Issue: curl(1) error codes are not yet displayed as human readable text.
-		echo Could not check for update. curl\(1\) Exit Code $MLcurlReturned.
-		exit $MLE_NoConfigFileParameterAndCouldNotVersioncheck
-	fi
+        fi
+    else # No, we could not successfully versioncheck.
+        # Known Issue: curl(1) error codes are not yet displayed as human readable text.
+        echo Could not check for update. curl\(1\) Exit Code $MLcurlReturned.
+        exit $MLE_NoConfigFileParameterAndCouldNotVersioncheck
+    fi
 
 else # We were passed a config file
-	MLconfigFile="$1"
-	debug "Config file to use is: $MLconfigFile"
+    MLconfigFile="$1"
+    debug "Config file to use is: $MLconfigFile"
 
-	# Now let's check that parameter
-	# Does this file exist?
-	if [ -e $MLconfigFile ]
-	then # The file does exist 
-		debug "Config file $MLconfigFile exists."
-		
-		# Is the config file readable by the user invoking the script?
-		if [ -r $MLconfigFile ]
-		then # The config file can be read by the user invoking this script
+    # Now let's check that parameter
+    # Does this file exist?
+    if [ -e $MLconfigFile ]
+    then # The file does exist 
+        debug "Config file $MLconfigFile exists."
+        
+        # Is the config file readable by the user invoking the script?
+        if [ -r $MLconfigFile ]
+        then # The config file can be read by the user invoking this script
 
-			# Load in the config (DIRTY *yuck*) Better use the defaults system
-			debug "Loading the config file $MLconfigFile"
-			. "$MLconfigFile"
-		else # The user does not have read permission for the config file
-			echo $MLbaseCommand[$$]:FATAL The config file $MLconfigFile seems to exist but is not readable by $USER. Please change the mode or owner of the configuration file or use a different user to run $MLbaseCommand!
-			exit $MLE_ConfigFileNotReadable # config file not readable
-			# We might do further testing of this file to give a better error
-		fi
-	else # The config file doesn't exist, FATAL
-		echo $MLbaseCommand[$$]:FATAL The config file $MLconfigFile could not be found. Please check the path!
-		exit $MLE_ConfigFileNotFound # Config file not found
-	fi # [ -e $MLconfigFile ]
+            # Load in the config (DIRTY *yuck*) Better use the defaults system
+            debug "Loading the config file $MLconfigFile"
+            . "$MLconfigFile"
+        else # The user does not have read permission for the config file
+            echo $MLbaseCommand[$$]:FATAL The config file $MLconfigFile seems to exist but is not readable by $USER. Please change the mode or owner of the configuration file or use a different user to run $MLbaseCommand!
+            exit $MLE_ConfigFileNotReadable # config file not readable
+            # We might do further testing of this file to give a better error
+        fi
+    else # The config file doesn't exist, FATAL
+        echo $MLbaseCommand[$$]:FATAL The config file $MLconfigFile could not be found. Please check the path!
+        exit $MLE_ConfigFileNotFound # Config file not found
+    fi # [ -e $MLconfigFile ]
 fi # [ -z "$1" ]
 ###############################################################################
 #------------------------------------------------------------------------------
@@ -353,36 +353,36 @@ MLgrowlnotify=/usr/local/bin/growlnotify
 
 if [ -e "$MLgrowlnotify" ]
 then
-	MLgrowlStandardPriority="Normal"
+    MLgrowlStandardPriority="Normal"
 
-	# creating a pseudorandom ID for growl coalescing. Should be sufficently unique for our purpose.
-	let "MLgrowlID = $MLtimeScriptStart + $RANDOM"
-	debug "MLgrowlID = $MLgrowlID"
+    # creating a pseudorandom ID for growl coalescing. Should be sufficently unique for our purpose.
+    let "MLgrowlID = $MLtimeScriptStart + $RANDOM"
+    debug "MLgrowlID = $MLgrowlID"
 
-	function notifyGrowl () {
-		# Usage: notifyGrowl "text of message" ["text of title" "other growlnotify options"]
-		# We use the icon of the source as notification Icon
-		# Automatically handles registration with growl as mlbackup, ID, coalescing
-		# other growlnotify options could be "--sticky" for example
-		# Could we really use SIPS to badge this mit an mlbackup icon? Esoteric?
-		MLgrowlIconpath="$MLsourcePath" # For use with --iconpath/-I (capital i)
-		
-		if [ ! -z "$2" ]
-		then
-			MLgrowlTitle="$2"
-		else
-			MLgrowlTitle="$MLbackupName"
-		fi
-		
-		MLgrowlTitle="$MLbackupName"
-		$MLgrowlnotify --priority "$MLgrowlStandardPriority" --identifier "$MLgrowlID" --iconpath "$MLgrowlIconpath" --name "$MLbaseCommand" $3 -m "$1" -t "$MLgrowlTitle"
-	}
+    function notifyGrowl () {
+        # Usage: notifyGrowl "text of message" ["text of title" "other growlnotify options"]
+        # We use the icon of the source as notification Icon
+        # Automatically handles registration with growl as mlbackup, ID, coalescing
+        # other growlnotify options could be "--sticky" for example
+        # Could we really use SIPS to badge this mit an mlbackup icon? Esoteric?
+        MLgrowlIconpath="$MLsourcePath" # For use with --iconpath/-I (capital i)
+        
+        if [ ! -z "$2" ]
+        then
+            MLgrowlTitle="$2"
+        else
+            MLgrowlTitle="$MLbackupName"
+        fi
+        
+        MLgrowlTitle="$MLbackupName"
+        $MLgrowlnotify --priority "$MLgrowlStandardPriority" --identifier "$MLgrowlID" --iconpath "$MLgrowlIconpath" --name "$MLbaseCommand" $3 -m "$1" -t "$MLgrowlTitle"
+    }
 else
-	debug "Could not find /usr/local/bin/growlnotify, Growl notifications are disabled."
-	function notifyGrowl () {
-		debug "$MLgrowlnotify is not installed. Cannot growl message parameters $@."
-		# Doing nothing, since growl is not installed.
-	}
+    debug "Could not find /usr/local/bin/growlnotify, Growl notifications are disabled."
+    function notifyGrowl () {
+        debug "$MLgrowlnotify is not installed. Cannot growl message parameters $@."
+        # Doing nothing, since growl is not installed.
+    }
 fi
 ###############################################################################
 # Post processing of new parameters loaded from the config file.
@@ -390,8 +390,8 @@ fi
 # Increasing overall verbosity if we're in DEBUG mode.
 if [ $MLdebug -eq 1 ] # Is the debug flag set?
 then # Yes, Increase verbosity
-		MLbeVerbose="-vvv" # For rsync
-		MLrm="/bin/rm -v" # for rm, actually -v is a NON POSIX standard option in rm on Mac OS X.
+        MLbeVerbose="-vvv" # For rsync
+        MLrm="/bin/rm -v" # for rm, actually -v is a NON POSIX standard option in rm on Mac OS X.
 fi
 ###############################################################################
 # Procesing global and per config exclusion files
@@ -399,45 +399,45 @@ fi
 debug "MLconfigExcludeFrom: $MLconfigExcludeFrom"
 if [ -z "$MLconfigExcludeFrom" ]
 then # There has no per config exclusion file been set
-	debug "No per-config exclusions file has been set."
-	debug "MLuseGlobalExclusions: $MLuseGlobalExclusions"
-	if [ $MLuseGlobalExclusions -eq 1 ]
-	then # We shall only use the global exclusions
-		debug "We are using the globalexclusions."
-		MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
-	else # We shall NOT use the global exclusions, nothing left to consider for exclusion
-		debug "We shall not use globalexclusions. Nothing will be excluded from the backup."
-		MLexcludeFrom=""
-	fi
-	debug "MLexcludeFrom: $MLexcludeFrom"
+    debug "No per-config exclusions file has been set."
+    debug "MLuseGlobalExclusions: $MLuseGlobalExclusions"
+    if [ $MLuseGlobalExclusions -eq 1 ]
+    then # We shall only use the global exclusions
+        debug "We are using the globalexclusions."
+        MLexcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
+    else # We shall NOT use the global exclusions, nothing left to consider for exclusion
+        debug "We shall not use globalexclusions. Nothing will be excluded from the backup."
+        MLexcludeFrom=""
+    fi
+    debug "MLexcludeFrom: $MLexcludeFrom"
 else # We shall respect a per config exclusions file.
-	debug "A per-config exclusions file has been set."
-	if [ -e $MLconfigExcludeFrom ]
-	then # The file does exist
-		debug "This exclusions file does exist."
-		if [ -r $MLconfigExcludeFrom ]
-		then # The per-config exclusions file can be read by the user invoking this script
-			debug "This exclusions file is readable by $USER."
-			if [ $MLuseGlobalExclusions -eq 1 ]
-			then # We shall also use the global exclusions, so we need to combine the files
-				debug "Globalexclusions shall also be respected."
-				MLcombinedExclusions=$(mktemp -t MLcombinedExclusions.XXXXXXXXXX) # Temporary File for exclusions
-				debug "MLcombinedExclusions = $MLcombinedExclusions"
-				debug "Combining globalexclusions and per-config exclusions."
-				grep -h -v -e "^#" -v -e "^$" -v -e "^;" "$MLglobalExclusionsFile" "$MLconfigExcludeFrom" | sort | uniq > $MLcombinedExclusions
-				MLexcludeFrom="--exclude-from=$MLcombinedExclusions"
-			else # We shall not use the globalexclusion, so we only use the per-config exclusions
-				debug "Globalexclusions shall not be used, only using per-config exclusions."
-				MLexcludeFrom="--exclude-from=$MLconfigExcludeFrom"
-			fi
-		else # The user does not have read permission for the per-config exclusions file
-			echo $MLbaseCommand[$$]:FATAL The config file $MLconfigExcludeFrom seems to exist but is not readable by $USER. Please change the mode or owner of the configuration file or use a different user to run $MLbaseCommand!
-			exit $MLE_ConfigExclusionsFileNotReadable # per-config exclusions file not readable. Exiting
-		fi
-	else # The per-config exclusions file does not exist, FATAL.	
-		echo $MLbaseCommand[$$]:FATAL The config file $MLconfigExcludeFrom could not be found. Please check the path!
-		exit $MLE_ConfigExclusionsFileDoesNotExist # Per Config Exclusions file does not exist. Exiting.
-	fi
+    debug "A per-config exclusions file has been set."
+    if [ -e $MLconfigExcludeFrom ]
+    then # The file does exist
+        debug "This exclusions file does exist."
+        if [ -r $MLconfigExcludeFrom ]
+        then # The per-config exclusions file can be read by the user invoking this script
+            debug "This exclusions file is readable by $USER."
+            if [ $MLuseGlobalExclusions -eq 1 ]
+            then # We shall also use the global exclusions, so we need to combine the files
+                debug "Globalexclusions shall also be respected."
+                MLcombinedExclusions=$(mktemp -t MLcombinedExclusions.XXXXXXXXXX) # Temporary File for exclusions
+                debug "MLcombinedExclusions = $MLcombinedExclusions"
+                debug "Combining globalexclusions and per-config exclusions."
+                grep -h -v -e "^#" -v -e "^$" -v -e "^;" "$MLglobalExclusionsFile" "$MLconfigExcludeFrom" | sort | uniq > $MLcombinedExclusions
+                MLexcludeFrom="--exclude-from=$MLcombinedExclusions"
+            else # We shall not use the globalexclusion, so we only use the per-config exclusions
+                debug "Globalexclusions shall not be used, only using per-config exclusions."
+                MLexcludeFrom="--exclude-from=$MLconfigExcludeFrom"
+            fi
+        else # The user does not have read permission for the per-config exclusions file
+            echo $MLbaseCommand[$$]:FATAL The config file $MLconfigExcludeFrom seems to exist but is not readable by $USER. Please change the mode or owner of the configuration file or use a different user to run $MLbaseCommand!
+            exit $MLE_ConfigExclusionsFileNotReadable # per-config exclusions file not readable. Exiting
+        fi
+    else # The per-config exclusions file does not exist, FATAL.    
+        echo $MLbaseCommand[$$]:FATAL The config file $MLconfigExcludeFrom could not be found. Please check the path!
+        exit $MLE_ConfigExclusionsFileDoesNotExist # Per Config Exclusions file does not exist. Exiting.
+    fi
 fi
 ###############################################################################
 # Writing a .pid file to /tmp
@@ -462,128 +462,128 @@ MLextendedAttributes="--hard-links --perms --executability --acls --xattrs --own
 
 if [ -e "$MLdestPath" ] # Does our target exist?
 then # Yes, it does exist,
-	if [ -d "$MLdestPath" ] # Is it a directory as well?
-	then # Yes, it IS a directory.
-		# check if it is writeable!
-		# if yes ok, else fail
-		if [[ -r "$MLdestPath" && -w "$MLdestPath" && -x "$MLdestPath" ]] # Can we rwx the destination? We need it.
-		then # Great, everything we need!
-			debug "The destination $MLdestPath offers all privs we need."
-		else
-			echo "The destination $MLdestPath need read, write and execute privs for the user $USER invoking this script to be able to backup your data."
-			exit $MLE_DestinationNotWriteable
-		fi
-	else
-		echo "$MLbaseCommand: The destination $MLdestPath is not a directory. We can not save backups in anything but a directory (like a file or block device)"
-		exit $MLE_DestinationIsNoDirectory
-	fi
+    if [ -d "$MLdestPath" ] # Is it a directory as well?
+    then # Yes, it IS a directory.
+        # check if it is writeable!
+        # if yes ok, else fail
+        if [[ -r "$MLdestPath" && -w "$MLdestPath" && -x "$MLdestPath" ]] # Can we rwx the destination? We need it.
+        then # Great, everything we need!
+            debug "The destination $MLdestPath offers all privs we need."
+        else
+            echo "The destination $MLdestPath need read, write and execute privs for the user $USER invoking this script to be able to backup your data."
+            exit $MLE_DestinationNotWriteable
+        fi
+    else
+        echo "$MLbaseCommand: The destination $MLdestPath is not a directory. We can not save backups in anything but a directory (like a file or block device)"
+        exit $MLE_DestinationIsNoDirectory
+    fi
 else # No, the target does not exist
-	debug "FATAL: The target $MLdestPath could not be found."
-	debug "If your target is on an external volume, make sure it is mounted!"
-	echo "The target $MLdestPath could not be found! If your target is on an external volume, make sure it is mounted!" | /usr/bin/mail -s "$MLhostname $MLbackupName: Target missing" $MLadminEmail
+    debug "FATAL: The target $MLdestPath could not be found."
+    debug "If your target is on an external volume, make sure it is mounted!"
+    echo "The target $MLdestPath could not be found! If your target is on an external volume, make sure it is mounted!" | /usr/bin/mail -s "$MLhostname $MLbackupName: Target missing" $MLadminEmail
 
-	notifyGrowl "ERROR: Destination could not be found." "" "--sticky"
-	cleanup
-	exit $MLE_DestinationNotFound
+    notifyGrowl "ERROR: Destination could not be found." "" "--sticky"
+    cleanup
+    exit $MLE_DestinationNotFound
 fi
 
 
 # Checking the source
 # Source could be local, could be remote via SSH as well, we need to accomodate that, but expect a local source in favor of a remote source.
-	MLfatalError=1
-	
+    MLfatalError=1
+    
 debug "Testing for local source in: $MLsourcePath"
 if [ -r "$MLsourcePath" -o -d "$MLsourcePath" ] # If the source exists (be it a local file or folder)
 then # Yes, the source folder can be found locally, using that one.
-		MLrsyncNetworkOptions=""
+        MLrsyncNetworkOptions=""
 
-		debug "The Source $MLsourcePath does exist locally."
-		MLfatalError=0
-		MLsourceIsRemote=0
+        debug "The Source $MLsourcePath does exist locally."
+        MLfatalError=0
+        MLsourceIsRemote=0
 else # No, the source could not be found locally, could still be remotely located.
-	debug "Local source could not be found."
-	debug "Testing for a remote source with $MLsourcePath"
-	# testing if a remote source does exist.
-	
-	$MLsourceRsync $MLdestRsync $MLrsyncNetworkOptions -n "$MLsourcePath" > /dev/null  2>&1
-	MLrsyncRemoteTest=$?
-	
-	case $MLrsyncRemoteTest in
-		0)	# The last backup went ok
-			MLeRsyncErrorMessage=""
-			MLfatalError=0
-			MLsourceIsRemote=1 ;;
-		# Error Codes we know from the rsync man page
-		1) MLeRsyncErrorMessage="Syntax or usage error";;
-		2) MLeRsyncErrorMessage="Protocol incompatibility";;
-		3) MLeRsyncErrorMessage="Errors selecting input/output files, dirs";;
-		4) MLeRsyncErrorMessage="Requested action not supported: an attempt was made to manipulate 64-bit files on a platform that cannot support them; or an option was specified that is supported by the client and not by the server.";;
-		5) MLeRsyncErrorMessage="Error starting client-server protocol";;
-		6) MLeRsyncErrorMessage="Daemon unable to append to log-file";;
-		10) MLeRsyncErrorMessage="Error in socket I/O";;
-		11) MLeRsyncErrorMessage="Error in file I/O";;
-		12) MLeRsyncErrorMessage="Error in rsync protocol data stream";;
-		13) MLeRsyncErrorMessage="Errors with program diagnostics";;
-		14) MLeRsyncErrorMessage="Error in IPC code";;
-		20) MLeRsyncErrorMessage="Received SIGUSR1 or SIGINT";;
-		21) MLeRsyncErrorMessage="Some error returned by waitpid()";;
-		22) MLeRsyncErrorMessage="Error allocating core memory buffers";;
-		23) MLeRsyncErrorMessage="Partial transfer due to error";;
-		24) MLeRsyncErrorMessage="Partial transfer due to vanished source files";;
-		25) MLeRsyncErrorMessage="The --max-delete limit stopped deletions";;
-		30) MLeRsyncErrorMessage="Timeout in data send/receive";;
-		255) MLeRsyncErrorMessage="ssh could not connect, probably unknown hostname."
-		# Any other error that might have occured that is unspecified
-		;;
-		*) MLeRsyncErrorMessage="$0: Rsync returned Error Code $MLbackupStatus: Sorry, we do not know what this error code means. You may want to check your logfiles or the man page for rsync on your system."
-		;;
-	esac
-	debug "Remote Source test returned Code $MLrsyncRemoteTest"
-	debug "$MLeRsyncErrorMessage"
+    debug "Local source could not be found."
+    debug "Testing for a remote source with $MLsourcePath"
+    # testing if a remote source does exist.
+    
+    $MLsourceRsync $MLdestRsync $MLrsyncNetworkOptions -n "$MLsourcePath" > /dev/null  2>&1
+    MLrsyncRemoteTest=$?
+    
+    case $MLrsyncRemoteTest in
+        0)  # The last backup went ok
+            MLeRsyncErrorMessage=""
+            MLfatalError=0
+            MLsourceIsRemote=1 ;;
+        # Error Codes we know from the rsync man page
+        1) MLeRsyncErrorMessage="Syntax or usage error";;
+        2) MLeRsyncErrorMessage="Protocol incompatibility";;
+        3) MLeRsyncErrorMessage="Errors selecting input/output files, dirs";;
+        4) MLeRsyncErrorMessage="Requested action not supported: an attempt was made to manipulate 64-bit files on a platform that cannot support them; or an option was specified that is supported by the client and not by the server.";;
+        5) MLeRsyncErrorMessage="Error starting client-server protocol";;
+        6) MLeRsyncErrorMessage="Daemon unable to append to log-file";;
+        10) MLeRsyncErrorMessage="Error in socket I/O";;
+        11) MLeRsyncErrorMessage="Error in file I/O";;
+        12) MLeRsyncErrorMessage="Error in rsync protocol data stream";;
+        13) MLeRsyncErrorMessage="Errors with program diagnostics";;
+        14) MLeRsyncErrorMessage="Error in IPC code";;
+        20) MLeRsyncErrorMessage="Received SIGUSR1 or SIGINT";;
+        21) MLeRsyncErrorMessage="Some error returned by waitpid()";;
+        22) MLeRsyncErrorMessage="Error allocating core memory buffers";;
+        23) MLeRsyncErrorMessage="Partial transfer due to error";;
+        24) MLeRsyncErrorMessage="Partial transfer due to vanished source files";;
+        25) MLeRsyncErrorMessage="The --max-delete limit stopped deletions";;
+        30) MLeRsyncErrorMessage="Timeout in data send/receive";;
+        255) MLeRsyncErrorMessage="ssh could not connect, probably unknown hostname."
+        # Any other error that might have occured that is unspecified
+        ;;
+        *) MLeRsyncErrorMessage="$0: Rsync returned Error Code $MLbackupStatus: Sorry, we do not know what this error code means. You may want to check your logfiles or the man page for rsync on your system."
+        ;;
+    esac
+    debug "Remote Source test returned Code $MLrsyncRemoteTest"
+    debug "$MLeRsyncErrorMessage"
 
 
-	if [ $MLfatalError -eq 1 ]
-	then
-		# The Source does not exist, bailing out.
-		debug "The Source $MLsourcePath could not be found. Cleaning up, exiting."
+    if [ $MLfatalError -eq 1 ]
+    then
+        # The Source does not exist, bailing out.
+        debug "The Source $MLsourcePath could not be found. Cleaning up, exiting."
 
-		appendToFile "$MLdestPath/$MLbackupName.log" "Testing for remote Source returned: $MLeRsyncErrorMessage"
-		appendToFile "$MLdestPath/$MLbackupName.log" "$(date) [$$] Source $MLsourcePath does not exist."
+        appendToFile "$MLdestPath/$MLbackupName.log" "Testing for remote Source returned: $MLeRsyncErrorMessage"
+        appendToFile "$MLdestPath/$MLbackupName.log" "$(date) [$$] Source $MLsourcePath does not exist."
 
-		cleanup
-		exit $MLE_SourceNotFound
-	fi
+        cleanup
+        exit $MLE_SourceNotFound
+    fi
 fi
 
 # Checking for concurrent mlbackup running with the same configuration
 if [ -r "$MLdestPath/$MLbackupName.pid" ] # Is there already a tag .pid in the destination?
-	then # Yes, there is a tag
-	MLprobablyConcurrentPid=$(cat "$MLdestPath/$MLbackupName.pid")
+    then # Yes, there is a tag
+    MLprobablyConcurrentPid=$(cat "$MLdestPath/$MLbackupName.pid")
 
-	# Checking if this tag is old or if it really is a running mlbackup instance
-	# The pid from the tag does have "mlbackup" and the same config file in use
-	
-	MLprobablyConcurrentProcess=$(/bin/ps -ax | grep ^$MLprobablyConcurrentPid | grep "$MLbaseCommand" | grep -e "$(basename $MLconfigFile)")
-	MLprobablyConcurrentProcessReturned=$?
-	debug "Checking for concurrent proess returned $MLprobablyConcurrentProcessReturned"
-	debug "MLprobablyConcurrentProcess = $MLprobablyConcurrentProcess"
-	
-	if [ "$MLprobablyConcurrentProcessReturned" ]
-	then
-		# we found another instance of mlbackup running with the same config.
-		# Refusing to run two instances simultanously to preserve backup integrity
-		debug "Found another instance of mlbackup with PID $MLprobablyConcurrentPid. Refusing simultaneous invocations. Exiting."
+    # Checking if this tag is old or if it really is a running mlbackup instance
+    # The pid from the tag does have "mlbackup" and the same config file in use
+    
+    MLprobablyConcurrentProcess=$(/bin/ps -ax | grep ^$MLprobablyConcurrentPid | grep "$MLbaseCommand" | grep -e "$(basename $MLconfigFile)")
+    MLprobablyConcurrentProcessReturned=$?
+    debug "Checking for concurrent proess returned $MLprobablyConcurrentProcessReturned"
+    debug "MLprobablyConcurrentProcess = $MLprobablyConcurrentProcess"
+    
+    if [ "$MLprobablyConcurrentProcessReturned" ]
+    then
+        # we found another instance of mlbackup running with the same config.
+        # Refusing to run two instances simultanously to preserve backup integrity
+        debug "Found another instance of mlbackup with PID $MLprobablyConcurrentPid. Refusing simultaneous invocations. Exiting."
 
-		notifyGrowl "Simultaneous invocation detected. Aborting."
+        notifyGrowl "Simultaneous invocation detected. Aborting."
 
-		cleanup
-		exit $MLE_ConcurrentInstanceRunningWithSameConfig
-	else
-		# The Tag seems to be leftover or the concurrent instance has finished by now.
-		debug "Found tag $MLdestPath/$MLbackupName.pid with PID $MLprobablyConcurrentPid which does not seem to be a running instance of $MLbaseCommand with config $MLconfigFile. Continuing."
-	fi
+        cleanup
+        exit $MLE_ConcurrentInstanceRunningWithSameConfig
+    else
+        # The Tag seems to be leftover or the concurrent instance has finished by now.
+        debug "Found tag $MLdestPath/$MLbackupName.pid with PID $MLprobablyConcurrentPid which does not seem to be a running instance of $MLbaseCommand with config $MLconfigFile. Continuing."
+    fi
 else
-	debug "Could not detect another concurrent running instance of mlbackup with config $MLconfigFile"
+    debug "Could not detect another concurrent running instance of mlbackup with config $MLconfigFile"
 fi
 
 debug "Writing my own tag to $MLdestPath/$MLbackupName.pid"
@@ -617,64 +617,64 @@ MLtimeRsyncEnd=$(date +%s) # Fetching a timestamp after rsync for timing stats
 let "MLtimeRsyncDuration = $MLtimeRsyncEnd - $MLtimeRsyncStart"
 if [ $MLtimeRsyncDuration -eq 1 ] # Just to care for proper language
 then # It was only one second
-	debug "rsync took $MLtimeRsyncDuration second."
+    debug "rsync took $MLtimeRsyncDuration second."
 else # zero, two or more seconds
-	debug "rsync took $MLtimeRsyncDuration seconds. $(
-	if [ $MLtimeRsyncDuration -gt 60 ] # more than 60 seconds
-	then # makes sense to output in human readable format
-		seconds2dhms $MLtimeRsyncDuration
-	fi)"
-fi	
+    debug "rsync took $MLtimeRsyncDuration seconds. $(
+    if [ $MLtimeRsyncDuration -gt 60 ] # more than 60 seconds
+    then # makes sense to output in human readable format
+        seconds2dhms $MLtimeRsyncDuration
+    fi)"
+fi  
 ###############################################################################
 # Post processing the recorded rsync logfiles and temporary files:
 # We move and compress the logfiles to the backup destination. (currently only on localhost)
 debug "Compressing the logfiles and moving them to the backup destination."
 
 debug "--- Post processing the error.log"
-	if [ -s $MLrsyncErrFile ] # Non zero byte error.log? Only in case of errors
-	then # Yes, there were errors recorded.
-		debug "Compressing $MLrsyncErrFile to $MLfinalTarget/error.log.gz."
-		gzip -9 --no-name --to-stdout "$MLrsyncErrFile" > "$MLfinalTarget/error.log.gz"
-		/bin/chmod 644 "$MLfinalTarget/error.log.gz"
-	else
-		debug "The error.log $MLrsyncErrFile was empty, looks good."
-	fi # [ -s $MLrsyncErrFile ]
+    if [ -s $MLrsyncErrFile ] # Non zero byte error.log? Only in case of errors
+    then # Yes, there were errors recorded.
+        debug "Compressing $MLrsyncErrFile to $MLfinalTarget/error.log.gz."
+        gzip -9 --no-name --to-stdout "$MLrsyncErrFile" > "$MLfinalTarget/error.log.gz"
+        /bin/chmod 644 "$MLfinalTarget/error.log.gz"
+    else
+        debug "The error.log $MLrsyncErrFile was empty, looks good."
+    fi # [ -s $MLrsyncErrFile ]
 
 # removing the error.log tempfile, should it not have been done by gzip already
 if [ -e "$MLrsyncErrFile" ] # Does our "$MLrsyncErrFile" still exist?
 then # Yes, it does exist, let us remove it.
-	debug "The temp MLrsyncErrFile $MLrsyncErrFile still exists, removing it."
-	$MLrm "$MLrsyncErrFile"
+    debug "The temp MLrsyncErrFile $MLrsyncErrFile still exists, removing it."
+    $MLrm "$MLrsyncErrFile"
 else
-	debug "The temp MLrsyncErrFile $MLrsyncErrFile did not exist aynmore, no need to delete it."
+    debug "The temp MLrsyncErrFile $MLrsyncErrFile did not exist aynmore, no need to delete it."
 fi
 
 debug "--- Post processing the rsync.log"
 if [ -s "$MLrsyncLogFile" ] # Non zero bytes rsync.log? (Expected)
 then # Yes, of course, compress and move to the backup folder
-	debug "Compressing $MLrsyncLogFile to $MLfinalTarget/rsync.log.gz."
-	gzip -9 --no-name --to-stdout "$MLrsyncLogFile" > "$MLfinalTarget/rsync.log.gz"
+    debug "Compressing $MLrsyncLogFile to $MLfinalTarget/rsync.log.gz."
+    gzip -9 --no-name --to-stdout "$MLrsyncLogFile" > "$MLfinalTarget/rsync.log.gz"
 
-	# make sure, the user can read that file!
-	/bin/chmod 644 "$MLfinalTarget/rsync.log.gz"
+    # make sure, the user can read that file!
+    /bin/chmod 644 "$MLfinalTarget/rsync.log.gz"
 else
-	debug "The rsync.log $MLrsyncLogFile was empty, this is extremely unlikely!"
+    debug "The rsync.log $MLrsyncLogFile was empty, this is extremely unlikely!"
 fi # [ -s $MLrsyncLogFile ]
 
 # Removing the rsync.log tempfile, should it not have been done by gzip already
 if [ -e "$MLrsyncLogFile" ] # Does our "$MLrsyncLogFile" still exist? Either was zero bytes, ot somethow not removed by gzip.
 then # Yes, it does exist, let us remove it.
-	debug "The temp MLrsyncLogFile $MLrsyncLogFile still exists, removing it."
-	$MLrm "$MLrsyncLogFile"
+    debug "The temp MLrsyncLogFile $MLrsyncLogFile still exists, removing it."
+    $MLrm "$MLrsyncLogFile"
 else
-	debug "The temp MLrsyncLogFile $MLrsyncLogFile did not exist aynmore, no need to delete it."
+    debug "The temp MLrsyncLogFile $MLrsyncLogFile did not exist aynmore, no need to delete it."
 fi
 
 # Cleaning up MLcombinedExclusions
 if [ $MLcombinedExclusions ]
 then # Yes, we have a temporary MLcombinedExclusions file, let us remove it.
-	debug "Removing MLcombinedExclusions: $MLcombinedExclusions"
-	$MLrm "$MLcombinedExclusions"
+    debug "Removing MLcombinedExclusions: $MLcombinedExclusions"
+    $MLrm "$MLcombinedExclusions"
 fi
 ###############################################################################
 # Post processing of the backup:
@@ -684,150 +684,150 @@ debug "--- Backup postprocessing"
 MLfatalError=1
 
 case $MLbackupStatus in
-	0)	# The last backup went ok
-		# If there is setlabel installed, we color it green (green is good)
-		MLeRsyncErrorMessage=""
-		MLfatalError=0 ;;
-	# Error Codes we know from the rsync man page
-	1) MLeRsyncErrorMessage="Syntax or usage error";;
-	2) MLeRsyncErrorMessage="Protocol incompatibility";;
-	3) MLeRsyncErrorMessage="Errors selecting input/output files, dirs";;
-	4) MLeRsyncErrorMessage="Requested action not supported: an attempt was made to manipulate 64-bit files on a platform that cannot support them; or an option was specified that is supported by the client and not by the server.";;
-	5) MLeRsyncErrorMessage="Error starting client-server protocol";;
-	6) MLeRsyncErrorMessage="Daemon unable to append to log-file"
-		MLfatalError=2 ;;
-	10) MLeRsyncErrorMessage="Error in socket I/O";;
-	11) MLeRsyncErrorMessage="Error in file I/O";;
-	12) MLeRsyncErrorMessage="Error in rsync protocol data stream";;
-	13) MLeRsyncErrorMessage="Errors with program diagnostics";;
-	14) MLeRsyncErrorMessage="Error in IPC code";;
-	20) MLeRsyncErrorMessage="Received SIGUSR1 or SIGINT"
-		# The backup has been aborted by the user or some other interrupt.
-		# We should definitely clean up our mess before exiting.
-		# To be implemented
-		;;
-	21) MLeRsyncErrorMessage="Some error returned by waitpid()";;
-	22) MLeRsyncErrorMessage="Error allocating core memory buffers";;
-	23) MLeRsyncErrorMessage="Partial transfer due to error"
-		MLfatalError=2 ;;
-	24) MLeRsyncErrorMessage="Partial transfer due to vanished source files";;
-	25) MLeRsyncErrorMessage="The --max-delete limit stopped deletions";;
-	30) MLeRsyncErrorMessage="Timeout in data send/receive";;
+    0)  # The last backup went ok
+        # If there is setlabel installed, we color it green (green is good)
+        MLeRsyncErrorMessage=""
+        MLfatalError=0 ;;
+    # Error Codes we know from the rsync man page
+    1) MLeRsyncErrorMessage="Syntax or usage error";;
+    2) MLeRsyncErrorMessage="Protocol incompatibility";;
+    3) MLeRsyncErrorMessage="Errors selecting input/output files, dirs";;
+    4) MLeRsyncErrorMessage="Requested action not supported: an attempt was made to manipulate 64-bit files on a platform that cannot support them; or an option was specified that is supported by the client and not by the server.";;
+    5) MLeRsyncErrorMessage="Error starting client-server protocol";;
+    6) MLeRsyncErrorMessage="Daemon unable to append to log-file"
+        MLfatalError=2 ;;
+    10) MLeRsyncErrorMessage="Error in socket I/O";;
+    11) MLeRsyncErrorMessage="Error in file I/O";;
+    12) MLeRsyncErrorMessage="Error in rsync protocol data stream";;
+    13) MLeRsyncErrorMessage="Errors with program diagnostics";;
+    14) MLeRsyncErrorMessage="Error in IPC code";;
+    20) MLeRsyncErrorMessage="Received SIGUSR1 or SIGINT"
+        # The backup has been aborted by the user or some other interrupt.
+        # We should definitely clean up our mess before exiting.
+        # To be implemented
+        ;;
+    21) MLeRsyncErrorMessage="Some error returned by waitpid()";;
+    22) MLeRsyncErrorMessage="Error allocating core memory buffers";;
+    23) MLeRsyncErrorMessage="Partial transfer due to error"
+        MLfatalError=2 ;;
+    24) MLeRsyncErrorMessage="Partial transfer due to vanished source files";;
+    25) MLeRsyncErrorMessage="The --max-delete limit stopped deletions";;
+    30) MLeRsyncErrorMessage="Timeout in data send/receive";;
 
-	# Any other error that might have occured that is unspecified
-	*) MLeRsyncErrorMessage="$0: Rsync returned Error Code $MLbackupStatus: Sorry, we do not know what this error code means. You may want to check your logfiles or the man page for rsync on your system."
-	;;
+    # Any other error that might have occured that is unspecified
+    *) MLeRsyncErrorMessage="$0: Rsync returned Error Code $MLbackupStatus: Sorry, we do not know what this error code means. You may want to check your logfiles or the man page for rsync on your system."
+    ;;
 esac
 
 case $MLfatalError in
-	1)	# Some fatal error occured during the backup
-		debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"
-		appendToFile "$MLadminEmailMessage" "Rsync returned $MLbackupStatus $MLeRsyncErrorMessage"
-	
-		debug "--- Post Processing backup errors"
-		if [ $MLbackupStatus -ne 0 ] # Something went wrong during the backup
-		then
-			# Telling that something went wrong
-			debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"
-			
-			# If there is setlabel installed, we color it red (red like a warning)
-			MLsetlabelPath=/sw/bin/setlabel
-			if [ -e $MLsetlabelPath ] # only makes it red if setlabel command is installed
-			then
-				debug "Setting a red label for ERROR $MLfinalTarget"
-				$MLsetlabelPath Red "$MLfinalTarget"
-			fi # [ -e $MLsetlabelPath ]
-		
-			# If we have setfcomment installed, we add a nice comment to the folder
-			MLsetfcommentPath=/sw/bin/setfcomment
-			if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
-			then
-				debug "Setting Backup ERROR comment"
-				/sw/bin/setfcomment -c "Unfinished backup! Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage Created by $MLbaseCommand $MLbacklemonVersion($MLbacklemonBuild). Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
-			fi # [ -e $MLsetfcommentPath ]
-		
-			# renaming the unfinished backup, so it will not be used for the next delta backup!
-			MLfinalNewTarget="$MLdestPath/ERROR-$MLbackupName-$MLbackupDate"
-			mv "$MLfinalTarget" "$MLfinalNewTarget"
-			MLfinalTarget="$MLfinalNewTarget"
-		fi #[ $MLbackupStatus -ne 0 ]
-		;;
-	*)	# The backup went OK, or had some other non fatal error (warning)
-		appendToFile "$MLadminEmailMessage" "The Backup $MLbackupName went OK!"
-		MLsetlabelPath=/sw/bin/setlabel
-		if [ -e $MLsetlabelPath ] # only makes it green if setlabel command is installed
-		then
-			$MLsetlabelPath Green "$MLfinalTarget/"
-		fi
-		
-		# If we have setfcomment installed, we add a nice comment to the folder
-		MLsetfcommentPath=/sw/bin/setfcomment
-		if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
-		then
-			/sw/bin/setfcomment -c "Created by $MLbaseCommand $MLversiy
-			on. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
-		fi
-		
-		# checking if we need to remove some old ones
-		MLoldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^$MLbackupName-" )
-		let "MLoldBackupCountDifference = $MLoldBackupCount - $MLbackupCount"	
-		debug "MLoldBackupCountDifference = " $MLoldBackupCountDifference
-		
-		if [ "$MLoldBackupCount" -gt "$MLbackupCount" ] # There are surplus Backups, so we remove them
-		then
+    1)  # Some fatal error occured during the backup
+        debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"
+        appendToFile "$MLadminEmailMessage" "Rsync returned $MLbackupStatus $MLeRsyncErrorMessage"
+    
+        debug "--- Post Processing backup errors"
+        if [ $MLbackupStatus -ne 0 ] # Something went wrong during the backup
+        then
+            # Telling that something went wrong
+            debug "Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage"
+            
+            # If there is setlabel installed, we color it red (red like a warning)
+            MLsetlabelPath=/sw/bin/setlabel
+            if [ -e $MLsetlabelPath ] # only makes it red if setlabel command is installed
+            then
+                debug "Setting a red label for ERROR $MLfinalTarget"
+                $MLsetlabelPath Red "$MLfinalTarget"
+            fi # [ -e $MLsetlabelPath ]
+        
+            # If we have setfcomment installed, we add a nice comment to the folder
+            MLsetfcommentPath=/sw/bin/setfcomment
+            if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
+            then
+                debug "Setting Backup ERROR comment"
+                /sw/bin/setfcomment -c "Unfinished backup! Rsync returned $MLbackupStatus: $MLeRsyncErrorMessage Created by $MLbaseCommand $MLbacklemonVersion($MLbacklemonBuild). Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
+            fi # [ -e $MLsetfcommentPath ]
+        
+            # renaming the unfinished backup, so it will not be used for the next delta backup!
+            MLfinalNewTarget="$MLdestPath/ERROR-$MLbackupName-$MLbackupDate"
+            mv "$MLfinalTarget" "$MLfinalNewTarget"
+            MLfinalTarget="$MLfinalNewTarget"
+        fi #[ $MLbackupStatus -ne 0 ]
+        ;;
+    *)  # The backup went OK, or had some other non fatal error (warning)
+        appendToFile "$MLadminEmailMessage" "The Backup $MLbackupName went OK!"
+        MLsetlabelPath=/sw/bin/setlabel
+        if [ -e $MLsetlabelPath ] # only makes it green if setlabel command is installed
+        then
+            $MLsetlabelPath Green "$MLfinalTarget/"
+        fi
+        
+        # If we have setfcomment installed, we add a nice comment to the folder
+        MLsetfcommentPath=/sw/bin/setfcomment
+        if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
+        then
+            /sw/bin/setfcomment -c "Created by $MLbaseCommand $MLversiy
+            on. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
+        fi
+        
+        # checking if we need to remove some old ones
+        MLoldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^$MLbackupName-" )
+        let "MLoldBackupCountDifference = $MLoldBackupCount - $MLbackupCount"   
+        debug "MLoldBackupCountDifference = " $MLoldBackupCountDifference
+        
+        if [ "$MLoldBackupCount" -gt "$MLbackupCount" ] # There are surplus Backups, so we remove them
+        then
 
-			MLoldBackupList=$(ls -1w "$MLdestPath/" | grep "^$MLbackupName-"| head -$MLoldBackupCountDifference)	
-			debug "Old Backup Count: $MLoldBackupCount, $MLoldBackupCountDifference to be removed."	
-			debug "Old Backup List: $MLoldBackupList"
-		
-			if [ $MLoldBackupCountDifference -eq 1 ] # just one old backup
-			then # Yes, just a single old backup.
-				debug "There is $MLoldBackupCountDifference surplus old backup, starting to remove it."
-			else #  no, several old backups to be removed
-				debug "There are $MLoldBackupCountDifference surplus old backups, starting to remove them."
-			fi
-			
-			for MLoldBackupTobeRemoved in $MLoldBackupList
-			do
+            MLoldBackupList=$(ls -1w "$MLdestPath/" | grep "^$MLbackupName-"| head -$MLoldBackupCountDifference)    
+            debug "Old Backup Count: $MLoldBackupCount, $MLoldBackupCountDifference to be removed." 
+            debug "Old Backup List: $MLoldBackupList"
+        
+            if [ $MLoldBackupCountDifference -eq 1 ] # just one old backup
+            then # Yes, just a single old backup.
+                debug "There is $MLoldBackupCountDifference surplus old backup, starting to remove it."
+            else #  no, several old backups to be removed
+                debug "There are $MLoldBackupCountDifference surplus old backups, starting to remove them."
+            fi
+            
+            for MLoldBackupTobeRemoved in $MLoldBackupList
+            do
 
-			debug "Removing the Set in: $MLdestPath/$MLoldBackupTobeRemoved"
-			$MLrm -Rf "$MLdestPath/$MLoldBackupTobeRemoved"
-			MLrmReturnCode=$?
-			debug "rm returned $MLrmReturnCode"
-			
-			if [ $MLrmReturnCode -ne 0 ] # did rm NOT return 0?
-			then # no it did not return 0, meaning an error occured
-				# So we try to unlock files and delete the remaining ones again
-				debug "Trying to unlock files that could not be deleted"
-				/usr/bin/chflags -R nouchg "$MLdestPath/$MLoldBackupTobeRemoved" # unlocking files
-				debug "Deleting the remaining files again."
-				$MLrm -Rf "$MLdestPath/$MLoldBackupTobeRemoved" # And delete the rest again
-				MLrmReturnCode=$?
-				debug "rm returned $MLrmReturnCode"
-			fi
-			
-			if [ $MLrmReturnCode -ne 0 ] # did rm still NOT return 0?
-			then # no it did not return 0, meaning an error occured
-				# Could not delete the old backup
-				# try to label it gray
-				if [ -e $MLsetlabelPath ] # only makes it gray if setlabel command is installed
-				then
-					$MLsetlabelPath Gray "$MLdestPath/$MLoldBackupTobeRemoved"
-				fi # [ -e $MLsetlabelPath ]
-				# and rename it
-				mv "$MLdestPath/$MLoldBackupTobeRemoved" "$MLdestPath/OLD-$MLoldBackupTobeRemoved"
-				appendToFile "$MLadminEmailMessage" "The Backup $MLdestPath/$MLoldBackupTobeRemoved could not be deleted because rm(1) returned $MLrmReturnCode. It has been renamed to $MLdestPath/OLD-$MLoldBackupTobeRemoved. Please investigate why this backup could not be deleted automatically. Remove this old backup manually!"
-				
-			fi # [ $MLrmReturnCode -ne 0 ]
-			done
-		fi
-		
-		# Ranaming the Backup so it will be reused as link-target for the next run
-		mv "$MLfinalTarget" "$MLdestPath/$MLbackupName-$MLbackupDate"
-		MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate"
-		
-	debug "mlbackup was successful!"
-	;;
+            debug "Removing the Set in: $MLdestPath/$MLoldBackupTobeRemoved"
+            $MLrm -Rf "$MLdestPath/$MLoldBackupTobeRemoved"
+            MLrmReturnCode=$?
+            debug "rm returned $MLrmReturnCode"
+            
+            if [ $MLrmReturnCode -ne 0 ] # did rm NOT return 0?
+            then # no it did not return 0, meaning an error occured
+                # So we try to unlock files and delete the remaining ones again
+                debug "Trying to unlock files that could not be deleted"
+                /usr/bin/chflags -R nouchg "$MLdestPath/$MLoldBackupTobeRemoved" # unlocking files
+                debug "Deleting the remaining files again."
+                $MLrm -Rf "$MLdestPath/$MLoldBackupTobeRemoved" # And delete the rest again
+                MLrmReturnCode=$?
+                debug "rm returned $MLrmReturnCode"
+            fi
+            
+            if [ $MLrmReturnCode -ne 0 ] # did rm still NOT return 0?
+            then # no it did not return 0, meaning an error occured
+                # Could not delete the old backup
+                # try to label it gray
+                if [ -e $MLsetlabelPath ] # only makes it gray if setlabel command is installed
+                then
+                    $MLsetlabelPath Gray "$MLdestPath/$MLoldBackupTobeRemoved"
+                fi # [ -e $MLsetlabelPath ]
+                # and rename it
+                mv "$MLdestPath/$MLoldBackupTobeRemoved" "$MLdestPath/OLD-$MLoldBackupTobeRemoved"
+                appendToFile "$MLadminEmailMessage" "The Backup $MLdestPath/$MLoldBackupTobeRemoved could not be deleted because rm(1) returned $MLrmReturnCode. It has been renamed to $MLdestPath/OLD-$MLoldBackupTobeRemoved. Please investigate why this backup could not be deleted automatically. Remove this old backup manually!"
+                
+            fi # [ $MLrmReturnCode -ne 0 ]
+            done
+        fi
+        
+        # Ranaming the Backup so it will be reused as link-target for the next run
+        mv "$MLfinalTarget" "$MLdestPath/$MLbackupName-$MLbackupDate"
+        MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate"
+        
+    debug "mlbackup was successful!"
+    ;;
 esac
 
 # Backup is completed by now. We can savely remove our tag.pid
@@ -843,9 +843,9 @@ MLreallyOldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^OLD-$MLbackupName-" )
 
 if [ $MLreallyOldBackupCount -ne 0 ] # any ERROR backups left
 then # Yes, at least one OLD backup still left.
-	MLreallyOldBackupList=$(ls -1w "$MLdestPath/" | grep "^OLD-$MLbackupName-" )
-	appendToFile "$MLadminEmailMessage" "
-	There are $MLreallyOldBackupCount old backup sets that could not be removed automatically. Please remove them manually.
+    MLreallyOldBackupList=$(ls -1w "$MLdestPath/" | grep "^OLD-$MLbackupName-" )
+    appendToFile "$MLadminEmailMessage" "
+    There are $MLreallyOldBackupCount old backup sets that could not be removed automatically. Please remove them manually.
 ${MLreallyOldBackupList}
 "
 fi # [ $MLreallyOldBackupCount -ne 0 ]
@@ -856,9 +856,9 @@ MLreallyErrorBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^ERROR-$MLbackupName
 
 if [ $MLreallyErrorBackupCount -ne 0 ] # any ERROR backups left
 then # Yes, at least one ERROR backup still left.
-	MLreallyErrorBackupList=$(ls -1w "$MLdestPath/" | grep "^ERROR-$MLbackupName-" )
-	appendToFile "$MLadminEmailMessage" "
-	There are $MLreallyErrorBackupCount failed backup sets left. Please remove them manually.
+    MLreallyErrorBackupList=$(ls -1w "$MLdestPath/" | grep "^ERROR-$MLbackupName-" )
+    appendToFile "$MLadminEmailMessage" "
+    There are $MLreallyErrorBackupCount failed backup sets left. Please remove them manually.
 ${MLreallyErrorBackupList}
 "
 fi # [ $MLreallyErrorBackupCount -ne 0 ] 
@@ -867,19 +867,19 @@ debug "--- Moving the Admin eMail Message to the Backup."
 # I should REALLY improve on Backup error postprocessing. *embarrassing*
 if [ -s $MLadminEmailMessage ] # admin eMail message greater than 0 bytes?
 then # Yes, something is in the Message file
-	# So we move it to the Backup Directory and rename it accordingly
-	mv "$MLadminEmailMessage" "$MLfinalTarget/AdminEMail.txt"
-	# Updating the variable, so some very late messages are still appended
-	MLadminEmailMessage=$MLfinalTarget/AdminEMail.txt
+    # So we move it to the Backup Directory and rename it accordingly
+    mv "$MLadminEmailMessage" "$MLfinalTarget/AdminEMail.txt"
+    # Updating the variable, so some very late messages are still appended
+    MLadminEmailMessage=$MLfinalTarget/AdminEMail.txt
 
-	/bin/chmod 644 "$MLadminEmailMessage"
+    /bin/chmod 644 "$MLadminEmailMessage"
 
 else # No, the message is empty, very unlikely
-	# nothing to shout about, so we silently remove the temporary file
-	# We can NEVER get here in debug mode thats why we use echo here!
-	echo "MLadminEmailMessage was empty, we just remove the temporary file."
-	$MLrm $MLadminEmailMessage
-	unset $MLadminEmailMessage
+    # nothing to shout about, so we silently remove the temporary file
+    # We can NEVER get here in debug mode thats why we use echo here!
+    echo "MLadminEmailMessage was empty, we just remove the temporary file."
+    $MLrm $MLadminEmailMessage
+    unset $MLadminEmailMessage
 fi
 
 # FUTURE: Postflight script
@@ -892,25 +892,25 @@ let "MLtimeScriptDurationTotal = $MLtimeScriptEnd - $MLtimeScriptStart"
 
 if [ $MLtimeScriptDurationTotal -eq 1 ] # Just to care for proper language
 then # It was only one second
-	debug "Backup took $MLtimeScriptDurationTotal second."
+    debug "Backup took $MLtimeScriptDurationTotal second."
 else # zero, two or more seconds
-	if [ $MLtimeScriptDurationTotal -gt 60 ] # Backup tool longer than 60 seconds, which equals 1 minute?
-	then # Yes, took longer than 60 seconds.
-		appendToFile "$MLadminEmailMessage" "Backup took $(seconds2dhms $MLtimeScriptDurationTotal). ($MLtimeScriptDurationTotal seconds)"
-	else
-		appendToFile "$MLadminEmailMessage" "Backup took $MLtimeScriptDurationTotal seconds."
-	fi
+    if [ $MLtimeScriptDurationTotal -gt 60 ] # Backup tool longer than 60 seconds, which equals 1 minute?
+    then # Yes, took longer than 60 seconds.
+        appendToFile "$MLadminEmailMessage" "Backup took $(seconds2dhms $MLtimeScriptDurationTotal). ($MLtimeScriptDurationTotal seconds)"
+    else
+        appendToFile "$MLadminEmailMessage" "Backup took $MLtimeScriptDurationTotal seconds."
+    fi
 fi
 
 debug "--- Sending the AdminEmail Message per mail."
 # sending the admin eMail Notification, only if we have an address
 if [ $MLadminEmail ] # Is the AdminEMail Address set?
 then # Yes, there is an address!
-	debug "Sending the Admin eMail to $MLadminEmail"
-	cat "$MLadminEmailMessage" | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
+    debug "Sending the Admin eMail to $MLadminEmail"
+    cat "$MLadminEmailMessage" | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
 else # No address set
-	debug "No MLadminEmail Address set, cannot send eMail!"
-	appendToFile $MLadminEmailMessage "No MLadminEmail Address set. You will not receive backup notifications via eMail."
+    debug "No MLadminEmail Address set, cannot send eMail!"
+    appendToFile $MLadminEmailMessage "No MLadminEmail Address set. You will not receive backup notifications via eMail."
 fi # [ $MLadminEmail -ne "" ]
 
 notifyGrowl "Finished backup"
