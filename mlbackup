@@ -253,7 +253,7 @@ MLdestRsync="--rsync-path=$MLrsync"
 # MLdryRun=-n
 
 # The options to invoke rsync with.
-MLrsyncOptions="-apogtxl --hard-links --fuzzy"
+MLrsyncOptions="-apogtxl --hard-links --fuzzy --fileflags --protect-args --protect-decmpfs --force-change --crtimes --devices --specials"
 
 # When running interactively we're showing some progress and stats for the user
 if [ $MLisInteractive ]
