@@ -1,12 +1,11 @@
 # What's new?
 
-
-
 ## mlbackup 1.5
-- First release of mlbackup that is now hosted on [GitHub](https://github.com/MacLemon/mlbackup)
-
+- First new release of mlbackup that is now hosted on [GitHub](https://github.com/MacLemon/mlbackup)
+- mlbackup now requires the bundled rsync 3.0.7, be sure to update all your Macs to the new release.
 
 ### rsync 3.0.7
 - Updated bundled rsync 3 to 3.0.7
 - Bundled rsync 3 now comes optimized for PowerPC G3, PowerPC G4, PowerPC G5, intel 32bit and intel 64bit processors.
-- Bundled rsync 3 still passes all backup bouncer tests and also Mike Bombich's extended backup bouncer test. 
+- Bundled rsync 3 passes all backup bouncer tests and also Mike Bombich's extended backup bouncer tests.
+

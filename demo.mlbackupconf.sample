@@ -3,14 +3,13 @@
 # To use this config file invoke mlbackup like this:
 # mlbackup path/to/your.mlbackupconf
 
-# What is the name of this backup set?
-MLbackupName="MacLemon-Sample"
 
 # NOTE on Naming Backups:
-# If you save this script with UTF-8 Encoding, it should
-# be capable of handling japanese characters (tested and verified)
-# This script is not yet capable of handling Umlauts in backupNames correctly!
+# Known issue: Spaces and german Umlauts in the backup name do cause problems, so just don't use them.
 # If you know how to make this work, please contact me!
+
+# What is the name of this backup set?
+MLbackupName="MacLemon-Sample"
 
 
 # How many Backup Sets to keep? (Integer > 0)
@@ -32,13 +31,11 @@ MLsourcePath="$HOME"
 MLdestPath="/Volumes/Backup"
 
 
-
 # Where to send the eMail notification about the backup to?
 # If you need multiple recipients separate them with commas.
 # Example: "admin@example.com,user@example.com"
 
-# If you don't have a working mailserver (postfix) setup on your Mac, like this might be on a Client Mac, you can just leave MLadminEmail="" and mlbackup will do it's backups as good as always, but without trying to send mail. The message will still be saved with the backup so you can have a look at it.
-
+# If you don't have a working mailserver (postfix) setup on your Mac, like this might be on a Client Mac, you can just leave MLadminEmail="" and mlbackup will do it's backups as good as always, but without trying to send mail. The message will still be saved with the backup so you can have a look at it. Of course you may also choose to just not receive email about backups.
 # Default: $USER
 MLadminEmail="$USER"
 
@@ -46,11 +43,14 @@ MLadminEmail="$USER"
 # If you don't want to exclude certain files that we deem unnecessary for a backup, set this parameter to 0.
 # To see what we exclude by default see /etc/maclemon/backup/globalexclusions
 # The default is to respect globalexclusions and not backup what is mentioned there.
+# Default: MLuseGlobalExclusions=1
 MLuseGlobalExclusions=1
+
 
 # You can specify an additional file with objects that you want to exclude from your backups.
 # You can leave that parameter empty "" if you don't want to use this.
-# You can use both MLconfigExcludeFrom and globalexclusions in combination.
+# You may use both MLconfigExcludeFrom and MLuseGlobalExclusions in combination.
+# Default: MLconfigExcludeFrom=""
 MLconfigExcludeFrom=""
 
 #EOF

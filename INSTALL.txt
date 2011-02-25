@@ -3,11 +3,14 @@ MacLemon Backup - INSTALL
 There are two ways to install mlbackup on your Mac.
 
 The easy way:
-Use the Installer package to install mlbackup and the required rsync 3 on your Mac. This is the recommended way and should work via the graphical Installer.app, /usr/sbin/installer on the command line, or even Apple Remote Desktop.
+Use the Installer package to install mlbackup and the required rsync 3 on your Mac. This is the recommended way and can be used with the graphical Installer.app, /usr/sbin/installer on the command line, or even Apple Remote Desktop.
 
-The manual way:
-Use the included install.sh script to copy all the mlbackup files to your Mac. This DOES NOT install the REQUIRED rsync 3 automatically. You can build rsync 3 from the included sources which you can also obtain from 
-It is likely that you need to edit the rsync path in /usr/local/bin/mlbackup manually when building your own rsync.
+
+The not-recommended way:
+Use the included install.sh script to copy all the mlbackup files to your Mac. This DOES NOT install the REQUIRED rsync 3 automatically. Basically this method is only suitable if you want to install mlbackup only for testing your own patches.
+
+You can build rsync 3 from the included sources which you can also obtain from http://rsync.samba.org/
+It is likely that you need to edit the rsync path in /usr/local/bin/mlbackup manually when building your own rsync or pass --prefix=/usr/local/maclemon to ./configure.
 
 For the email notification to work make sure that /usr/bin/mail correctly works on your system.
 
@@ -24,12 +27,16 @@ A file containing files and folders which should not be backed up on Mac OS X or
 
 
 /usr/local/bin/mlbackup
-The main mlbackup skript that does most of the magic.
+The main mlbackup script that does most of the magic.
 
 
 /usr/local/maclemon/bin/rsync
 /usr/local/maclemon/share/man/man1/rsync.1
 /usr/local/maclemon/share/man/man5/rsyncd.conf.5
 The great rsync 3 and man pages that empower mlbackup and do the rest of the magic.
+
+
+UPGRADES from prior versions of mlbackup:
+You can simply use the .mpkg to update mlbackup and rsync. There is no NEED to change your configuration files. You are ENCOURAGED to compare your currently used config files to the updated demo.mlbackupconf.sample to find out about new options that might be of interest to you.
 
 # EOF

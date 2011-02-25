@@ -1,8 +1,8 @@
 MacLemon Backup - COPYING
 
 # Author: Pepi Zawodsky
-# Authors eMail: pepi@maclemon.at
-# Website: http://maclemon.at/mlbackup
+# Authors eMail: mlbackup@maclemon.at
+# Website: https://github.com/MacLemon/mlbackup
 # License: GNU general public license (GPL) http://www.gnu.org/licenses/gpl.html
 
 You should have received a copy of the GPL with this software distribution. If it was missing please visit http://www.gnu.org/licenses/gpl.html to obtain a copy.
