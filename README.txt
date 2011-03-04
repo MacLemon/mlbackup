@@ -1,25 +1,16 @@
 mlbackup - README
 
+If you like mlbackup and use it to safeguard your data, please consider supporting it's further development through flattr! Thanks!
+https://flattr.com/thing/141895/mlbackup
 
-
-License:
--------------------------------------------------------------------------------
-GNU general public license (GPLv3) 
-You should have received a copy of the GPL with this software distribution. If not, you can find more information about the GPL at the official website of the free software foundation.
-http://www.gnu.org/licenses/gpl.html
-
-
-
-Disclaimer:
--------------------------------------------------------------------------------
 This software is provided as-is. mlbackup has proven to work fine on _my_ servers and many 1other's, but please do not solely rely on the backups made with mlbackup. As usual, always have at least a second backup for vital data. Please use the wiki at the [mlbackup](https://github.com/MacLemon/mlbackup) github page to post your tips and tricks and how you use mlbackup!
 
 
 
 Target Audience:
 -------------------------------------------------------------------------------
-Mac OS X Admins and Geek Users who like a nice intelligent and incremental backup through the shell. Can be run from launchd (or cron) if you like. This is NOT INTENDED for normal users. mlbackup is explicitly targeted at the Mac OS X (10.4 Tiger, 10.5 Leopard, 10.6 Snow Leopard and respective Server Versions) platform. It has not been tested on other software platforms! At least Mac OS X 10.4.11 is recommended.
-mlbackup is not yet tested on the Mac OS X 10.7 Lion Developer Preview, but will support 10.7 in the future.
+Mac OS X Admins and Geek Users who like a nice intelligent and incremental backup through the shell. Can be run from launchd (or cron) if you like. This is NOT INTENDED for normal users. mlbackup is explicitly targeted at the Mac OS X (10.4 Tiger, 10.5 Leopard, 10.6 Snow Leopard and respective Server Versions) platform. It has not been tested on other software platforms! mlbackup requires at least Mac OS X 10.4.11.
+mlbackup is not yet tested on the Mac OS X 10.7 Lion Developer Preview, but will support 10.7 in the future. If you did test mlbackup on Lion I welcome your feedback!
 
 
 
