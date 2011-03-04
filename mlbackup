@@ -283,7 +283,7 @@ MLglobalExcludeFrom="--exclude-from=/etc/maclemon/backup/globalexclusions"
 MLconfigExcludeFrom=""
 
 # For deleting stuff we use
-MLrm="/bin/rm"
+MLrm="rm"
 ###############################################################################
 # Getting the configuration file
 # Handling of the config file should be a little more elegant.
