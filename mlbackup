@@ -375,7 +375,7 @@ then
         fi
 
         MLgrowlTitle="$MLbackupName"
-        $MLgrowlnotify --priority "$MLgrowlStandardPriority" --identifier "$MLgrowlID" --iconpath "$MLgrowlIconpath" --name "$MLbaseCommand" $3 -m "$1" -t "$MLgrowlTitle"
+        $MLgrowlnotify --priority "$MLgrowlStandardPriority" --identifier "$MLgrowlID" --iconpath "$MLgrowlIconpath" --name "$MLbaseCommand" $3 -m "$1" -t "$MLgrowlTitle" >/dev/null 2>&1
     }
 else
     debug "Could not find /usr/local/bin/growlnotify, Growl notifications are disabled."
