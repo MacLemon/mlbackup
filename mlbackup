@@ -34,7 +34,7 @@ MLdebug=0
 MLfullCommand=$0
 MLbaseCommand=$(basename $0)
 MLhostname=$(hostname)
-MLversion=1.5.0
+MLversion=1.5.1
 MLrevision=__CCUURREENNTT__RREEVVIISSIIOONN__
 
 # For development and testing only:
@@ -480,7 +480,18 @@ then # Yes, it does exist,
 else # No, the target does not exist
     debug "FATAL: The target $MLdestPath could not be found."
     debug "If your target is on an external volume, make sure it is mounted!"
-    echo "The target $MLdestPath could not be found! If your target is on an external volume, make sure it is mounted!" | /usr/bin/mail -s "$MLhostname $MLbackupName: Target missing" $MLadminEmail
+
+    MLtargetNotFoundNotification="The target $MLdestPath could not be found! If your target is on an external volume, make sure it is mounted!"
+
+    # sending the admin eMail Notification, only if we have an address
+    if [ $MLadminEmail ] # Is the AdminEMail Address set?
+    then # Yes, there is an address!
+        debug "Sending the Admin eMail to $MLadminEmail"
+        echo "$MLtargetNotFoundNotification" | /usr/bin/mail -s "$MLhostname $MLbackupName: Target missing" $MLadminEmail
+    else # No address set
+        debug "No MLadminEmail Address set, cannot send eMail!"
+        logger "$MLbaseCommand: $MLtargetNotFoundNotification"
+    fi # [ $MLadminEmail -ne "" ]
 
     notifyGrowl "ERROR: Destination could not be found." "" "--sticky"
     cleanup
