@@ -1,6 +1,17 @@
 # What's new?
 
-## mlbackup 1.5
+## mlbackup 160
+- Fixes issue 1, a bug that would try to send mail even if MLAdminEmail was empty.
+- Growl notifications are now less verbose in the logs if Gowl somehow misbehaves.
+
+## rsync 3.0.8
+- Updated bundled rsync 3 to 3.0.8
+- Fixes a bug with rsync and libiconv that could occur on 32-bit PPC systems under 10.4.
+- For detailed information what is new in rsync 3.0.8 see rsync-3.0.8-NEWS.txt
+
+
+
+## mlbackup 157
 - First new release of mlbackup that is now hosted on [GitHub](https://github.com/MacLemon/mlbackup)
 - mlbackup now requires the bundled rsync 3.0.7, be sure to update all your Macs to the new release.
 - Rotating Backups should now be slightly faster.
