@@ -543,6 +543,7 @@ else # No, the source could not be found locally, could still be remotely locate
         24) MLeRsyncErrorMessage="Partial transfer due to vanished source files";;
         25) MLeRsyncErrorMessage="The --max-delete limit stopped deletions";;
         30) MLeRsyncErrorMessage="Timeout in data send/receive";;
+        127) MLeRsyncErrorMessage="Rsync not found on remote machine, probably mlbackup not installed.";;
         255) MLeRsyncErrorMessage="ssh could not connect, probably unknown hostname."
         # Any other error that might have occured that is unspecified
         ;;
