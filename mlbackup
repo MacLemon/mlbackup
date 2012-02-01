@@ -322,12 +322,12 @@ else # We were passed a config file
 
     # Now let's check that parameter
     # Does this file exist?
-    if [ -e $MLconfigFile ]
+    if [ -e "$MLconfigFile" ]
     then # The file does exist
         debug "Config file $MLconfigFile exists."
 
         # Is the config file readable by the user invoking the script?
-        if [ -r $MLconfigFile ]
+        if [ -r "$MLconfigFile" ]
         then # The config file can be read by the user invoking this script
 
             # Load in the config (DIRTY *yuck*) Better use the defaults system
@@ -391,7 +391,7 @@ fi
 if [ $MLdebug -eq 1 ] # Is the debug flag set?
 then # Yes, Increase verbosity
         MLbeVerbose="-vvv" # For rsync
-        MLrm="/bin/rm -v" # for rm, actually -v is a NON POSIX standard option in rm on Mac OS X.
+        MLrm="rm -v" # for rm, actually -v is a NON POSIX standard option in rm on Mac OS X.
 fi
 ###############################################################################
 # Procesing global and per config exclusion files
@@ -896,7 +896,7 @@ else # No, the message is empty, very unlikely
     # nothing to shout about, so we silently remove the temporary file
     # We can NEVER get here in debug mode thats why we use echo here!
     echo "MLadminEmailMessage was empty, we just remove the temporary file."
-    $MLrm $MLadminEmailMessage
+    $MLrm "$MLadminEmailMessage"
     unset $MLadminEmailMessage
 fi
 
@@ -928,7 +928,7 @@ then # Yes, there is an address!
     cat "$MLadminEmailMessage" | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
 else # No address set
     debug "No MLadminEmail Address set, cannot send eMail!"
-    appendToFile $MLadminEmailMessage "No MLadminEmail Address set. You will not receive backup notifications via eMail."
+    appendToFile "$MLadminEmailMessage" "No MLadminEmail Address set. You will not receive backup notifications via eMail."
 fi # [ $MLadminEmail -ne "" ]
 
 notifyGrowl "Finished backup"
