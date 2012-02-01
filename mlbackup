@@ -876,7 +876,7 @@ if [ $MLreallyErrorBackupCount -ne 0 ] # any ERROR backups left
 then # Yes, at least one ERROR backup still left.
     MLreallyErrorBackupList=$(ls -1w "$MLdestPath/" | grep "^ERROR-$MLbackupName-" )
     appendToFile "$MLadminEmailMessage" "
-    There are $MLreallyErrorBackupCount failed backup sets left. Please remove them manually.
+    There are $MLreallyErrorBackupCount failed backup sets left in $MLdestPath. Please remove them manually.
 ${MLreallyErrorBackupList}
 "
 fi # [ $MLreallyErrorBackupCount -ne 0 ]
