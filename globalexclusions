@@ -130,11 +130,11 @@
 - Library/Indexes/FindByContent/00002/
 - Library/Indexes/FindByContent/FBCPrivateIndexDB.plist
 
-# 10.3+ Adaptive hotfile Clustering Info will be useless in case of restore.
-- .hotfiles.btree
-
 # Mac OS X System Kernel Extensions Cache File
 - Library/Extensions.kextcache
+
+# 10.3+ Adaptive hotfile Clustering Info will be useless in case of restore.
+- .hotfiles.btree
 
 # 10.4+ Spotlight indeces will be useless in case of restore. 
 - .Spotlight-V100/
