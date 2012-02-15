@@ -29,6 +29,8 @@
 #
 ###############################################################################
 #
+#   2012/02/15  Changed: Made a first attempt at reorganizing this file
+#
 #	2009/02/04: Added:	Different stuff related to temp directories
 #				fifos and sockets
 #	2008/11/20: Added:
@@ -109,9 +111,13 @@
 - *.sock
 - *.fifo
 
-# Find By Content Lock Folder, used by Sherlock
-- .FBCLockFolder/
+# Java Applet Cache
+- .jpi_cache/
 
+# Temporary Items folders created by Mac OS and other Apps
+- .TemporaryItems/
+- temp/
+- tmp/**
 
 # We won't backup stuff, that is already in the Trash.
 - .Trash/
@@ -119,19 +125,16 @@
 - Network Trash Folder/
 - ._Network Trash Folder
 
-# The Volume Settings Folder by Mac OS
-- TheVolumeSettingsFolder/
-- ._TheVolumeSettingsFolder
+# Common Cache Files for many apps
+- *.cache
 
-# The FindByContentFolder from Mac OS 9 (Sherlock)
-- /TheFindByContentFolder
-- .FBCindex
-- Library/Indexes/FindByContent/00001/
-- Library/Indexes/FindByContent/00002/
-- Library/Indexes/FindByContent/FBCPrivateIndexDB.plist
+# Apple stuff
+###############################################################################
 
-# Mac OS X System Kernel Extensions Cache File
-- Library/Extensions.kextcache
+# Classic Finder Desktop Database files, only used by Mac OS 9/Classic
+# Will be useless in case of restore
+- Desktop DB
+- Desktop DF
 
 # 10.3+ Adaptive hotfile Clustering Info will be useless in case of restore.
 - .hotfiles.btree
@@ -141,13 +144,10 @@
 # Special note, I guess the V100 MAY change in future releases of Spotlight.
 # So we better be aware of this. May be changed to a wildcard in the future.
 
-
 # 10.5 additions
 - /.fseventsd
-
 # TimeMachine tagging of Volume
 - .com.apple.timemachine.supported
-
 # Leopard Special Folders
 - /net
 - /home
@@ -164,237 +164,38 @@
 - /.vol/*
 - /Library/Updates/*
 
+# Find By Content Lock Folder, used by Sherlock
+- .FBCLockFolder/
 
 # Finder Desktop File information files
 # - .DS_Store
 # Excluding these files will speed up the backup noticably, but also at the cost of loosing your view selections, custom Icons and Spotlight/finder comments set on objects. Depending on your source files you may or may not want to skip these files.
 
+# The Volume Settings Folder by Mac OS
+- TheVolumeSettingsFolder/
+- ._TheVolumeSettingsFolder
 
-# Classic Finder Desktop Database files, only used by Mac OS 9/Classic
-# Will be useless in case of restore
-- Desktop DB
-- Desktop DF
+# The FindByContentFolder from Mac OS 9 (Sherlock)
+- /TheFindByContentFolder
+- .FBCindex
+- Library/Indexes/FindByContent/00001/
+- Library/Indexes/FindByContent/00002/
+- Library/Indexes/FindByContent/FBCPrivateIndexDB.plist
 
-
-# Apple Safari (and Webkit?) partial downloads
-# Info: http://www.apple.com/safari/
-- *.download
-
-# Mozilla Firefox Partial downloads
-- *.part
-
-
-# Safari Favicons Cache (00-15/00-15/*.cache please help to improve this regexp)
-- Library/Safari/Icons/
-
-
-# iChat Partial Transfers
-- *.iChatTransfer
-
-
-# Common Cache Files for many apps
-- *.cache
-
-
-# Wired partially transferred files 
-# Info and Download: http://www.zankasoftware.com/wired/
-- *.WiredTransfer
-
-
-# Heidrun Partial download files
-# Info: http://www.macupdate.com/info.php/id/11881
-# Info 2: http://www.versiontracker.com/dyn/moreinfo/macosx/16296
-- *.HeidrunDownload
-
-# Audiobook Builder Temporary Files
-# More Info: http://www.splasm.com/audiobookbuilder/
-- Library/Application Support/Audiobook Builder/Temp/*
-
-# BluePhoneElite 1.x
-# To be checked
-# - Library/Application Support/BluePhoneElite/Archive_Old
-# - Library/Application Support/BluePhonElite/SMS Archive_1.0.8.780
-# und andere Versions und builds Nummern RegExp?
-
-
-
-
-# Apple Addressbook Backup. Actually, these are packages (which are actually folders in the filesystem) simply containing the normal files used by Address Book in the Library
-- *.abbu/
-
-
-# Apple iCal Backup. Actually, these are packages simply containing the normal files used by iCal in the Library
-- *.icbu/
-
-
-# Apple Backup 3.0 incompleted Backup Set (due to error during Backup or because the Backup is currently running)
-# Does it make sense to keep a FAILED backup of another Backup application?
-- *.backXX/
-# other filetypes used by Apple Backup 3.0 are
-# FullBackups and Incremental Backups
-# - *.FullBackup/
-# - *.IncrementalBackup/
-
+# Mac OS X System Kernel Extensions Cache File
+- Library/Extensions.kextcache
 
 # User's Caches, global Library Caches and even System Caches
 - Library/Caches/
-
 
 # Aliases to the recently used apps/docs in the Apple Menu
 - Library/Recent Applications/
 - Library/Recent Documents/
 
-
 # Bookmarks to recently connected servers (AFP, SMB, FTP, etc.)
 # Accessible from the Finders "Go" Menu
 # We do not exclude these by default, as they're like bookmarks.
 # - Library/Recent Servers/
-
-
-# iSync - SyncService "Revert to last Sync" files
-# Though not vital for a backup, possibly useful if your iSync goes belly up
-# and you end up with an empty Addressbook and empty cell phone/iPod/PDA/.Mac
-# Info: http://www.apple.com/isync/
-# NOT excluded by default.
-# - Library/SyncService/
-
-
-# Apple Calculator Currency Exchange Rates
-# When restoring a backup exchange rates will be outdated and should be
-# updated anyway, no need to backup them.
-- Library/Application Support/Calculator/FinancialRates.plist
-
-
-# OpenUp Archive decompressed files
-# Info about OpenUp: http://www.stepwise.com/Software/OpenUp/
-# Download: http://homepage.mac.com/sanguish/OpenUp/
-- Library/OpenUp/
-
-
-# Recent Items used by Allume Stuffit Deluxe (former Aladdin Systems)
-# Info: http://www.allume.com/ or http://www.stuffit.com/
-- Library/Preferences/Allume/StuffIt Deluxe Recent Items/
-
-
-# Microsoft Internet Explorer Cache Files for Downloads
-# We don't link to Microsoft!
-- Library/Preferences/Explorer/Download Cache/
-
-
-# Microsoft Internet Explorer temporary files
-- Library/Preferences/Explorer/Temporary Files/
-
-
-# Microsoft Office 2004 (11) Font Cache Files
-- Documents/Microsoft-Benutzerdaten/Entourage Temp
-- Documents/Microsoft-Benutzerdaten/Office X-Identitäten/Hauptidentität/Datenbank Cache
-- Library/Preferences/Microsoft/Office Font Cache (10)
-- Library/Preferences/Microsoft/Office Font Cache (11)
-- Library/Preferences/Microsoft/Office Registration Cache X
-- Library/Preferences/Microsoft/Office Registration Cache 11
-- Library/Preferences/MS Internet Cache
-
-
-# Connectix Virtual PC 6.x, Printer Spooler files
-# Info: http://www.connectix.com/
-# Virtual PC has since been bought by Microsoft :-(
-- Library/Preferences/Virtaul PC 6.0 Preferences/Virtual PC Print Spool/
-
-
-# iCab WebBrowser temporary and cache folder
-# http://www.icab.de/
-- Library/Preferences/iCab Preferences/iCab Cache/
-
-
-# iSerial Reader Cache Files
-- Library/Application Support/iSerial Reader/Cache
-
-# RagTime Cache Files
-# http://www.ragtime.de/
-- Library/Preferences/RagTime/RagTime Privat Cache_de
-- Library/Preferences/RagTime/RagTime Solo Cache_en
-
-
-# VLC (Video Lan Client) Cache
-# Info: http://www.videolan.org/
-- Library/Preferences/VLC/cache/
-
-
-# mlMac partial and fully downloaded Files (This applies to the default
-# location, if you have moved your incoming and temp directories you
-# may want to change the path below as well!
-# Info: http://mlmac.org/
-# If YOU know what should be added here, contact me please! (see top of file!)
-- Library/Application Support/mlMac/incoming/
-- Library/Application Support/mlMac/temp/
-- Library/Application Support/mlMac/torrents/
-- Library/Application Support/mlMac/*.old
-
-# Mac The Ripper Temp Files
-- .dvdcss
-
-# NetNewsWire and NetNewsWire Lite Caches:
-# Info & Download: http://ranchero.com/netnewswire/
-# Only applies to NNW before 2.1b16, the caches have been moved to
-# Library/Caches/ since which we are excluding by default.
-- Library/Application Support/NetNewsWire/Cache/
-- Library/Application Support/NetNewsWire/Backups/
-- Library/Application Support/NetNewsWire/Favicons/
-
-
-# NewsFire RSS Reader Cache
-# Info & Download: http://www.newsfirerss.com/
-- Library/Application Support/NewsFire/Cache/
-
-
-# PopCap Game: Zuma
-# - Library/Application Support/PopCap/Zuma/levels/cached_thumbnails/*
-
-
-# Quark XPress 6 Aliases, for recently used files
-- Library/Preferences/Quark/QuarkXPress 6.0/MRU/*.qxp 
-
-
-# DiscTop Artwork - will be refetched if missing, not vital to a backup
-# If you desperately want to keep the comment out the line accordingly.
-# Info: http://www.mekentosj.com/disctop/
-- Library/Application Support/DiscTop/Artwork/
-
-
-# Mozilla FireFox WebCache (all Profiles)
-# http://www.mozilla.com/
-# ------------------------------------------ These rules should be improved!
-- Library/Application Support/FireFox/Profiles/**Cache/
-- Library/Application Support/FireFox/Profiles/**/Cache.Trash/
-
-
-# LaunchBar 3 SetupCache (Does not apply to LaunchBar 4)
-# Info: http://obdev.at/products/launchbar/
-- Library/Application Support/LaunchBar/SetupCache.plist
-
-
-# Synergy Temporary Album Cover
-# Info: http://wincent.com/a/products/synergy-classic/
-- Library/Application Support/Synergy/Temporary Album Covers/
-
-
-# Pulp Fiction RSS Cache
-# Info: http://freshsqueeze.com/products/pulpfiction/
-# Thanks to Brad Miller from Freshly Squeezed Software for your support.
-- Library/Application Support/PulpFiction/Cache/
-# Library/Caches is generally excluded by default, no need to specify again.
-# - Libraray/Caches/PulpFiction/
-
-
-# Freespace 2 (Game) Cache files *.ibx
-# Info: http://freespace2.com/
-- Library/FS2_Open/data/cache/
-
-
-# Webkit Favicon Cache files (Subfolder 00-15/00-15, should improve regexp here)
-# to exactly and only match these folders 00-15/00-15/*.cache
-- Library/Icons/
-
 
 # Users Logs and global Library Logs (for all users)
 # You might be interested in keeping those logs, so the default is to backup them
@@ -402,6 +203,126 @@
 # Or skip only the CrashReporter Logs and keep the rest?
 # - Library/Logs/CrashReporter/*.log
 
+# Apple iSync Backup Data
+# Currently we keep this, as I've seen to many people empty their phone and
+# AddressBook/Calendar by dumb use of iSync
+# If you don't want to keep this, uncomment the following line (remove # )
+# - Library/SyncService/Backup Data/
+
+# Flickr Export Resize Cache
+# Info: http://flickr.com/
+- Library/Application Support/FlickrExport/ResizeCache/
+
+# User's and System Keychains
+###############################################################################
+
+###############################################################################
+############################ SECURITY WARNING #################################
+###############################################################################
+# If you don't know about the safety of your data on the
+# location you save your backup to, you may want to SKIP these as your 
+# keychains may contain vital and private login data as well as your encryption
+# private keys and certificates!
+#
+# Keychain files are protected by a password (usually your login password)
+# so make sure at least that password is really good.
+#
+# In that case you should backup your keychains to ANOTHER location that you 
+# know your files are safe on!
+# (Like your private iPod, USB Stick, external Drive, etc.)
+#
+# If the line below this block begins with a comment "#" or ";" then your 
+# keychain files will be backuped!
+###############################################################################
+# - Library/Keychains/
+
+# User's Fonts
+# CAUTION: If you're doing a lot of font management (activating/deactivatig)
+# fonts, you may want to SKIP this folder, as font's might be copied to and
+# deleted from this folder by your font management software.
+# eg: Extensis Suitcase, FontDoctor, FontExplorer, etc.
+# - Library/Fonts/
+
+###############################################################################
+# Things we are considering for exclusion, but are not yet sure if this is ok.
+# If you have insight about one of these items please contact me!
+###############################################################################
+#
+# Distributed Compiler, /usr/bin/distcc
+# ~/.distcc/
+# ~/.distcc/state/
+
+
+# Apps
+###############################################################################
+
+# Miro
+- Library/Application Support/Miro/icon-cache/
+- Movies/Miro/Incomplete Downloads
+
+# Google Earth - MyPlaces Application Backup File & temp file
+# Info: http://earth.google.com
+- Library/Application Support/Google Earth/myplaces.backup.kml
+- Library/Application Support/Google Earth/myplaces.kml.tmp
+
+# iSerial Reader
+# - Library/Application Support/iSerial Reader/Cache/
+
+# iSlayer iStatPro Widget
+- Library/Application Support/iSlayer/ProcessesIconCache/
+- Library/Application Support/iSlayer/Processes/IconsCache
+
+# Wired.app
+###############################################################################
+# This ONLY applies to wired versions BELOW 1.3. Since 1.3 passwords are stored
+# in the keychain where they belong.
+#
+# SECURITY WARNING: This file contains login data to your wired bookmarks in
+# PLAIN TEXT! If you're not sure your backup location is safe from prying eyes
+# you may want to skip this file and backup to another location.
+#
+# Since Mac OS 10.4 .plist files are usually stored as binary XML files.
+# This takes about 15 seconds more to get to the plain text passwords.
+# Conclusion, it's just as unsave as before! Take care!
+#
+# If the line below this block begins with a comment "#" or ";" then your 
+# Wired Preferences will be backuped!
+###############################################################################
+# - Library/Preferences/com.zanka.WiredClient.plist
+
+# BZflag (Game) Cache files
+# Info: http://sourceforge.net/projects/bzflag/
+- Library/Application Support/BZFlag/cache/
+
+
+# Camino (Mozilla Engine based Cocoa webbrowser) Cache Files
+# Info: http://www.caminobrowser.org/
+- Library/Application Support/Camino/Cache/
+
+
+# TVtoday Fernsehen Widget (TV Program Guide) Cache Files
+# Info: http://www.sebastian-krauss.de/software/
+- Library/Application Support/Fernsehen/Cache/
+
+# Adobe Acrobat Distiller FontCache Files
+# Info: http://www.adobe.com/
+
+# For Adobe Acrobat Distiller 6
+- Library/Application Support/Adobe/Acrobat/Distiller 6/FontCache/PSHFList
+
+# For Adobe Acrobat Distiller 7
+- Library/Application Support/Adobe/Acrobat/Distiller 7/FontCache/PSHFList
+
+# For Adobe Acrobat 8
+- Library/Acrobat User Data/Preflight Acrobat 8/Preferences/Cache/*
+- Library/Application Support/Adobe/Acrobat/Distiller 8/FontCache/PSHFList
+
+# Module Caches for german Adobe Creative Suite
+- Library/Preferences/Adobe Photoshop 7.0 Settings/Zusatzmodul-Cache.psp
+- Library/Preferences/Adobe Photoshop CS Einstellungen/Zusatzmodul-Cache.psp
+- Library/Preferences/Adobe InDesign/Version 3.0/InDesign ClipboradScrap
+- Library/Preferences/Adobe InDesign/Version 3.0/InDesign OSXServicesScrap
+- Library/Preferences/Adobe Illustrator 10/Zusatzmodul-Cache.psp
 
 # This Cache file belongs to Adobe Creative Suite
 # Info: http://www.adobe.com/support/techdocs/330060.html
@@ -446,130 +367,171 @@
 - Library/Shiira/IconDatabase/
 - Library/Shiira/Feeds/tmp/*.xml
 
-# Apple iSync Backup Data
-# Currently we keep this, as I've seen to many people empty their phone and
-# AddressBook/Calendar by dumb use of iSync
-# If you don't want to keep this, uncomment the following line (remove # )
-# - Library/SyncService/Backup Data/
+# Freespace 2 (Game) Cache files *.ibx
+# Info: http://freespace2.com/
+- Library/FS2_Open/data/cache/
 
-# Adobe Acrobat Distiller FontCache Files
-# Info: http://www.adobe.com/
+# Apple Calculator Currency Exchange Rates
+# When restoring a backup exchange rates will be outdated and should be
+# updated anyway, no need to backup them.
+- Library/Application Support/Calculator/FinancialRates.plist
 
-# For Adobe Acrobat Distiller 6
-- Library/Application Support/Adobe/Acrobat/Distiller 6/FontCache/PSHFList
+# OpenUp Archive decompressed files
+# Info about OpenUp: http://www.stepwise.com/Software/OpenUp/
+# Download: http://homepage.mac.com/sanguish/OpenUp/
+- Library/OpenUp/
 
-# For Adobe Acrobat Distiller 7
-- Library/Application Support/Adobe/Acrobat/Distiller 7/FontCache/PSHFList
+# Recent Items used by Allume Stuffit Deluxe (former Aladdin Systems)
+# Info: http://www.allume.com/ or http://www.stuffit.com/
+- Library/Preferences/Allume/StuffIt Deluxe Recent Items/
 
-# For Adobe Acrobat 8
-- Library/Acrobat User Data/Preflight Acrobat 8/Preferences/Cache/*
-- Library/Application Support/Adobe/Acrobat/Distiller 8/FontCache/PSHFList
+# Microsoft Internet Explorer Cache Files for Downloads
+# We don't link to Microsoft!
+- Library/Preferences/Explorer/Download Cache/
 
-# Module Caches for german Adobe Creative Suite
-- Library/Preferences/Adobe Photoshop 7.0 Settings/Zusatzmodul-Cache.psp
-- Library/Preferences/Adobe Photoshop CS Einstellungen/Zusatzmodul-Cache.psp
-- Library/Preferences/Adobe InDesign/Version 3.0/InDesign ClipboradScrap
-- Library/Preferences/Adobe InDesign/Version 3.0/InDesign OSXServicesScrap
-- Library/Preferences/Adobe Illustrator 10/Zusatzmodul-Cache.psp
+# Microsoft Internet Explorer temporary files
+- Library/Preferences/Explorer/Temporary Files/
 
+# Microsoft Office 2004 (11) Font Cache Files
+- Documents/Microsoft-Benutzerdaten/Entourage Temp
+- Documents/Microsoft-Benutzerdaten/Office X-Identitäten/Hauptidentität/Datenbank Cache
+- Library/Preferences/Microsoft/Office Font Cache (10)
+- Library/Preferences/Microsoft/Office Font Cache (11)
+- Library/Preferences/Microsoft/Office Registration Cache X
+- Library/Preferences/Microsoft/Office Registration Cache 11
+- Library/Preferences/MS Internet Cache
 
-# BZflag (Game) Cache files
-# Info: http://sourceforge.net/projects/bzflag/
-- Library/Application Support/BZFlag/cache/
+# Connectix Virtual PC 6.x, Printer Spooler files
+# Info: http://www.connectix.com/
+# Virtual PC has since been bought by Microsoft :-(
+- Library/Preferences/Virtaul PC 6.0 Preferences/Virtual PC Print Spool/
 
+# iCab WebBrowser temporary and cache folder
+# http://www.icab.de/
+- Library/Preferences/iCab Preferences/iCab Cache/
 
-# Camino (Mozilla Engine based Cocoa webbrowser) Cache Files
-# Info: http://www.caminobrowser.org/
-- Library/Application Support/Camino/Cache/
+# iSerial Reader Cache Files
+- Library/Application Support/iSerial Reader/Cache
 
+# RagTime Cache Files
+# http://www.ragtime.de/
+- Library/Preferences/RagTime/RagTime Privat Cache_de
+- Library/Preferences/RagTime/RagTime Solo Cache_en
 
-# TVtoday Fernsehen Widget (TV Program Guide) Cache Files
-# Info: http://www.sebastian-krauss.de/software/
-- Library/Application Support/Fernsehen/Cache/
+# VLC (Video Lan Client) Cache
+# Info: http://www.videolan.org/
+- Library/Preferences/VLC/cache/
 
-# Flickr Export Resize Cache
-# Info: http://flickr.com/
-- Library/Application Support/FlickrExport/ResizeCache/
+# mlMac partial and fully downloaded Files (This applies to the default
+# location, if you have moved your incoming and temp directories you
+# may want to change the path below as well!
+# Info: http://mlmac.org/
+# If YOU know what should be added here, contact me please! (see top of file!)
+- Library/Application Support/mlMac/incoming/
+- Library/Application Support/mlMac/temp/
+- Library/Application Support/mlMac/torrents/
+- Library/Application Support/mlMac/*.old
 
-# Google Earth - MyPlaces Application Backup File & temp file
-# Info: http://earth.google.com
-- Library/Application Support/Google Earth/myplaces.backup.kml
-- Library/Application Support/Google Earth/myplaces.kml.tmp
+# Mac The Ripper Temp Files
+- .dvdcss
 
-# iSerial Reader
-# - Library/Application Support/iSerial Reader/Cache/
+# NetNewsWire and NetNewsWire Lite Caches:
+# Info & Download: http://ranchero.com/netnewswire/
+# Only applies to NNW before 2.1b16, the caches have been moved to
+# Library/Caches/ since which we are excluding by default.
+- Library/Application Support/NetNewsWire/Cache/
+- Library/Application Support/NetNewsWire/Backups/
+- Library/Application Support/NetNewsWire/Favicons/
 
-# iSlayer iStatPro Widget
-- Library/Application Support/iSlayer/ProcessesIconCache/
-- Library/Application Support/iSlayer/Processes/IconsCache
+# NewsFire RSS Reader Cache
+# Info & Download: http://www.newsfirerss.com/
+- Library/Application Support/NewsFire/Cache/
 
-# Java Applet Cache
-- .jpi_cache/
+# PopCap Game: Zuma
+# - Library/Application Support/PopCap/Zuma/levels/cached_thumbnails/*
 
-# Miro
-- Library/Application Support/Miro/icon-cache/
-- Movies/Miro/Incomplete Downloads
+# Quark XPress 6 Aliases, for recently used files
+- Library/Preferences/Quark/QuarkXPress 6.0/MRU/*.qxp 
 
-# Temporary Items folders created by Mac OS and other Apps
-- .TemporaryItems/
-- temp/
-- tmp/**
+# DiscTop Artwork - will be refetched if missing, not vital to a backup
+# If you desperately want to keep the comment out the line accordingly.
+# Info: http://www.mekentosj.com/disctop/
+- Library/Application Support/DiscTop/Artwork/
 
-# User's and System Keychains
-###############################################################################
-############################ SECURITY WARNING #################################
-###############################################################################
-# If you don't know about the safety of your data on the
-# location you save your backup to, you may want to SKIP these as your 
-# keychains may contain vital and private login data as well as your encryption
-# private keys and certificates!
-#
-# Keychain files are protected by a password (usually your login password)
-# so make sure at least that password is really good.
-#
-# In that case you should backup your keychains to ANOTHER location that you 
-# know your files are safe on!
-# (Like your private iPod, USB Stick, external Drive, etc.)
-#
-# If the line below this block begins with a comment "#" or ";" then your 
-# keychain files will be backuped!
-###############################################################################
-# - Library/Keychains/
+# Mozilla FireFox WebCache (all Profiles)
+# http://www.mozilla.com/
+# ------------------------------------------ These rules should be improved!
+- Library/Application Support/FireFox/Profiles/**Cache/
+- Library/Application Support/FireFox/Profiles/**/Cache.Trash/
 
+# LaunchBar 3 SetupCache (Does not apply to LaunchBar 4)
+# Info: http://obdev.at/products/launchbar/
+- Library/Application Support/LaunchBar/SetupCache.plist
 
-# Wired.app
-###############################################################################
-# This ONLY applies to wired versions BELOW 1.3. Since 1.3 passwords are stored
-# in the keychain where they belong.
-#
-# SECURITY WARNING: This file contains login data to your wired bookmarks in
-# PLAIN TEXT! If you're not sure your backup location is safe from prying eyes
-# you may want to skip this file and backup to another location.
-#
-# Since Mac OS 10.4 .plist files are usually stored as binary XML files.
-# This takes about 15 seconds more to get to the plain text passwords.
-# Conclusion, it's just as unsave as before! Take care!
-#
-# If the line below this block begins with a comment "#" or ";" then your 
-# Wired Preferences will be backuped!
-###############################################################################
-# - Library/Preferences/com.zanka.WiredClient.plist
+# Synergy Temporary Album Cover
+# Info: http://wincent.com/a/products/synergy-classic/
+- Library/Application Support/Synergy/Temporary Album Covers/
 
+# Pulp Fiction RSS Cache
+# Info: http://freshsqueeze.com/products/pulpfiction/
+# Thanks to Brad Miller from Freshly Squeezed Software for your support.
+- Library/Application Support/PulpFiction/Cache/
+# Library/Caches is generally excluded by default, no need to specify again.
+# - Libraray/Caches/PulpFiction/
 
-# User's Fonts
-# CAUTION: If you're doing a lot of font management (activating/deactivatig)
-# fonts, you may want to SKIP this folder, as font's might be copied to and
-# deleted from this folder by your font management software.
-# eg: Extensis Suitcase, FontDoctor, FontExplorer, etc.
-# - Library/Fonts/
+# Wired partially transferred files 
+# Info and Download: http://www.zankasoftware.com/wired/
+- *.WiredTransfer
 
-###############################################################################
-# Things we are considering for exclusion, but are not yet sure if this is ok.
-# If you have insight about one of these items please contact me!
-###############################################################################
-#
-# Distributed Compiler, /usr/bin/distcc
-# ~/.distcc/
-# ~/.distcc/state/
+# Heidrun Partial download files
+# Info: http://www.macupdate.com/info.php/id/11881
+# Info 2: http://www.versiontracker.com/dyn/moreinfo/macosx/16296
+- *.HeidrunDownload
+
+# Audiobook Builder Temporary Files
+# More Info: http://www.splasm.com/audiobookbuilder/
+- Library/Application Support/Audiobook Builder/Temp/*
+
+# BluePhoneElite 1.x
+# To be checked
+# - Library/Application Support/BluePhoneElite/Archive_Old
+# - Library/Application Support/BluePhonElite/SMS Archive_1.0.8.780
+# und andere Versions und builds Nummern RegExp?
+
+# Apple Safari (and Webkit?) partial downloads
+# Info: http://www.apple.com/safari/
+- *.download
+# Safari Favicons Cache (00-15/00-15/*.cache please help to improve this regexp)
+- Library/Safari/Icons/
+# Webkit Favicon Cache files (Subfolder 00-15/00-15, should improve regexp here)
+# to exactly and only match these folders 00-15/00-15/*.cache
+- Library/Icons/
+
+# Mozilla Firefox Partial downloads
+- *.part
+
+# iChat Partial Transfers
+- *.iChatTransfer
+
+# Apple Addressbook Backup. Actually, these are packages (which are actually folders in the filesystem) simply containing the normal files used by Address Book in the Library
+- *.abbu/
+
+# Apple iCal Backup. Actually, these are packages simply containing the normal files used by iCal in the Library
+- *.icbu/
+
+# Apple Backup 3.0 incompleted Backup Set (due to error during Backup or because the Backup is currently running)
+# Does it make sense to keep a FAILED backup of another Backup application?
+- *.backXX/
+# other filetypes used by Apple Backup 3.0 are
+# FullBackups and Incremental Backups
+# - *.FullBackup/
+# - *.IncrementalBackup/
+
+# iSync - SyncService "Revert to last Sync" files
+# Though not vital for a backup, possibly useful if your iSync goes belly up
+# and you end up with an empty Addressbook and empty cell phone/iPod/PDA/.Mac
+# Info: http://www.apple.com/isync/
+# NOT excluded by default.
+# - Library/SyncService/
 
 #EOF
