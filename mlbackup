@@ -36,6 +36,7 @@ MLbaseCommand=$(basename $0)
 MLhostname=$(hostname)
 MLversion=1.5.2
 MLrevision=__CCUURREENNTT__RREEVVIISSIIOONN__
+MLlatestBackupTitle="Latest"
 
 # For development and testing only:
 # MLrevision=$(svn info svn+maclemon:///Backup/trunk | grep "Revision:" | awk {'print $2'})
@@ -848,7 +849,7 @@ case $MLfatalError in
         # Ranaming the Backup so it will be reused as link-target for the next run
         mv "$MLfinalTarget" "$MLdestPath/$MLbackupName-$MLbackupDate"
         MLfinalTarget="$MLdestPath/$MLbackupName-$MLbackupDate"
-
+        ln -shf "$MLfinalTarget" "$MLdestPath/$MLlatestBackupTitle"
     debug "mlbackup was successful!"
     ;;
 esac
