@@ -214,7 +214,7 @@ debug "MLrsyncErrFile = $MLrsyncErrFile"
 # Version Checking info
 MLversioncheckBaseURL="http://versioncheck.maclemon.at/"
 MLversioncheckURL="$MLversioncheckBaseURL$MLbaseCommand.txt"
-MLinfoURL="http://maclemon.at/mlbackup"
+MLinfoURL="https://github.com/MacLemon.at/mlbackup"
 debug "MLversioncheckURL: $MLversioncheckURL"
 ###############################################################################
 # Check if we'are running in an interactive shell, and control output accordingly.
