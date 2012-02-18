@@ -907,6 +907,9 @@ fi
 # Almost last thing is to determine how long the backup took.
 MLtimeScriptEnd=$(date +%s)
 
+# Report free space on the destination volume.
+appendToFile "$MLadminEmailMessage" "Free space on $MLdestPath: $(df -h $MLdestPath | tail -1 | sed "s/^ *//;s/ *$//;s/ \{1,\}/ /g" | cut -d " " -f 4) ($(df $MLdestPath | tail -1 | sed "s/^ *//;s/ *$//;s/ \{1,\}/ /g" | cut -d " " -f 4) $(df $MLdestPath | head -1 | sed "s/^ *//;s/ *$//;s/ \{1,\}/ /g" | cut -d " " -f 2))"
+
 #Calculating the time difference between start and end giving us the duration
 let "MLtimeScriptDurationTotal = $MLtimeScriptEnd - $MLtimeScriptStart"
 
