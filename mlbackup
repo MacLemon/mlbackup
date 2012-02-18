@@ -462,6 +462,10 @@ debug "PID File written to $MLmyPidFile"
 # For rsync 3 the options are a LOT different:
 MLextendedAttributes="--hard-links --perms --executability --acls --xattrs --owner --group --times"
 
+debug "Using custom rsync options from config file: $MLcustomRsyncOptions"
+
+
+
 # checking target
 # target is always local at the moment
 
@@ -627,7 +631,10 @@ MLtimeRsyncStart=$(date +%s)
 # backing up
 
 # building the final command to run the backup
-$MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLshowRsyncProgress $MLrsyncNetworkOptions $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom --log-file="$MLrsyncLogFile" --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" 2>"$MLrsyncErrFile"
+
+debug $MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLshowRsyncProgress $MLrsyncNetworkOptions $MLdryRun $MLextendedAttributes $MLdelete $MLexcludeFrom $MLcustomRsyncOptions --log-file="$MLrsyncLogFile" --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" 2>"$MLrsyncErrFile"
+
+$MLsourceRsync $MLbeVerbose "$MLdestRsync" $MLrsyncOptions $MLshowRsyncProgress $MLrsyncNetworkOptions $MLdryRun $MLextendedAttributes $MLcustomRsyncOptions $MLdelete $MLexcludeFrom --log-file="$MLrsyncLogFile" --link-dest="$MLdestPath/$MLmostRecentSet/" "$MLsourcePath" "$MLfinalTarget/" 2>"$MLrsyncErrFile"
 MLbackupStatus=$? # Fetching the return code from our rsync command
 MLtimeRsyncEnd=$(date +%s) # Fetching a timestamp after rsync for timing stats
 

@@ -53,4 +53,9 @@ MLuseGlobalExclusions=1
 # Default: MLconfigExcludeFrom=""
 MLconfigExcludeFrom=""
 
+# You can specify custom rsync options per config here:
+MLcustomRsyncOptions=""
+# Example: You can set --bwlimit=3072 to limit rsync I/O throughput to 3MB per second. bwlimit is passed in KB/s
+# See man rsync for other options you may want to use.
+# Hint: Turning on debugging with MLdebug=1 in this config file to see the final resulting rsync command in the log.
 #EOF
