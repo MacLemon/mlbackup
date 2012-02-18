@@ -331,7 +331,7 @@ else # We were passed a config file
         then # The config file can be read by the user invoking this script
 
             # Load in the config (DIRTY *yuck*) Better use the defaults system
-            appendToFile "$MLadminEmailMessage" "Using config file in $MLconfigFile"¬
+            appendToFile "$MLadminEmailMessage" "Using config file in $MLconfigFile"
             debug "Loading the config file $MLconfigFile"
             . "$MLconfigFile"
         else # The user does not have read permission for the config file
@@ -478,7 +478,7 @@ then # Yes, it does exist,
         echo "$MLbaseCommand: The destination $MLdestPath is not a directory. We can not save backups in anything but a directory (like a file or block device)"
         exit $MLE_DestinationIsNoDirectory
     fi
-    debug "Backup destination: $MLdestinationPath"
+    appendToFile "$MLadminEmailMessage" "Backup destination: $MLdestPath"
 else # No, the target does not exist
     debug "FATAL: The target $MLdestPath could not be found."
     debug "If your target is on an external volume, make sure it is mounted!"
@@ -568,7 +568,7 @@ else # No, the source could not be found locally, could still be remotely locate
         exit $MLE_SourceNotFound
     fi
 fi
-appendToFile "$MLadminEmailMessage" "Backup source: $MLsourcePath"¬
+appendToFile "$MLadminEmailMessage" "Backup source: $MLsourcePath"
 # Checking for concurrent mlbackup running with the same configuration
 if [ -r "$MLdestPath/$MLbackupName.pid" ] # Is there already a tag .pid in the destination?
     then # Yes, there is a tag
