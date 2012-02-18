@@ -284,6 +284,9 @@ MLconfigExcludeFrom=""
 
 # For deleting stuff we use
 MLrm="rm"
+
+# Writing Script starting time to the Admin email:
+appendToFile "$MLadminEmailMessage" "Backup started: $(date -r $MLtimeScriptStart)"
 ###############################################################################
 # Getting the configuration file
 # Handling of the config file should be a little more elegant.
@@ -905,11 +908,11 @@ fi
 # FUTURE: Postflight script
 ###############################################################################
 # Almost last thing is to determine how long the backup took.
-MLtimeScriptEnd=$(date +%s)
 
 # Report free space on the destination volume.
 appendToFile "$MLadminEmailMessage" "Free space on $MLdestPath: $(df -h $MLdestPath | tail -1 | sed "s/^ *//;s/ *$//;s/ \{1,\}/ /g" | cut -d " " -f 4) ($(df $MLdestPath | tail -1 | sed "s/^ *//;s/ *$//;s/ \{1,\}/ /g" | cut -d " " -f 4) $(df $MLdestPath | head -1 | sed "s/^ *//;s/ *$//;s/ \{1,\}/ /g" | cut -d " " -f 2))"
 
+MLtimeScriptEnd=$(date +%s)
 #Calculating the time difference between start and end giving us the duration
 let "MLtimeScriptDurationTotal = $MLtimeScriptEnd - $MLtimeScriptStart"
 
@@ -924,6 +927,8 @@ else # zero, two or more seconds
         appendToFile "$MLadminEmailMessage" "Backup took $MLtimeScriptDurationTotal seconds."
     fi
 fi
+
+appendToFile "$MLadminEmailMessage" "Backup ended: $(date -r $MLtimeScriptEnd)"
 
 debug "--- Sending the AdminEmail Message per mail."
 # sending the admin eMail Notification, only if we have an address
