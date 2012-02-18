@@ -3,7 +3,7 @@ mlbackup - README
 If you like mlbackup and use it to safeguard your data, please consider supporting it's further development through flattr! Thanks!
 https://flattr.com/thing/141895/mlbackup
 
-This software is provided as-is. mlbackup has proven to work fine on _my_ servers and many 1other's, but please do not solely rely on the backups made with mlbackup. As usual, always have at least a second backup for vital data. Please use the wiki at the [mlbackup](https://github.com/MacLemon/mlbackup) github page to post your tips and tricks and how you use mlbackup!
+This software is provided as-is. mlbackup has proven to work fine on _my_ servers and many other's, but please do not solely rely on the backups made with mlbackup. As usual, always have at least a second backup for vital data. Please use the wiki at the [mlbackup](https://github.com/MacLemon/mlbackup) github page to post your tips and tricks and how you use mlbackup!
 
 
 
