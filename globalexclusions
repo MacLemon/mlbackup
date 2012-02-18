@@ -29,6 +29,8 @@
 #
 ###############################################################################
 #
+#   2012/02/17  Added TimeMachine local Snapshots used in 10.7 or higher
+#
 #   2012/02/15  Changed: Made a first attempt at reorganizing this file
 #
 #	2009/02/04: Added:	Different stuff related to temp directories
@@ -163,6 +165,10 @@
 - /Auth.bak
 - /.vol/*
 - /Library/Updates/*
+
+# Mac OS X 10.7 and higher
+# Local TimeMachine Snapshots
+- /.MobileBackups
 
 # Find By Content Lock Folder, used by Sherlock
 - .FBCLockFolder/
