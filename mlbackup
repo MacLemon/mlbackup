@@ -37,7 +37,7 @@ MLhostname=$(hostname)
 MLversion=1.5.2
 MLrevision=__CCUURREENNTT__RREEVVIISSIIOONN__
 MLlatestBackupTitle="Latest"
-
+MLflattrURL="https://flattr.com/thing/141895/mlbackup"
 # For development and testing only:
 # MLrevision=$(svn info svn+maclemon:///Backup/trunk | grep "Revision:" | awk {'print $2'})
 # echo "MLrevision: $MLrevision"
@@ -929,7 +929,19 @@ else # zero, two or more seconds
     fi
 fi
 
+# Timestamping the admin message with the end of the backup
 appendToFile "$MLadminEmailMessage" "Backup ended: $(date -r $MLtimeScriptEnd)"
+
+
+# Encouraging users to support the development of mlbackup by adding a flattr link ot the email.
+appendToFile "$MLadminEmailMessage" "
+
+You're using mlbackup to safeguard your data. Please consider making a donation to support further development or click our flattr button once in a while.
+https://flattr.com/thing/141895/mlbackup
+
+Thanks!
+
+"
 
 debug "--- Sending the AdminEmail Message per mail."
 # sending the admin eMail Notification, only if we have an address
