@@ -782,7 +782,7 @@ case $MLfatalError in
 
         if [ $MLbackupStatus -ne "" ]
         then
-            appentToFile "$MLadminEmailMessage" "$MLeRsyncErrorMessage."
+            appendToFile "$MLadminEmailMessage" "$MLeRsyncErrorMessage."
         fi #[ $MLbackupStatus -ne "" ] 
 
         MLsetlabelPath=/sw/bin/setlabel
