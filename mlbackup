@@ -795,8 +795,7 @@ case $MLfatalError in
         MLsetfcommentPath=/sw/bin/setfcomment
         if [ -e $MLsetfcommentPath ] # Is setfcomment intalled?
         then
-            /sw/bin/setfcomment -c "Created by $MLbaseCommand $MLversiy
-            on. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
+            /sw/bin/setfcomment -c "Created by $MLbaseCommand $MLversion. Invoked by $USER on $MLbackupDate from Source: $MLsourcePath" "$MLfinalTarget/"
         fi
 
         # checking if we need to remove some old ones
