@@ -799,14 +799,14 @@ case $MLfatalError in
         fi
 
         # checking if we need to remove some old ones
-        MLoldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^$MLbackupName-" )
+        MLoldBackupCount=$(ls -1w "$MLdestPath/" | grep -Ec "^$MLbackupName-(19|20)[0-9][0-9]\.(0[1-9]|1[012])\.(0[1-9]|[12][0-9]|3[01])-([01][0-9]|2[0-3])\.[0-5][0-9]\.[0-5][0-9]$" )
         let "MLoldBackupCountDifference = $MLoldBackupCount - $MLbackupCount"
         debug "MLoldBackupCountDifference = " $MLoldBackupCountDifference
 
         if [ "$MLoldBackupCount" -gt "$MLbackupCount" ] # There are surplus Backups, so we remove them
         then
 
-            MLoldBackupList=$(ls -1w "$MLdestPath/" | grep "^$MLbackupName-"| head -$MLoldBackupCountDifference)
+            MLoldBackupList=$(ls -1w "$MLdestPath/" | grep -E "^$MLbackupName-(19|20)[0-9][0-9]\.(0[1-9]|1[012])\.(0[1-9]|[12][0-9]|3[01])-([01][0-9]|2[0-3])\.[0-5][0-9]\.[0-5][0-9]$" | head -$MLoldBackupCountDifference)
             debug "Old Backup Count: $MLoldBackupCount, $MLoldBackupCountDifference to be removed."
             debug "Old Backup List: $MLoldBackupList"
 
