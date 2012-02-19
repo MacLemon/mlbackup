@@ -612,7 +612,7 @@ debug "Writing my own tag to $MLdestPath/$MLbackupName.pid"
 echo $$ > "$MLdestPath/$MLbackupName.pid"
 
 # We need to find the most recent Backup as our Target for the link-dest
-MLmostRecentSet=$(ls -1tw "$MLdestPath/" | grep -E "^$MLbackupName-(19|20)[0-9][0-9]\.(0[1-9]|1[012])\.(0[1-9]|[12][0-9]|3[01])-([01][0-9]|2[0-3])\.[0-5][0-9]\.[0-5][0-9]" | head -1)
+MLmostRecentSet=$(ls -1tw "$MLdestPath/" | grep -E "^$MLbackupName-(19|20)[0-9][0-9]\.(0[1-9]|1[012])\.(0[1-9]|[12][0-9]|3[01])-([01][0-9]|2[0-3])\.[0-5][0-9]\.[0-5][0-9]$" | head -1)
 debug "The most Recent Set to refer to is: $MLmostRecentSet"
 
 #Fetching the current date and time
