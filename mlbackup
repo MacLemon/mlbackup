@@ -585,12 +585,12 @@ if [ -r "$MLdestPath/$MLbackupName.pid" ] # Is there already a tag .pid in the d
     # Checking if this tag is old or if it really is a running mlbackup instance
     # The pid from the tag does have "mlbackup" and the same config file in use
 
-    MLprobablyConcurrentProcess=$(/bin/ps -ax | grep ^$MLprobablyConcurrentPid | grep "$MLbaseCommand" | grep -e "$(basename $MLconfigFile)")
+    MLprobablyConcurrentProcess=$(/bin/ps -ax | grep "^$MLprobablyConcurrentPid" | grep "$MLfullCommand" | grep -e "$MLconfigFile")
     MLprobablyConcurrentProcessReturned=$?
     debug "Checking for concurrent proess returned $MLprobablyConcurrentProcessReturned"
     debug "MLprobablyConcurrentProcess = $MLprobablyConcurrentProcess"
 
-    if [ "$MLprobablyConcurrentProcessReturned" ]
+    if [ "$MLprobablyConcurrentProcessReturned" -eq 0 ]
     then
         # we found another instance of mlbackup running with the same config.
         # Refusing to run two instances simultanously to preserve backup integrity
