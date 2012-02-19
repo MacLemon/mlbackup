@@ -3,8 +3,8 @@ MacLemon Backup - COPYING
 # Author: Pepi Zawodsky
 # Authors eMail: mlbackup@maclemon.at
 # Website: https://github.com/MacLemon/mlbackup
-# License: GNU general public license (GPL) http://www.gnu.org/licenses/gpl.html
+# License: Modified BSD License (also known as "3-clause BSD license")
 
-You should have received a copy of the GPL with this software distribution. If it was missing please visit http://www.gnu.org/licenses/gpl.html to obtain a copy.
+You should have received a copy of the "Modified BSD License" with this software. BSD-LICENSE.txt
 
-If you create derivative works of this software, we would really like to know about them. We might be interested in incorporating your changes into the main project as well. If you have questions, suggestions, bug-reports or feature-requests please contact the author!
+If you create derivative works of or improve this software, we love to hear about them. We are interested in incorporating your changes into the main project as well. If you have questions, suggestions, bug-reports or feature-requests please contact the author! Pull requests on Github are welcome as well!

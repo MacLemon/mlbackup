@@ -3,19 +3,21 @@ mlbackup - README
 If you like mlbackup and use it to safeguard your data, please consider supporting it's further development through flattr! Thanks!
 https://flattr.com/thing/141895/mlbackup
 
-This software is provided as-is. mlbackup has proven to work fine on _my_ servers and many other's, but please do not solely rely on the backups made with mlbackup. As usual, always have at least a second backup for vital data. Please use the wiki at the [mlbackup](https://github.com/MacLemon/mlbackup) github page to post your tips and tricks and how you use mlbackup!
+This software is provided as-is. mlbackup has proven to work fine on my servers and many other's, but please do not solely rely on the backups made with mlbackup. As usual, always have at least a second backup for vital data. Please use the wiki at the [mlbackup](https://github.com/MacLemon/mlbackup) github page to post your tips and tricks and how you use mlbackup!
 
 
 
 Target Audience:
 -------------------------------------------------------------------------------
-Mac OS X Admins and Geek Users who like a nice intelligent and incremental backup through the shell. Can be run from launchd (or cron) if you like. This is NOT INTENDED for normal users. mlbackup is explicitly targeted at the Mac OS X (10.4 Tiger, 10.5 Leopard, 10.6 Snow Leopard and respective Server Versions) platform. It has not been tested on other software platforms! mlbackup requires at least Mac OS X 10.4.11.
-mlbackup is not yet tested on the Mac OS X 10.7 Lion Developer Preview, but will support 10.7 in the future. If you did test mlbackup on Lion I welcome your feedback!
+Mac OS X Admins and Geek Users who like a nice intelligent and incremental backup through the shell. Can be run from launchd (or cron) if you like. This is NOT INTENDED for casual users. mlbackup is explicitly targeted at the Mac OS X (10.4 Tiger, 10.5 Leopard, 10.6 Snow Leopard and respective Server Versions) platform. It has not been tested on other software platforms! mlbackup requires at least Mac OS X 10.4.11 and has been successfully tested up to 10.7.3 with backup bouncer.
+
+mlbackup is not yet tested on the Mac OS X 10.8 Mountain Lion Developer Preview, but will support 10.8 in the future. If you did test mlbackup on Mountain Lion I welcome your feedback!
 
 
 
 Download & Versioncheck:
 -------------------------------------------------------------------------------
+The recommended way is to use the full packages from the [mlbackup downloads](https://github.com/MacLemon/mlbackup/downloads) on Github!
 You can always get the latest version of mlbackup at the [mlbackup](https://github.com/MacLemon/mlbackup) GitHub page.
 If you invoke mlbackup without a config file parameter it will check online for an updated version. It tries to connect to http://versioncheck.maclemon.at/mlbackup.txt to find out if there is a newer version available. At no point is ANY information sent to our servers to respect your privacy.
 
@@ -23,7 +25,8 @@ If you invoke mlbackup without a config file parameter it will check online for 
 
 Installation:
 -------------------------------------------------------------------------------
-Just use install the installer package. See the INSTALL.txt file for not recommended other ways.
+Just use install the installer package available on the [mlbackup downloads](https://github.com/MacLemon/mlbackup/downloads) page on Github.
+See the INSTALL.txt file for not recommended other ways. (Those are mainly for people who want to contribute to the development of mlbackup.)
 
 
 
@@ -46,13 +49,7 @@ Additions:
 None of these are mandatory, but they provide some comfort and help to beautify your backups.
 
 Growl:
-NOTE: Growl notifications are currently NOT available until a later date in the development cycle.
 If you have growl and growlnotify installed, mlbackup will try to make use of it. For more info on growl see http://growl.info/
-
-	
-fink project:
-See http://fink.sf.net/ for info on fink.
-You can use `fink install osxutils` to install osxutils if you have fink.
 
 
 
@@ -60,14 +57,11 @@ Known Issues:
 -------------------------------------------------------------------------------
 Still no manpage for mlbackup yet. (There still is hope and you should be able to get mlbackup up and running easily anyway.)
 
-The backup set name may NOT include german umlaut characters. (I am still investigating why this is the case. If you have any information on how to make this work, please contact me!) This issue ONLY affects the naming of the backup sets. The files you intend to backup are not affected and will be backupped just fine!
-
+The backup set name may NOT include german umlaut characters and spaces. (I am still investigating why this is the case. If you have any information on how to make this work, please contact me!) This issue ONLY affects the naming of the backup sets. The files you intend to backup are not affected and will be backupped just fine!
 
 If you are using Kerio mailserver be sure to check with the Kerio documentation on how to use the sendmail replacement wrapper for Kerio on your system. Otherwise mlbackup may not be able to send email. If you're using the Mac OS X postfix mailserver everything should just work. If you don't want to or cannot send email, just leave the $MLadminEmail=""
 
-
 Versioncheck will not work if you need to connect to the web using a proxy server. This will hopefully be improved in a future version. (Patches welcome!)
-
 
 If mlbackup cannot check for updates it will present you an Exit Code that it got from curl(1) but will not give you a helpful human readable error message. At the moment you need to look up the error in man curl.
 

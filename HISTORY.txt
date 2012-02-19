@@ -1,15 +1,66 @@
 # What's new?
+------------------------------------------------------------
+
+## mlbackup 190
+### New features in mlbackup
+- An alias named "Latest" is now created after each successful backup pointing to the latest finished backup.
+- Added a new config option $MLcustomRsyncOptions that allows custom and per configuration rsync options to be used. This option is passed after all mlbackup native options and may be suitable to override these.
+
+#### new features in the admin email message
+- The admin email now contains a link to my flattr button https://flattr.com/thing/141895/mlbackup and encourages users to make a donation to support further development.
+- The admin email message will now report the start and end timestamps of each backup.
+- The amount of free space on the MLdestPath is now reported in the admin email message.
+- Configfile, backup source and destination are now reported in the admin email message.
+- When reporting that there are ERROR backups the destination path is now added to the Admin Email.
+- Report Emails now will include a human readable error message for fatal and non-fatal errors.
+
+#### globalexclusions
+- global exclusions: Added exclusion of TimeMachine local snapshots used in 10.7 and higher
+
+
+### Improvements
+#### Admin email message
+- improved wording for debug messages and admin email.
+
+#### globalexclusions
+- global exclusions is now sorted in: system and global/usual things, Apple things, files created by GUI applications., Resorted Apple OS's, Fixed two typos in globalexclusions - Thanks to @zettt for the patch!
+
+### Bugfixes
+- Fixed the way the install.sh script handles detection of systems that need the postfix fix.
+- Corrected a bug that would try to fix postfix on 10.7 and fail. This part is now only run on 10.[456]. Also fixes a bug with the installer package that would report failure where it actually did install just fine.
+- Fixed a minor typo in handling of the comment added to a backup if setfcomment is installed by fink.
+- Corrected a typo in case rsync reported an error to include a human readable error message in the admin email.
+
+### mlbackup
+- Added error message 127 "Rsync not found on remote machine, probably mlbackup not installed." - Thanks to Yene for the patch!
+- Corrected a typo in the README.
+- Updated MLinfoURL to point users to github for updates instead of maclemon.at
+- Improved stability: Quoted a few file variables. These are extremley unlikely (if possible at all) to contain spaces but for safety reasons they were quoted.
+- More robust detection of concurrent invocation of mlbackup with the same config file.
+- More robust detection of the most recent backup to refer to for hard links.
+- Improved handling and cleanup of OLD, ERROR and crashed backups that leave a .pid tag and .noindex folder.
+- More robust detection of which backups to rotate.
+
+## License changed to "Modified BSD license"
+- We're no longer using the GPL license, but from mlbackup-190 on we're using the more permissive Modified BSD license (also known as "3-clause BSD license") A copy of the license is included with mlbackup.
+
+
+## rsync 3.0.9
+- Updated bundled rsync 3 to 3.0.9
+- For detailed information what is new in rsync 3.0.9 see rsync-3.0.9-NEWS.txt
+
+------------------------------------------------------------
 
 ## mlbackup 160
 - Fixes issue 1, a bug that would try to send mail even if MLAdminEmail was empty.
-- Growl notifications are now less verbose in the logs if Gowl somehow misbehaves.
+- Growl notifications are now less verbose in the logs if Growl somehow misbehaves.
 
 ## rsync 3.0.8
 - Updated bundled rsync 3 to 3.0.8
 - Fixes a bug with rsync and libiconv that could occur on 32-bit PPC systems under 10.4.
 - For detailed information what is new in rsync 3.0.8 see rsync-3.0.8-NEWS.txt
 
-
+------------------------------------------------------------
 
 ## mlbackup 157
 - First new release of mlbackup that is now hosted on [GitHub](https://github.com/MacLemon/mlbackup)
