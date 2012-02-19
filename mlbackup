@@ -869,29 +869,74 @@ debug "--- Handling OLD backups"
 # Reporting of surplus OLD and ERROR backups that need to be taken care of
 # OLD backups that should have been removed during rotation
 # but somehow could not be deleted (protected files, etc.)
-MLreallyOldBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^OLD-$MLbackupName-" )
+MLreallyOldBackupCount=$(ls -1w "$MLdestPath/" | grep -Ec "^OLD-$MLbackupName-(19|20)[0-9][0-9]\.(0[1-9]|1[012])\.(0[1-9]|[12][0-9]|3[01])-([01][0-9]|2[0-3])\.[0-5][0-9]\.[0-5][0-9]$" )
 
 if [ $MLreallyOldBackupCount -ne 0 ] # any ERROR backups left
 then # Yes, at least one OLD backup still left.
-    MLreallyOldBackupList=$(ls -1w "$MLdestPath/" | grep "^OLD-$MLbackupName-" )
+    MLreallyOldBackupList=$(ls -1w "$MLdestPath/" | grep -E "^OLD-$MLbackupName-(19|20)[0-9][0-9]\.(0[1-9]|1[012])\.(0[1-9]|[12][0-9]|3[01])-([01][0-9]|2[0-3])\.[0-5][0-9]\.[0-5][0-9]$" )
+    case $MLreallyOldBackupCount in
+    1)
+        appendToFile "$MLadminEmailMessage" "
+    There is $MLreallyOldBackupCount old backup set that could not be removed automatically. Please remove it manually.
+${MLreallyOldBackupList}
+"
+    ;;
+    *)
     appendToFile "$MLadminEmailMessage" "
     There are $MLreallyOldBackupCount old backup sets that could not be removed automatically. Please remove them manually.
 ${MLreallyOldBackupList}
 "
+    ;;
+esac
 fi # [ $MLreallyOldBackupCount -ne 0 ]
 
 debug "--- Handling ERROR backups"
 # ERROR backups that did not finish or had problems
-MLreallyErrorBackupCount=$(ls -1w "$MLdestPath/" | grep -c "^ERROR-$MLbackupName-" )
+MLreallyErrorBackupCount=$(ls -1w "$MLdestPath/" | grep -Ec "^ERROR-$MLbackupName-(19|20)[0-9][0-9]\.(0[1-9]|1[012])\.(0[1-9]|[12][0-9]|3[01])-([01][0-9]|2[0-3])\.[0-5][0-9]\.[0-5][0-9]$" )
 
 if [ $MLreallyErrorBackupCount -ne 0 ] # any ERROR backups left
 then # Yes, at least one ERROR backup still left.
-    MLreallyErrorBackupList=$(ls -1w "$MLdestPath/" | grep "^ERROR-$MLbackupName-" )
+    MLreallyErrorBackupList=$(ls -1w "$MLdestPath/" | grep -E "^ERROR-$MLbackupName-(19|20)[0-9][0-9]\.(0[1-9]|1[012])\.(0[1-9]|[12][0-9]|3[01])-([01][0-9]|2[0-3])\.[0-5][0-9]\.[0-5][0-9]$" )
+
+case $MLreallyErrorBackupCount in
+    1)
+        appendToFile "$MLadminEmailMessage" "
+    There is $MLreallyErrorBackupCount failed backup set left in $MLdestPath. Please remove it manually.
+${MLreallyErrorBackupList}
+"
+    ;;
+    *)
     appendToFile "$MLadminEmailMessage" "
     There are $MLreallyErrorBackupCount failed backup sets left in $MLdestPath. Please remove them manually.
 ${MLreallyErrorBackupList}
 "
+    ;;
+    esac
 fi # [ $MLreallyErrorBackupCount -ne 0 ]
+
+debug "--- Handling ABORTED and .noindex backups"
+# ERROR backups that did not finish or had problems
+MLabortedBackupCount=$(ls -1w "$MLdestPath/" | grep -Ec "$MLbackupName-(19|20)[0-9][0-9]\.(0[1-9]|1[012])\.(0[1-9]|[12][0-9]|3[01])-([01][0-9]|2[0-3])\.[0-5][0-9]\.[0-5][0-9]\.noindex$" )
+
+if [ $MLabortedBackupCount -ne 0 ] # any ERROR backups left
+then # Yes, at least one ERROR backup still left.
+    MLabortedBackupList=$(ls -1w "$MLdestPath/" | grep -E "$MLbackupName-(19|20)[0-9][0-9]\.(0[1-9]|1[012])\.(0[1-9]|[12][0-9]|3[01])-([01][0-9]|2[0-3])\.[0-5][0-9]\.[0-5][0-9]\.noindex$" )
+case $MLabortedBackupCount in
+    1)
+        appendToFile "$MLadminEmailMessage" "
+    There is $MLabortedBackupCount aborted backup set left in $MLdestPath. Please investigate the cause of abortion by checking the logs and remove it manually.
+${MLabortedBackupList}
+"
+    ;;
+    *)
+        appendToFile "$MLadminEmailMessage" "
+    There are $MLabortedBackupCount aborted backup sets left in $MLdestPath. Please investigate the cause of abortion by checking the logs and remove them manually.
+${MLabortedBackupList}
+"
+    ;;
+esac
+
+fi # [ $MLabortedBackupCount -ne 0 ]
 
 debug "--- Moving the Admin eMail Message to the Backup."
 # I should REALLY improve on Backup error postprocessing. *embarrassing*
