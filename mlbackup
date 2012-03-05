@@ -780,7 +780,7 @@ case $MLfatalError in
     *)  # The backup went OK, or had some other non fatal error (warning)
         appendToFile "$MLadminEmailMessage" "The Backup $MLbackupName went OK!"
 
-        if [ $MLbackupStatus -ne "" ]
+        if [ $MLbackupStatus -gt 0 ]
         then
             appendToFile "$MLadminEmailMessage" "$MLeRsyncErrorMessage."
         fi #[ $MLbackupStatus -ne "" ] 
