@@ -1,7 +1,7 @@
 # What's new?
 ------------------------------------------------------------
 
-## mlbackup 190
+## mlbackup 192
 ### New features in mlbackup
 - An alias named "Latest" is now created after each successful backup pointing to the latest finished backup.
 - Added a new config option $MLcustomRsyncOptions that allows custom and per configuration rsync options to be used. This option is passed after all mlbackup native options and may be suitable to override these.
@@ -30,6 +30,7 @@
 - Corrected a bug that would try to fix postfix on 10.7 and fail. This part is now only run on 10.[456]. Also fixes a bug with the installer package that would report failure where it actually did install just fine.
 - Fixed a minor typo in handling of the comment added to a backup if setfcomment is installed by fink.
 - Corrected a typo in case rsync reported an error to include a human readable error message in the admin email.
+- Corrected a bug that would prevent the addition of a human readable error message when there were warnings or errors during the backup.
 
 ### mlbackup
 - Added error message 127 "Rsync not found on remote machine, probably mlbackup not installed." - Thanks to Yene for the patch!

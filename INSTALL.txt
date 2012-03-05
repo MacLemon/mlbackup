@@ -2,7 +2,7 @@ MacLemon Backup - INSTALL
 
 There are two ways to install mlbackup on your Mac.
 
-The easy way:
+The recommended way:
 Use the Installer package to install mlbackup and the required rsync 3 on your Mac. This is the recommended way and can be used with the graphical Installer.app, /usr/sbin/installer on the command line, or even Apple Remote Desktop.
 
 
