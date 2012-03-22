@@ -25,7 +25,8 @@
 ###############################################################################
 
 MLbackupInstallerVersion="0.0.2"
-MLbackupBuild=__CCUURREENNTT__RREEVVIISSIIOONN__
+# MLbackupBuild=__CCUURREENNTT__RREEVVIISSIIOONN__
+MLbackupBuild=$(git log --pretty=format:'' | wc -l | sed "s/[ \t]//g")
 
 ###############################################################################
 # Must be run as root
@@ -34,6 +35,8 @@ MLbinDir=/usr/local/bin
 MLconfigDir=/etc/maclemon/backup
 MLcpFlags="-vp"
 MLlnFlags="-vi"
+MLsed=/usr/bin/sed
+
 
 MLrootUID=0
 if [ "$UID" -ne "$MLrootUID" ]
@@ -42,20 +45,21 @@ if [ "$UID" -ne "$MLrootUID" ]
 
 		# install.sh should check if the user is able to provide a password that can be used.
 		# Member of group admin or wheel on Mac OS X should be enough, maybe check the sudoers file as well.
-		exit 1	
+		exit 1
 	else # Yes, we are root.
 	echo
 	echo Creating directories
 	# Creating the directory to keep the scripts
-	mkdir -p $MLbinDir	
-	
+	mkdir -p $MLbinDir
+
 	# Creating the directory to keep the sample config and globalexclusions
 	mkdir -p $MLconfigDir
-	
+
 	echo
 	echo copying files
 	# copying the files
-	cp $MLcpFlags mlbackup $MLbinDir/
+	cp $MLcpFlags mlbackup $MLbinDir
+    $MLsed -i "" "s/__CCUURREENNTT__RREEVVIISSIIOONN__/$MLbackupBuild/g" "$MLbinDir/mlbackup"
 
 	cp $MLcpFlags globalexclusions $MLconfigDir/
 	cp $MLcpFlags demo.mlbackupconf.sample $MLconfigDir/
@@ -64,13 +68,13 @@ if [ "$UID" -ne "$MLrootUID" ]
 	# Setting correct Ownership of files
 
 	chown root:wheel $MLbinDir/mlbackup $MLconfigDir/globalexclusions $MLconfigDir
-	
+
 	echo
 	echo Setting correct privileges and file modes
 	# Setting correct file modes
 	chmod 755 $MLbinDir/mlbackup $MLconfigDir
 	chmod 644 $MLconfigDir/globalexclusions $MLconfigDir/demo.mlbackupconf.sample
-	
+
 	if [ ! $(sw_vers | grep -q "Server") ]
 	then
         if [ $(sw_vers | grep -q "10.[456]") ]
