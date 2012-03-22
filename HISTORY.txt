@@ -1,7 +1,11 @@
 # What's new?
 ------------------------------------------------------------
 
-## mlbackup 192
+## mlbackup 194
+Fixes issue #6: A bug in installer.sh and the installer package that broke online versioncheck.
+https://github.com/MacLemon/mlbackup/issues/6
+
+## mlbackup 193
 ### New features in mlbackup
 - An alias named "Latest" is now created after each successful backup pointing to the latest finished backup.
 - Added a new config option $MLcustomRsyncOptions that allows custom and per configuration rsync options to be used. This option is passed after all mlbackup native options and may be suitable to override these.
