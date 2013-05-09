@@ -497,7 +497,7 @@ else # No, the target does not exist
     if [ $MLadminEmail ] # Is the AdminEMail Address set?
     then # Yes, there is an address!
         debug "Sending the Admin eMail to $MLadminEmail"
-        echo "$MLtargetNotFoundNotification" | /usr/bin/mail -s "$MLhostname $MLbackupName: Target missing" $MLadminEmail
+        echo "$MLtargetNotFoundNotification" | /usr/bin/mail -s "$MLbaseCommand $MLhostname $MLbackupName: Target missing" $MLadminEmail
     else # No address set
         debug "No MLadminEmail Address set, cannot send eMail!"
         logger "$MLbaseCommand: $MLtargetNotFoundNotification"
@@ -999,7 +999,7 @@ debug "--- Sending the AdminEmail Message per mail."
 if [ $MLadminEmail ] # Is the AdminEMail Address set?
 then # Yes, there is an address!
     debug "Sending the Admin eMail to $MLadminEmail"
-    cat "$MLadminEmailMessage" | mail -s "$MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
+    cat "$MLadminEmailMessage" | mail -s "$MLbaseCommand $MLhostname $MLbackupName Report $MLbackupStatus" $MLadminEmail
 else # No address set
     debug "No MLadminEmail Address set, cannot send eMail!"
     appendToFile "$MLadminEmailMessage" "No MLadminEmail Address set. You will not receive backup notifications via eMail."
